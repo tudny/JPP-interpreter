@@ -1,0 +1,47 @@
+
+// wypisuje `str` na stdout
+# writeStr(str: String) : Unit
+
+// wypisuje `num` na stdout
+# writeInt(num: Integer) : Unit
+
+// wczytuje `str` z stdin
+# readStr() : String
+
+// wczytuje `num` z stdin
+# readInt() : Integer
+
+// zamienia zmienną typu `Integer` na `String`
+# toString(Integer) : String
+
+// zamienia zmienną typu `String` na `Integer`
+# toInt(String) : Integer
+
+// przechdzi o jeden krok w generatorze i zwraca wartość
+//  rzuca wyjątek w przypadku przejścia przez całe generator
+# next(Gen[Integer]) : Integer
+# next(Gen[Boolean]) : Boolean
+# next(Gen[String]) : Strign
+
+// sprawdza czy generator ma następny krok
+# hasNext(Gen) : Boolean
+
+
+// ==============================================
+
+// wypisanie "Ala ma kota" ma stdout
+writeStr("Ala ma kota");
+// wypisanie "11" na stdout
+writeStr(toString(11))
+
+// wczytanie stringa do zmiennej `s`
+// to polecenie zawsze się uda
+var s : String = readStr();
+
+// wypisanie "11" na stdout (to samo co `writeStr(toString())`)
+writeInt(11)
+
+// wczytanie wartości liczbowej do zmiennej
+// to polecenie może rzucić wyjątek błędnej liczby na wejściu
+var n : Integer = readInt();
+

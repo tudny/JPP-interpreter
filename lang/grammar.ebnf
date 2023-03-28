@@ -15,7 +15,9 @@ separator       Arg "," ;
 
 -- Declarations -------------------------------------------
 
-DIttem.         Item ::= Ident ":" Type "=" Expr ;
+DItemVal.       Item ::= Ident ":" Type "=" Expr ;
+
+DItem.          Item ::= Ident ":" Type ;
 
 separator       Item "," ;
 
@@ -41,6 +43,10 @@ IRetAfter.      Instr ::= "return" Expr "also" Block ";" ;
 
 IRetUnit.       Instr ::= "return" ";" ;
 
+IYield.         Instr ::= "yield" Expr ";" ;
+
+IYieldUnit.     Instr ::= "yield" ";" ;
+
 IIf.            Instr ::= "if" Expr Block ";" ;
 
 IIfElse.        Instr ::= "if" Expr Block "else" Block ";" ;
@@ -51,7 +57,11 @@ IWhileEnd.      Instr ::= "while" Expr Block "finally" Block;
 
 IFor.           Instr ::= "for" Ident "=" Expr ".." Expr ;
 
+IForGen.        Instr ::= "for" Ident "=" Expr ;
+
 IExpr.          Instr ::= Expr ";" ;
+
+IDecl.          Instr ::= Decl ;
 
 -- Types --------------------------------------------------
 
@@ -61,9 +71,9 @@ TBool.          Type ::= "Boolean" ;
 
 TString.        Type ::= "String" ;
 
-TVoid.          Type ::= "Unit" ;
+TGen.           Type ::= "Gen" "[" Type "]" ;
 
-TFun.           Type ::= "(" [Type] ")" ":" Type ;
+TVoid.          Type ::= "Unit" ;
 
 separator       Type "," ;
 
@@ -154,6 +164,8 @@ EMMinusPost.    Expr1 ::= Ident "--" ;
 EPPlusPre.      Expr1 ::= "++" Ident ;
 
 EMMinusPre.     Expr1 ::= "--" Ident ;
+
+EIf.            Expr1 ::= "?" Expr ":" Expr ;
 
 
 coercions       Expr 8 ;

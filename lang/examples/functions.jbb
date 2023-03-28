@@ -1,0 +1,114 @@
+
+fun foo() : Unit {
+    writeStr("Foooooo....");
+}
+
+fun bar(x: Integer): Unit {
+    writeStr("Your number is...\n");
+    writeInt(x);
+}
+
+fun putSqRef(x: Integer): Unit {
+    x = x * x;
+    writeStr("Your number squared is...\n");
+    write(x);
+}
+
+var x: Integer = 10;
+putSqRef(x);
+// x będzie równy 100
+
+
+fun putSqCp(new x: Integer): Unit {
+    x = x * x;
+    writeStr("Your number squared is...\n");
+    write(x);
+}
+
+var x: Integer = 10;
+putSqCp(x);
+// x będzie równy 10
+
+
+fun sqGen(n: Integer): Gen[Integer] {
+    var sq: Integer = 0;
+    for k = 1..n {
+        var odd: Integer = 2 * k - 1;
+        sq = sq + odd;
+        yield sq;
+    }
+}
+
+
+fun printProgress(n: Integer): Gen[Unit] {
+    for k = 1..n {
+        yield;
+        writeStr("Done " + toString(k) + " out of " + toString(n) + " steps.");
+    }
+}
+
+fun veryLongFunction(): Unit {
+    var infoBar: Gen[Unit] = printProgress(3);
+    val x : String = ... <long computation>
+    next(infoBar);
+    val y : String = ... <long computation>
+    next(infoBar);
+    val z : String = ... <long computation>
+    next(infoBar);
+}
+
+
+fun succ(n: Integer) : Integer {
+    return n + 1;
+}
+
+
+fun div(a: Integer, b: Integer) {
+    return a / b also {
+        writeStr("Finishing function div successfully");
+    }
+}
+
+// Działania ma być analogiczne do
+fun div(a: Integer, b: Integer) {
+    val result: Integer = a / b;
+    writeStr("Finishing function div successfully");
+    return result;
+}
+// ale nie mamy dostępu do zmiennej `result`
+// Potencjalne zastosowanie widoczne jest w przypadku
+//  debuggowanie i szukania dzielenia przez 0 
+//  (lub innej operacji powodującej wyjątek)
+
+fun div2(a: Integer, b: Integer, error: String) {
+    return a / b also {
+        error = "b was not equal to 0";
+    };
+}
+
+// Wprowadząjąc strukturę typu stos z metodami `push`, `pop` i `top`
+//  (jak w C++) aby wziąć element ze stosu i go zwrócić musimy zapisać
+//  wartość z wywołania `top` do zmiennej. 
+
+fun take(h: Stack[Integer]): Integer {
+    return h.top() also { h.pop() };
+}
+
+// gdzie w C++ musimy zrobić
+// int take(priority_queue<int> &q) {
+//     int top = q.top();
+//     q.pop();
+//     return top;
+// }
+
+// W Javie można zrobić taki `trik` 
+// (ignorując fakt, że w Javie `pop` zwraca to samo co `peek`) 
+Stack take(Stack<Integer> s) {
+    try {
+        return s.peek();
+    } finally {
+        s.pop();
+    }
+}
+
+
