@@ -1,5 +1,11 @@
 
--- Declarations -------------------------------------------
+-- Programs -----------------------------------------------
+
+entrypoint      Program ::= [TopDecl] ;
+
+DFun.           TopDecl ::= "fun" Ident "(" [Arg] ")" ":" Type Block ;
+
+separator nonempty       TopDecl "" ;
 
 RefArg.         Arg ::= Ident ":" Type;
 
@@ -7,17 +13,23 @@ CopyArg.        Arg ::= "new" Ident ":" Type ;
 
 separator       Arg "," ;
 
-DVar.           Decl ::= "var" Ident ":" Type "=" Expr ";" ;
+-- Declarations -------------------------------------------
 
-DVal.           Decl ::= "val" Ident ":" Type "=" Expr ";" ;
+DIttem.         Item ::= Ident ":" Type "=" Expr ;
+
+separator       Item "," ;
+
+DVar.           Decl ::= "var" [Item] ";" ;
+
+DVal.           Decl ::= "val" [Item] ";" ;
 
 DSingle.        Decl ::= "lateval" Ident ":" Type ";" ;
-
-DFun.           Decl ::= "fun" Ident "(" [Arg] ")" ":" Type Block ;
 
 -- Instructions -------------------------------------------
 
 Block.          Block ::= "{" [Instr] "}" ;
+
+separator       Instr "" ;
 
 IUnit.          Instr ::= ";" ;
 
@@ -38,6 +50,8 @@ IWhile.         Instr ::= "while" Expr Block ";" ;
 IWhileEnd.      Instr ::= "while" Expr Block "finally" Block;
 
 IFor.           Instr ::= "for" Ident "=" Expr ".." Expr ;
+
+IExpr.          Instr ::= Expr ";" ;
 
 -- Types --------------------------------------------------
 
@@ -109,27 +123,27 @@ ERun.           Expr8 ::= Expr "(" [Expr] ")" ;
 
 EPow.           Expr7 ::= Expr PowOp Expr ;
 
-ENeg.           Expr7 ::= NegOp Expr ;
+ENeg.           Expr7 ::= NegOp Expr8 ;
 
-ENot.           Expr7 ::= NotOp Expr ;
+ENot.           Expr7 ::= NotOp Expr8 ;
 
-EMul.           Expr6 ::= Expr MulOp Expr ;
+EMul.           Expr6 ::= Expr6 MulOp Expr7 ;
 
-EDiv.           Expr6 ::= Expr DivOp Expr ;
+EDiv.           Expr6 ::= Expr6 DivOp Expr7 ;
 
-ESum.           Expr5 ::= Expr PlsOp Expr ;
+ESum.           Expr5 ::= Expr5 PlsOp Expr6 ;
 
-ESub.           Expr5 ::= Expr MinOp Expr ;
+ESub.           Expr5 ::= Expr5 MinOp Expr6 ;
 
-EMod.           Expr4 ::= Expr ModOp Expr ;
+EMod.           Expr4 ::= Expr4 ModOp Expr5 ;
 
-ERel.           Expr3 ::= Expr RelOp Expr ;
+ERel.           Expr3 ::= Expr3 RelOp Expr4 ;
 
-EBAnd.          Expr2 ::= Expr AndOp Expr ;
+EBAnd.          Expr2 ::= Expr2 AndOp Expr1 ;
 
-EBOr.           Expr1 ::= Expr OrOp Expr ;
+EBOr.           Expr1 ::= Expr1 OrOp Expr ;
 
-EBXor.          Expr1 ::= Expr XorOp Expr ;
+EBXor.          Expr1 ::= Expr1 XorOp Expr ;
 
 EAsgn.          Expr1 ::= Ident "=" Expr ;
 
@@ -149,6 +163,8 @@ separator       Expr "," ;
 -- Comments -----------------------------------------------
 
 comment         "#" ;
-comment         "#*" "*#" ;
 
+comment         "//" ;
+
+comment         "/*" "*/" ;
 
