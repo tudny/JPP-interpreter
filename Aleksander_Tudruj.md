@@ -22,7 +22,7 @@ fun foo_123(str1: String, new num: Integer) : Integer {
     return num = num + 1;
 }
 
-fun bar_abc(num: Integer) : unit {
+fun bar_abc(num: Integer) : Unit {
 
     // zwiększy x dwukrotnie i zmieni oryginał
     num = num * 2;
@@ -69,7 +69,7 @@ toInt(String) : Integer
 //  rzuca wyjątek w przypadku przejścia przez całe generator
 next(Gen[Integer]) : Integer
 next(Gen[Boolean]) : Boolean
-next(Gen[String]) : Strign
+next(Gen[String]) : String
 
 // sprawdza czy generator ma następny krok
 hasNext(Gen) : Boolean
