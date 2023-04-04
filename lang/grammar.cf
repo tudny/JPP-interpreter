@@ -1,0 +1,150 @@
+ 
+-- Programs -----------------------------------------------
+
+entrypoints     Program ;
+
+PProgram.       Program ::= [TopDecl] ;
+
+DFun.           TopDecl ::= "fun" Ident "(" [Arg] ")" ":" Type Block ;
+
+separator nonempty       TopDecl "" ;
+
+RefArg.         Arg ::= Ident ":" Type;
+
+CopyArg.        Arg ::= "new" Ident ":" Type ;
+
+separator       Arg "," ;
+
+-- Declarations -------------------------------------------
+
+DItemVal.       Item ::= Ident ":" Type "=" Expr ;
+
+DItem.          Item ::= Ident ":" Type ;
+
+separator       Item "," ;
+
+DVar.           Decl ::= "var" [Item] ;
+
+DVal.           Decl ::= "val" [Item] ;
+
+DSingle.        Decl ::= "lateval" Ident ":" Type ;
+
+-- Instructions -------------------------------------------
+
+IBlock.         Block ::= "{" [Instr] "}" ;
+
+separator       Instr "" ;
+
+IUnit.          Instr ::= ";" ;
+
+IRet.           Instr ::= "return" Expr ";" ;
+
+IRetUnit.       Instr ::= "return" ";" ;
+
+IYield.         Instr ::= "yield" Expr ";" ;
+
+IYieldUnit.     Instr ::= "yield" ";" ;
+
+IIf.            Instr ::= "if" Expr Block ;
+
+IIfElse.        Instr ::= "if" Expr Block "else" Block ;
+
+IWhile.         Instr ::= "while" Expr Block ;
+
+IFor.           Instr ::= "for" Ident "=" Expr ".." Expr Block ;
+
+IForGen.        Instr ::= "for" Ident "in" Expr Block ;
+
+IExpr.          Instr ::= Expr ";" ;
+
+IDecl.          Instr ::= Decl ";" ;
+
+-- Types --------------------------------------------------
+
+TInt.           Type ::= "Integer" ;
+
+TBool.          Type ::= "Boolean" ;
+
+TString.        Type ::= "String" ;
+
+TGen.           Type ::= "Gen" "[" Type "]" ;
+
+TVoid.          Type ::= "Unit" ;
+
+-- Operators ----------------------------------------------
+
+OPlus.          PlsOp ::= "+" ;
+
+OMinus.         PlsOp ::= "-" ;
+
+OMul.           MulOp ::= "*" ;
+
+ODiv.           MulOp ::= "/" ;
+
+OMod.           MulOp ::= "%" ;
+
+ONot.           NotOp ::= "!" ;
+
+ONeg.           NegOp ::= "-" ;
+
+OAnd.           AndOp ::= "&&" ;
+
+OOr.            OrOp  ::= "||" ;
+
+-- Equality -----------------------------------------------
+
+REq.            RelOp ::= "==" ;
+
+RNeq.           RelOp ::= "!=" ;
+
+-- Relations ----------------------------------------------
+
+RLt.            RelOp ::= "<" ;
+
+RGt.            RelOp ::= ">" ;
+
+RLeq.           RelOp ::= "<=" ;
+
+RGeq.           RelOp ::= ">=" ;
+
+-- Expressions --------------------------------------------
+
+EVarName.       Expr6 ::= Ident ;
+
+EIntLit.        Expr6 ::= Integer ;
+
+EBoolLitTrue.   Expr6 ::= "true" ;
+
+EBoolLitFalse.  Expr6 ::= "false" ;
+
+ERun.           Expr6 ::= Ident "(" [Expr] ")" ;
+
+EStringLit.     Expr6 ::= String ;
+
+ENeg.           Expr5 ::= NegOp Expr6 ;
+
+ENot.           Expr5 ::= NotOp Expr6 ;
+
+EMul.           Expr4 ::= Expr4 MulOp Expr5 ;
+
+ESum.           Expr3 ::= Expr3 PlsOp Expr4 ;
+
+ERel.           Expr2 ::= Expr2 RelOp Expr3 ;
+
+EBAnd.          Expr1 ::= Expr2 AndOp Expr1 ;
+
+EBOr.           Expr ::= Expr1 OrOp Expr ;
+
+
+coercions       Expr 6 ;
+
+separator       Expr "," ;
+
+-- Comments -----------------------------------------------
+
+comment         "#" ;
+
+comment         "//" ;
+
+comment         "/*" "*/" ;
+
