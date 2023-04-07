@@ -31,8 +31,6 @@ DVar.           Decl ::= "var" [Item] ;
 
 DVal.           Decl ::= "val" [Item] ;
 
-DSingle.        Decl ::= "lateval" Ident ":" Type ;
-
 -- Instructions -------------------------------------------
 
 IBlock.         Block ::= "{" [Instr] "}" ;

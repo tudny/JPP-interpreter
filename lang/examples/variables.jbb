@@ -19,15 +19,6 @@ val the_answer : Integer = 42;
 // Błąd kompilacji - nie można zmienić wartości stałej
 the_answer = 43; 
 
-// Utworzenie stałej bez wartości.
-// Initializacja nastąpi później
-lateval the_other_answer : Integer;
-
-// Zmienną lateval można ustawić dokładnie raz
-the_other_answer = 43;
-
-// Błąd kompilacji - nie można zmienić wartości stałej
-the_other_answer = 44;
 
 // Deklaracja i inicializacja wielu zmiennych
 var a : Integer = 10, b : Integer = 20, c : Integer = 30;
@@ -50,10 +41,6 @@ s = s + " " + t;
 
 // Utworzenie stałej the_question
 val the_question : String = "What is the answer to the ultimate question of life, the universe and everything?";
-lateval the_str_answer : String;
-
-the_str_anwer = "The answer to life, the universe, and everything is " + toString(the_answer);
-
 
 // Wartości logiczne
 var b2 : Boolean = true;
