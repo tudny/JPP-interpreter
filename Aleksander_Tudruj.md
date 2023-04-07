@@ -9,6 +9,19 @@
 
 Typ języka: imperatywny
 
+Język nie posiada szczególnych udziwnień w porównaniu do Latte.
+
+Zmienne `var` są mutowalne, `val` są niemutowalne.
+
+Przy przekazaniu argumentów do funkcji nie są one kopiowane, tylko przekazywane przez referencję.
+
+Aby przekazać kopię należy dopisać słowo kluczowe `new` przed typem.
+
+Dla pętli for dodano słowo kluczowe `finally`, które pozwala
+zadeklarować blok kodu, który zostanie wykonany po zakończeniu pętli, lecz tylko wtedy, gdy pętla została wykonana. W przeciwnym wypadku blok ten nie zostanie wykonany. Przykładem przerwania pętli jest `break`.
+
+Generatory typowane są przez `Gen[T]`, gdzie `T` jest typem elementów generowanych przez generator.
+
 BNF w pliku "lang/grammar.cf"
 
 Przykłady użycia w plikach "lang/examples/*.jbb"
@@ -66,7 +79,7 @@ toString(Integer) : String
 // zamienia zmienną typu `String` na `Integer`
 toInt(String) : Integer
 
-// przechdzi o jeden krok w generatorze i zwraca wartość
+// przechodzi o jeden krok w generatorze i zwraca wartość
 //  rzuca wyjątek w przypadku przejścia przez całe generator
 next(Gen[Integer]) : Integer
 next(Gen[Boolean]) : Boolean
