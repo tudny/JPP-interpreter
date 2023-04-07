@@ -6,8 +6,8 @@ var y : String = "Hello, World\n!";
 x = 42;
 y = "Witaj, świecie!\n";
 
-var a = 42;
-var b = 11;
+var a: Integer = 42;
+var b: Integer = 11;
 
 a == x;  // prawda
 a != y;  // fałsz
@@ -22,17 +22,14 @@ a >= b;  // prawda
 a <= x;  // prawda
 a >= x;  // prawda
 
-var b0 = False;
-var b1 = True;
+var b0: Boolean = False;
+var b1: Boolean = True;
 
 // logiczny `and`
 b0 && b1;   // fałsz
 
 // logiczny `or`
 b0 || b1;   // prawda
-
-// logiczny `xor`
-b0 ^^ b1;   // prawda
 
 // logiczny `not`
 !b0;        // prawda
@@ -50,12 +47,10 @@ x * y;  // 432
 x / 2;  // 9
 x / 5;  // 3
 18 % 5; // 3
-2^4;    // 16
 
-x++;    // 18. Wartość x po operacji 19
-++y;    // 25. Wartość y po operacji 25
+x++;    // Wartość x po operacji: 19
 // analogicznie operator `--`
 
 // operator ternarny
-True ? 1 : 2;   // 1
-False ? 1 : 2;  // 2
+true ? 1 : 2;   // 1
+false ? 1 : 2;  // 2

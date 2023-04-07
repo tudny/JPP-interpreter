@@ -50,12 +50,11 @@ s = s + " " + t;
 
 // Utworzenie stałej the_question
 val the_question : String = "What is the answer to the ultimate question of life, the universe and everything?";
+lateval the_str_answer : String;
 
-lateval the_str_anwer : String = "The answer to life, the universe, and everything is " + toString(the_answer)
+the_str_anwer = "The answer to life, the universe, and everything is " + toString(the_answer);
 
 
 // Wartości logiczne
-var b0 : Boolean = True;
-var b1 : Boolean = False;
 var b2 : Boolean = true;
 var b3 : Boolean = false;

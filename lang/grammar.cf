@@ -3,15 +3,19 @@
 
 entrypoints     Program ;
 
-PProgram.       Program ::= [TopDecl] ;
+PProgram.       Program ::= [Instr] ;
 
-DFun.           TopDecl ::= "fun" Ident "(" [Arg] ")" ":" Type Block ;
+DFun.           Instr ::= "fun" Ident "(" [Arg] ")" ":" Type Block ;
 
-separator nonempty       TopDecl "" ;
+-- separator nonempty       TopDecl "" ;
 
-RefArg.         Arg ::= Ident ":" Type;
+RefMutArg.      Arg ::= "var" Ident ":" Type;
 
-CopyArg.        Arg ::= "new" Ident ":" Type ;
+RefConstArg.    Arg ::= "val" Ident ":" Type;
+
+CopyMutArg.     Arg ::= "var" Ident ":" "new" Type ;
+
+CopyConstArg.   Arg ::= "val" Ident ":" "new" Type ;
 
 separator       Arg "," ;
 
@@ -37,6 +41,12 @@ separator       Instr "" ;
 
 IUnit.          Instr ::= ";" ;
 
+IIncr.          Instr ::= Ident "++" ";" ;
+
+IDecr.          Instr ::= Ident "--" ";" ;
+
+IAss.           Instr ::= Ident "=" Expr ";" ;
+
 IRet.           Instr ::= "return" Expr ";" ;
 
 IRetUnit.       Instr ::= "return" ";" ;
@@ -50,6 +60,8 @@ IIf.            Instr ::= "if" Expr Block ;
 IIfElse.        Instr ::= "if" Expr Block "else" Block ;
 
 IWhile.         Instr ::= "while" Expr Block ;
+
+IWhileFin.      Instr ::= "while" Expr Block "finally" Block ;
 
 IFor.           Instr ::= "for" Ident "=" Expr ".." Expr Block ;
 
@@ -135,6 +147,7 @@ EBAnd.          Expr1 ::= Expr2 AndOp Expr1 ;
 
 EBOr.           Expr ::= Expr1 OrOp Expr ;
 
+ETer.           Expr ::= Expr1 "?" Expr1 ":" Expr ;
 
 coercions       Expr 6 ;
 

@@ -9,20 +9,21 @@
 
 Typ języka: imperatywny
 
-EBNF w pliku "lang/grammar.ebnf"
+BNF w pliku "lang/grammar.cf"
 
 Przykłady użycia w plikach "lang/examples/*.jbb"
 
 ```kotlin
 
-fun foo_123(str1: String, new num: Integer) : Integer {
+fun foo_123(val str1: String, var num: new Integer) : Integer {
     writeStr(str1);
 
     // zwiększy kopię x o 1 i go zwróci
-    return num = num + 1;
+    num = num + 1;
+    return num;
 }
 
-fun bar_abc(num: Integer) : Unit {
+fun bar_abc(var num: Integer) : Unit {
 
     // zwiększy x dwukrotnie i zmieni oryginał
     num = num * 2;
@@ -30,7 +31,7 @@ fun bar_abc(num: Integer) : Unit {
 
 fun main() : Unit {
     // x = -1
-    var x = 10 - 11;
+    var x: Integer = 10 - 11;
 
     // na stdout wpisze "abc", zwróci 0, zmienna x będzie miała wartość -1
     foo_123("abc", x);

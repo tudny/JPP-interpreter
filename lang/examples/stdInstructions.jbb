@@ -1,5 +1,5 @@
-var x = 0;
-var y = 1;
+var x: Integer = 0;
+var y: Integer = 1;
 
 if x != y {
     x = y;
@@ -7,43 +7,43 @@ if x != y {
 
 // ==============================================
 
-var x = 10;
-var y = 11;
+var x: Integer = 10;
+var y: Integer = 11;
 
 if x == y {
-    writeStr("x and y and equal")
+    writeStr("x and y and equal");
 } else {
-    writeStr("x and y and different")
+    writeStr("x and y and different");
 }
 
 // ==============================================
 
-var fst = 0;
-var snd = 1;
-val N = 100;
+var fst: Integer = 0;
+var snd: Integer = 1;
+val N: Integer = 100;
 
 while snd < N {
-    var temp = snd;
+    var temp: Integer = snd;
     snd = snd + fst;
     fst = temp;
 }
 
 // ==============================================
 
-var x = 11;
+var x: Integer = 11;
 
 while x > 0 {
     if x == 10 { break; }
-    --x;
+    x--;
 } finally {
     writeStr("X was never equal to 10");
 }
 
-var x = 11;
+var x: Integer = 11;
 
 while x > 0 {
     if x == 20 { break; }
-    --x;
+    x--;
 } finally {
     writeStr("X was never equal to 20");
 }

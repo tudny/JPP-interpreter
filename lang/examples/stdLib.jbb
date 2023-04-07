@@ -32,14 +32,14 @@
 // wypisanie "Ala ma kota" ma stdout
 writeStr("Ala ma kota");
 // wypisanie "11" na stdout
-writeStr(toString(11))
+writeStr(toString(11));
 
 // wczytanie stringa do zmiennej `s`
 // to polecenie zawsze się uda
 var s : String = readStr();
 
 // wypisanie "11" na stdout (to samo co `writeStr(toString())`)
-writeInt(11)
+writeInt(11);
 
 // wczytanie wartości liczbowej do zmiennej
 // to polecenie może rzucić wyjątek błędnej liczby na wejściu
