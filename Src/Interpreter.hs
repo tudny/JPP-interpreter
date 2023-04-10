@@ -29,35 +29,19 @@ runFile :: ParseFun Program -> FilePath -> IO ()
 runFile p f = putStrLn f >> readFile f >>= run p
 
 run :: ParseFun Program -> String -> IO ()
-run p s =
-  case p ts of
-    Left err -> do
-      putStrLn "\nParse              Failed...\n"
-      putStrLn err
-      exitFailure
-    Right tree -> do
-      putStrLn "\nParse Successful!"
-      putStrLn "TypeChecking..."
-      case typeCheck tree of
-        Left err -> do
-          putStrLn "\nTypeCheck          Failed...\n"
-          putStrLn err
-          exitFailure
-        Right tree -> do
-          putStrLn "\nTypeCheck Successful!"
-          putStrLn "\nInterpreting..."
-          case evaluate tree of
-            Left err -> do
-              putStrLn "\nInterpret          Failed...\n"
-              putStrLn err
-              exitFailure
-            Right io -> do
-              putStrLn "\nInterpret Successful!"
-              io
+run p s = case go of
+  Left err -> do
+    putStrLn "\nError!\n"
+    putStrLn err
+    exitFailure
+  Right io -> io
   where
-  ts = myLexer s
-  showPosToken ((l,c),t) = concat [ show l, ":", show c, "\t", show t ]
-
+    ts = myLexer s
+    go = do 
+      tree <- p ts
+      tree <- typeCheck tree
+      evaluate tree
+  
 usage :: IO ()
 usage = do
   putStrLn $ unlines
