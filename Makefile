@@ -4,4 +4,4 @@ all:
 clean:
 
 generate:
-	bnfc -m -d --haskell -p Parser -o src lang/jabba.cf
+	bnfc -m -d --haskell -p Src -o . lang/jabba.cf
