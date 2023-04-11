@@ -49,14 +49,15 @@ checkTypeI (DFun i as t b) = do
         else pure ()
     -- add variables to type environment
     let varTypes = map (\(i, t, m) -> (i, (t, m))) vars
-    retType <- localState (Map.union (Map.fromList varTypes)) (checkTypeB b)
+    let functionType = VTFun (map (\(_, t, _) -> t) vars) (mapArgType t)
+    retType <- localState (Map.union (Map.fromList ((i, (functionType, VMConst)) : varTypes))) (checkTypeB b)
     let resolvedReturnType = Data.Maybe.fromMaybe VTVoid retType
     if resolvedReturnType /= mapArgType t
         then throwError "Return type does not match function type"
-        else 
+        else do 
             -- add function to type environment
-            let funType = VTFun (map (\(_, t, _) -> t) vars) (mapArgType t)
-            in localState (Map.insert i (funType, VMConst)) (pure Nothing)
+            modify (Map.insert i (functionType, VMConst))
+            pure Nothing
 checkTypeI (IIncr v) = do
     integerMutableOperation v
     pure Nothing
