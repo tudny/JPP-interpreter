@@ -5,12 +5,6 @@
 // wypisuje `num` na stdout
 # writeInt(num: Integer) : Unit
 
-// wczytuje `str` z stdin
-# readStr() : String
-
-// wczytuje `num` z stdin
-# readInt() : Integer
-
 // zamienia zmienną typu `Integer` na `String`
 # toString(Integer) : String
 
@@ -34,14 +28,6 @@ writeStr("Ala ma kota");
 // wypisanie "11" na stdout
 writeStr(toString(11));
 
-// wczytanie stringa do zmiennej `s`
-// to polecenie zawsze się uda
-var s : String = readStr();
-
 // wypisanie "11" na stdout (to samo co `writeStr(toString())`)
 writeInt(11);
-
-// wczytanie wartości liczbowej do zmiennej
-// to polecenie może rzucić wyjątek błędnej liczby na wejściu
-var n : Integer = readInt();
 

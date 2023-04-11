@@ -21,6 +21,8 @@ var b3: Boolean = b1 && b2;  // b3 = False
 b3              = b1 || b2;  // b3 = True
 
 var s: String = "Hello";
+// Pozwalamy na konkatenację stringów.
+// Nie pozwalamy na mieszanie typów dla operacji `+`.
 s = s + " World";   // s = "Hello World"
 
 s = "Kocham Haskella"; // s = "Kocham Haskella"

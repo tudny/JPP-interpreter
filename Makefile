@@ -16,7 +16,8 @@ ALEX_OPTS  = --ghc
 
 # Default goal.
 
-all : Src/Interpreter
+# all : Interpreter
+all : Test
 
 Interpreter : Src/Interpreter
 

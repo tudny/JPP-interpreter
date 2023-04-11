@@ -60,12 +60,6 @@ writeStr(str: String) : Unit
 // wypisuje `num` na stdout
 writeInt(num: Integer) : Unit
 
-// wczytuje `str` z stdin
-readStr() : String
-
-// wczytuje `num` z stdin
-readInt() : Integer
-
 // zamienia zmienną typu `Integer` na `String`
 toString(Integer) : String
 
