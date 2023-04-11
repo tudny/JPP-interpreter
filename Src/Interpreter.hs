@@ -39,7 +39,7 @@ run p s = case go of
     ts = myLexer s
     go = do 
       tree <- p ts
-      tree <- typeCheck tree
+      typeCheck tree
       evaluate tree
   
 usage :: IO ()
