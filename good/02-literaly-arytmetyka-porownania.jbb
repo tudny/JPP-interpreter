@@ -1,0 +1,26 @@
+
+var a: Integer = 23;
+var b: Integer = 19;
+var c: Integer = a + b; // c = 42
+
+var z: Integer = a - b; // z = 4
+z = a * b;              // z = 437
+z = a / b;              // z = 1
+
+var b: Boolean = True;
+b = a < b;  // b = False
+b = a > b;  // b = True
+b = a <= b; // b = False
+b = a >= b; // b = True
+b = a == b; // b = False
+b = a != b; // b = True
+
+var b1: Boolean = True;
+var b2: Boolean = False;
+var b3: Boolean = b1 && b2;  // b3 = False
+b3              = b1 || b2;  // b3 = True
+
+var s: String = "Hello";
+s = s + " World";   // s = "Hello World"
+
+s = "Kocham Haskella"; // s = "Kocham Haskella"

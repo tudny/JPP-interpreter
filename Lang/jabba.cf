@@ -53,6 +53,10 @@ IYield.         Instr ::= "yield" Expr ";" ;
 
 IYieldUnit.     Instr ::= "yield" ";" ;
 
+IBreak.         Instr ::= "break" ";" ;
+
+ICont.          Instr ::= "continue" ";" ;
+
 IIf.            Instr ::= "if" Expr Block ;
 
 IIfElse.        Instr ::= "if" Expr Block "else" Block ;
