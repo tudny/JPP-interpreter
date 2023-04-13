@@ -16,14 +16,16 @@ import Control.Monad.Except (ExceptT, MonadError (throwError), runExceptT)
 import Control.Monad.State (StateT (runStateT), State, runState, evalState, MonadState (get, put), modify)
 import Data.List ( nub )
 import qualified Data.Maybe
+import Src.Errors
+    ( ErrType (..),
+      ErrHolder (TypeChecker),
+      Err )
+import Src.Types ( VarMutability(..), VarType(..) )
 
 type RetType = Maybe VarType
-data VarType = VTInt | VTBool | VTString | VTVoid | VTFun [VarType] VarType deriving (Eq, Show)
-data VarMutability = VMMut | VMConst deriving (Eq, Show)
 
-type Err = Either String
 type TypeEnv = Map.Map Ident (VarType, VarMutability)
-type IM a = ExceptT String (State TypeEnv) a
+type IM a = ExceptT ErrHolder (State TypeEnv) a
 
 localState :: (TypeEnv -> TypeEnv) -> IM a -> IM a
 localState f m = do
@@ -46,8 +48,8 @@ checkTypeI (IIncr pos v) = do
     case t of
         VTInt -> case m of
             VMMut -> pure Nothing
-            VMConst -> throwError $ "Cannot increment immutable " ++ show v ++ " of type " ++ show t ++ " at " ++ show pos ++ "."
-        _ -> throwError $ "Cannot increment " ++ show v ++ " of type " ++ show t ++ " at " ++ show pos ++ "."
+            VMConst -> throwError $ TypeChecker pos $ ImmutVar v
+        _ -> throwError $ TypeChecker pos $ WrongType v t [VTInt]
 checkTypeI i = pure Nothing
 
 getVarType :: BNFC'Position -> Ident -> IM (VarType, VarMutability)
@@ -55,4 +57,4 @@ getVarType pos v = do
     env <- get
     case Map.lookup v env of
         Just (t, m) -> pure (t, m)
-        Nothing -> throwError $ "Variable " ++ show v ++ " not in scope."
+        Nothing -> throwError $ TypeChecker pos $ NotDeclVar v

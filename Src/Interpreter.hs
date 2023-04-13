@@ -8,7 +8,7 @@ import Prelude
   , Show, show
   , IO, (>>), (>>=), mapM_, putStrLn
   , FilePath
-  , getContents, readFile
+  , getContents, readFile, print
   )
 import System.Environment ( getArgs )
 import System.Exit        ( exitFailure )
@@ -21,6 +21,8 @@ import Src.Jabba.Print ( Print, printTree )
 import Src.Jabba.Skel  ()
 import Src.TypeChecker ( typeCheck )
 import Src.Evaluator   ( evaluate )
+import Src.Errors      ( ErrHolder (ParserErr) )
+import Src.Utils       ( left )
 
 type Err        = Either String
 type ParseFun a = [Token] -> Err a
@@ -32,16 +34,16 @@ run :: ParseFun Program -> String -> IO ()
 run p s = case go of
   Left err -> do
     putStrLn "\nError!\n"
-    putStrLn err
+    print err
     exitFailure
   Right io -> io
   where
     ts = myLexer s
-    go = do 
-      tree <- p ts
+    go = do
+      tree <- left ParserErr $ p ts
       typeCheck tree
       evaluate tree
-  
+
 usage :: IO ()
 usage = do
   putStrLn $ unlines
