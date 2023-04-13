@@ -1,5 +1,7 @@
 module Src.Types where
 
+import Src.Jabba.Abs ( Type' (..), Type (..) )
+
 data VarType 
     = VTInt 
     | VTBool 
@@ -13,6 +15,14 @@ data VarMutability
     = VMMut 
     | VMConst 
     deriving (Eq)
+
+
+absTypeToVarType :: Type -> VarType
+absTypeToVarType (TInt _) = VTInt
+absTypeToVarType (TBool _) = VTBool
+absTypeToVarType (TString _) = VTString
+absTypeToVarType (TVoid _) = VTVoid
+absTypeToVarType TGen {} = undefined
 
 
 instance Show VarType where
