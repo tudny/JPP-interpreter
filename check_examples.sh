@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Create parser tester `Test` 
+# Create parser tester `Test`
 make Test > /dev/null 2>&1
 
 for file in Lang/Examples/*.jbb; do

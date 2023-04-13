@@ -16,11 +16,11 @@ ALEX_OPTS  = --ghc
 
 # Default goal.
 
-all : Interpreter Test
+all : Interpreter Test TypeCheckerTest
 
 Interpreter : Src/Interpreter
-
 Test : Src/Jabba/Test
+TypeCheckerTest : Src/TypeCheckerTest
 
 # Rules for building the parser.
 
@@ -38,6 +38,9 @@ Src/Interpreter : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/P
 
 Src/Jabba/Test : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/Jabba/Test.hs
 	${GHC} ${GHC_OPTS} $@ -o Test
+
+Src/TypeCheckerTest : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/TypeCheckerTest.hs
+	${GHC} ${GHC_OPTS} $@ -o TypeCheckerTest
 
 # Rules for cleaning generated files.
 

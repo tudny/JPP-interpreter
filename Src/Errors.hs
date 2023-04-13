@@ -14,6 +14,7 @@ data ErrType
     | NotDeclVar Ident
     | NotDeclFun Ident
     | WrongType Ident VarType [VarType]
+    deriving (Eq)
 
 
 showPos :: BNFC'Position -> String

@@ -36,7 +36,10 @@ localState f m = do
     return r
 
 typeCheck :: Program -> Err ()
-typeCheck p = evalState (runExceptT (checkTypeP p)) Map.empty
+typeCheck = typeCheckWithEnv Map.empty
+
+typeCheckWithEnv :: TypeEnv -> Program -> Either ErrHolder ()
+typeCheckWithEnv env p = evalState (runExceptT (checkTypeP p)) env
 
 checkTypeP :: Program -> IM ()
 checkTypeP (PProgram _ is) = mapM_ checkTypeI is 
