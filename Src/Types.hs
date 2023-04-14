@@ -7,8 +7,10 @@ data VarType
     | VTBool 
     | VTString 
     | VTVoid 
-    | VTFun [(VarType, VarMutability, VarRef)] VarType 
     deriving (Eq)
+
+type FnArg = (VarType, VarMutability, VarRef)
+data FnType = Fn [FnArg] VarType deriving (Eq)
 
 
 data VarMutability
@@ -36,7 +38,10 @@ instance Show VarType where
     show VTString = "String"
     show VTBool = "Boolean"
     show VTVoid = "Unit"
-    show (VTFun args ret) = "(" ++ show args ++ ") -> " ++ show ret
+
+
+instance Show FnType where
+    show (Fn args ret) = "(" ++ show args ++ ") -> " ++ show ret
 
 
 instance Show VarMutability where

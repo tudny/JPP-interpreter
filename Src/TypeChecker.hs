@@ -28,7 +28,7 @@ import Src.Errors
     ( ErrType (..),
       ErrHolder (TypeChecker),
       Err )
-import Src.Types ( VarMutability (..), VarType (..), absTypeToVarType, VarRef (..) )
+import Src.Types ( VarMutability (..), VarType (..), absTypeToVarType, VarRef (..), FnType (..), FnArg (..) )
 import Debug.Trace (trace)
 
 data RetType'
@@ -40,10 +40,12 @@ data RetType'
 type RetType = (RetType', Bool)
 
 type TypeEnv = Map.Map Ident (VarType, VarMutability)
-type IM a = ExceptT ErrHolder (State TypeEnv) a
+type FnEnv = Map.Map Ident (FnType, TypeEnv)
+type Env = (TypeEnv, FnEnv)
+type IM a = ExceptT ErrHolder (State Env) a
 
 
-localState :: (TypeEnv -> TypeEnv) -> IM a -> IM a
+localState :: (Env -> Env) -> IM a -> IM a
 localState f m = do
     s <- get
     put (f s)
@@ -53,10 +55,10 @@ localState f m = do
 
 
 typeCheck :: Program -> Err ()
-typeCheck = typeCheckWithEnv Map.empty
+typeCheck = typeCheckWithEnv (Map.empty, Map.empty)
 
 
-typeCheckWithEnv :: TypeEnv -> Program -> Either ErrHolder ()
+typeCheckWithEnv :: Env -> Program -> Either ErrHolder ()
 typeCheckWithEnv env p = evalState (runExceptT (checkTypeP p)) env
 
 
@@ -126,11 +128,22 @@ checkTypeI (IFor pos v e1 e2 bl) = do
     n2 <- checkTypeE e2
     if n1 /= VTInt || n2 /= VTInt
         then throwError $ TypeChecker pos $ ForRangeTypeMismatch n1 n2
-        else localState (Map.insert v (VTInt, VMConst)) $ checkTypeI (IWhile pos (EBoolLitTrue pos) bl)
+        else localState (onFirst $ Map.insert v (VTInt, VMConst)) $ checkTypeI (IWhile pos (EBoolLitTrue pos) bl)
         >>= \(x, _) -> pure (x, False)
 checkTypeI IForGen {} = undefined
 checkTypeI (IBBlock _ b) = checkTypeB b
-checkTypeI (DFun pos v args t b) = undefined -- TODO: implement
+checkTypeI (DFun pos f args t b) = do
+    args' <- mapM resolveFnArg args
+    saveEnv <- get
+
+    pure (None, False)
+
+
+resolveFnArg :: Arg -> IM (Ident, VarType, VarMutability, VarRef)
+resolveFnArg (RefMutArg    _ v t) = pure (v, absTypeToVarType t, VMMut,   VRRef)
+resolveFnArg (RefConstArg  _ v t) = pure (v, absTypeToVarType t, VMConst, VRRef)
+resolveFnArg (CopyMutArg   _ v t) = pure (v, absTypeToVarType t, VMMut,   VRCopy)
+resolveFnArg (CopyConstArg _ v t) = pure (v, absTypeToVarType t, VMConst, VRCopy)
 
 
 checkTypeB :: Block -> IM RetType
@@ -235,17 +248,17 @@ getRelOpName (RGeq _) = "greater or equal"
 
 getVarType :: BNFC'Position -> Ident -> IM (VarType, VarMutability)
 getVarType pos v = do
-    env <- get
-    case Map.lookup v env of
+    (envT, envF) <- get
+    case Map.lookup v envT of
         Just (t, m) -> pure (t, m)
         Nothing -> throwError $ TypeChecker pos $ NotDeclVar v
 
 
 getF :: BNFC'Position -> Ident -> IM ([(VarType, VarMutability, VarRef)], VarType)
 getF pos fn = do
-    env <- get
-    case Map.lookup fn env of
-        Just (VTFun args ret, _) -> pure (args, ret)
+    (envT, envF) <- get
+    case Map.lookup fn envF of
+        Just (Fn args ret, _) -> pure (args, ret)
         _ -> throwError $ TypeChecker pos $ NotDeclFun fn
 
 
@@ -296,11 +309,15 @@ checkAllNamesAreUnique s ((v, t, pos):xs) = do
         else checkAllNamesAreUnique (Set.insert v s) xs
 
 
+onFirst :: (a -> b) -> (a, c) -> (b, c)
+onFirst f (a, c) = (f a, c)
+
+
 declareNewVariables :: BNFC'Position -> [Item' BNFC'Position] -> VarMutability -> IM RetType
 declareNewVariables pos its m = do
     items <- mapM checkTypeItem its
     checkAllNamesAreUnique Set.empty items
-    mapM_ (\(v, t, _) -> modify (Map.insert v (t, m))) items
+    mapM_ (\(v, t, _) -> modify (onFirst $ Map.insert v (t, m))) items
     pure (None, False)
 
 
