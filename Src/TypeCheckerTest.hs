@@ -15,7 +15,9 @@ testFiles = [
     ("12-001-const", ImmutVar (Ident "x")),
     ("12-002-multiname", VarAlreadyDecl (Ident "x")),
     ("12-003-wrong-type", WrongType (Ident "s") VTString [VTInt]),
-    ("12-004-multi-wrong-type", WrongType (Ident "x") VTInt [VTString])
+    ("12-004-wrong-type-var", WrongType (Ident "s") VTString [VTInt]),
+    ("12-005-multi-wrong-type", WrongType (Ident "x") VTInt [VTString]),
+    ("12-006-multi-wrong-type-var", WrongType (Ident "x") VTInt [VTString])
   ]
 
 inlineTests :: [InlineTestCase]
