@@ -90,6 +90,193 @@ inlineTests = [
         (Ident "x", (VTInt, VMConst)) -- val x: Integer
         ],
       ExprMutPass 0
+    ),
+    (
+      "-\"abc\";",
+      Map.empty,
+      WrongTypeOp "negation" VTString
+    ),
+    (
+      "!\"abc\";",
+      Map.empty,
+      WrongTypeOp "negation" VTString
+    ),
+    (
+      "-true;",
+      Map.empty,
+      WrongTypeOp "negation" VTBool
+    ),
+    (
+      "!1;",
+      Map.empty,
+      WrongTypeOp "negation" VTInt
+    ),
+    (
+      "1+\"abc\";",
+      Map.empty,
+      WrongTypeBiOp "addition" VTInt VTString
+    ),
+    (
+      "1-\"abc\";",
+      Map.empty,
+      WrongTypeBiOp "subtraction" VTInt VTString
+    ),
+    (
+      "\"abc\"+1;",
+      Map.empty,
+      WrongTypeBiOp "addition" VTString VTInt
+    ),
+    (
+      "\"abc\"-1;",
+      Map.empty,
+      WrongTypeBiOp "subtraction" VTString VTInt
+    ),
+    (
+      "\"abc\"*1;",
+      Map.empty,
+      WrongTypeBiOp "multiplication" VTString VTInt
+    ),
+    (
+      "\"abc\"/1;",
+      Map.empty,
+      WrongTypeBiOp "division" VTString VTInt
+    ),
+    (
+      "\"abc\"%1;",
+      Map.empty,
+      WrongTypeBiOp "modulo" VTString VTInt
+    ),
+    (
+      "\"abc\"<1;",
+      Map.empty,
+      WrongTypeBiOp "less than" VTString VTInt
+    ),
+    (
+      "\"abc\">1;",
+      Map.empty,
+      WrongTypeBiOp "greater than" VTString VTInt
+    ),
+    (
+      "\"abc\"<=1;",
+      Map.empty,
+      WrongTypeBiOp "less or equal" VTString VTInt
+    ),
+    (
+      "\"abc\">=1;",
+      Map.empty,
+      WrongTypeBiOp "greater or equal" VTString VTInt
+    ),
+    (
+      "\"abc\"==1;",
+      Map.empty,
+      WrongTypeBiOp "equality" VTString VTInt
+    ),
+    (
+      "\"abc\"!=1;",
+      Map.empty,
+      WrongTypeBiOp "inequality" VTString VTInt
+    ),
+    (
+      "\"abc\"&&1;",
+      Map.empty,
+      WrongTypeBiOp "and" VTString VTInt
+    ),
+    (
+      "\"abc\"||1;",
+      Map.empty,
+      WrongTypeBiOp "or" VTString VTInt
+    ),
+    (
+      "1+true;",
+      Map.empty,
+      WrongTypeBiOp "addition" VTInt VTBool
+    ),
+    (
+      "1-true;",
+      Map.empty,
+      WrongTypeBiOp "subtraction" VTInt VTBool
+    ),
+    (
+      "true+1;",
+      Map.empty,
+      WrongTypeBiOp "addition" VTBool VTInt
+    ),
+    (
+      "true-1;",
+      Map.empty,
+      WrongTypeBiOp "subtraction" VTBool VTInt
+    ),
+    (
+      "true*1;",
+      Map.empty,
+      WrongTypeBiOp "multiplication" VTBool VTInt
+    ),
+    (
+      "true/1;",
+      Map.empty,
+      WrongTypeBiOp "division" VTBool VTInt
+    ),
+    (
+      "true%1;",
+      Map.empty,
+      WrongTypeBiOp "modulo" VTBool VTInt
+    ),
+    (
+      "true<1;",
+      Map.empty,
+      WrongTypeBiOp "less than" VTBool VTInt
+    ),
+    (
+      "true>1;",
+      Map.empty,
+      WrongTypeBiOp "greater than" VTBool VTInt
+    ),
+    (
+      "true<=1;",
+      Map.empty,
+      WrongTypeBiOp "less or equal" VTBool VTInt
+    ),
+    (
+      "true>=1;",
+      Map.empty,
+      WrongTypeBiOp "greater or equal" VTBool VTInt
+    ),
+    (
+      "true==1;",
+      Map.empty,
+      WrongTypeBiOp "equality" VTBool VTInt
+    ),
+    (
+      "true!=1;",
+      Map.empty,
+      WrongTypeBiOp "inequality" VTBool VTInt
+    ),
+    (
+      "true?1:\"abc\";",
+      Map.empty,
+      TernaryMismatch VTInt VTString
+    ),
+    (
+      "true?1:\"abc\";",
+      Map.empty,
+      TernaryMismatch VTInt VTString
+    ),
+    (
+      "(x && y || z) ? 1 : 2;",
+      Map.fromList [
+        (Ident "x", (VTBool, VMConst)),
+        (Ident "y", (VTBool, VMConst)),
+        (Ident "z", (VTInt, VMConst))
+        ],
+      WrongTypeBiOp "or" VTBool VTInt
+    ),
+    (
+      "(x && y) ? \"ERROR\" : 1;",
+      Map.fromList [
+        (Ident "x", (VTBool, VMConst)),
+        (Ident "y", (VTBool, VMConst))
+        ],
+      TernaryMismatch VTString VTInt
     )
   ]
 
@@ -151,5 +338,8 @@ testSingleInlineCase (content, env, expected) = do
 
 main :: IO ()
 main = do
+  putStrLn "Running tests..."
+  putStrLn $ "Detected files number: " ++ show (length testFiles)
+  putStrLn $ "Detected inline tests number: " ++ show (length inlineTests) 
   mapM_ testSingleFileCase testFiles
   mapM_ testSingleInlineCase inlineTests

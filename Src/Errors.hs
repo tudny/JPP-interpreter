@@ -19,6 +19,10 @@ data ErrType
     | WrongNumberOfArgs Ident Int Int
     | ExprMutPass Int
     | ImmutMutPass Int
+    | WrongTypeOp String VarType
+    | WrongTypeBiOp String VarType VarType
+    | TernaryMismatch VarType VarType
+    | ZeroLiternalDiv
     deriving (Eq)
 
 
@@ -51,3 +55,7 @@ instance Show ErrType where
     show (WrongNumberOfArgs i ex got) = "function " ++ showI i ++ " was called with " ++ show got ++ " arguments but expected " ++ show ex ++ " arguments."
     show (ExprMutPass i) = "expression " ++ show (i + 1) ++ " was passed to a mutable reference argument."
     show (ImmutMutPass i) = "immutable variable " ++ show i ++ " was passed to a mutable reference argument."
+    show (WrongTypeOp op t) = "operator " ++ op ++ " is not defined for type " ++ show t ++ "."
+    show (WrongTypeBiOp op t1 t2) = "operator " ++ op ++ " is not defined for types " ++ show t1 ++ " and " ++ show t2 ++ "."
+    show (TernaryMismatch t1 t2) = "ternary operator has type " ++ show t1 ++ " and " ++ show t2 ++ " as branches."
+    show ZeroLiternalDiv = "division by zero literal."

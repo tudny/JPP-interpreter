@@ -6,11 +6,17 @@ import Src.Jabba.Abs ( Ident,
                        Arg' (..), Arg (..),
                        Item' (..), Item (..),
                        Decl' (..), Decl (..),
-                       Block (..), Type (..),
-                       PlsOp (..), MulOp (..),
-                       NotOp (..), NegOp (..),
+                       Block' (..), Block (..),
+                       Type' (..), Type (..),
+                       PlsOp' (..), PlsOp (..),
+                       MulOp' (..), MulOp (..),
+                       NotOp' (..), NotOp (..),
+                       NegOp' (..), NegOp (..),
+                       RelOp' (..), RelOp (..),
+                       AndOp' (..), AndOp (..),
+                       OrOp' (..), OrOp (..),
                        Expr' (..), Expr (..),
-                       BNFC'Position, Ident (..)
+                       BNFC'Position, Ident (..),
                        )
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -92,7 +98,41 @@ checkTypeE (ERun pos fn es) = do
             let args' = zip3 callArgs args [0..]
             mapM_ (checkCallArgument pos) args'
             pure ret
-checkTypeE _ = pure VTVoid -- TODO: implement
+checkTypeE (ENeg pos (ONeg _) e) = checkExprSingleOp "negation" pos e VTInt
+checkTypeE (ENot pos (ONot _) e) = checkExprSingleOp "negation" pos e VTBool
+checkTypeE (EMul pos e1 (ODiv _) (EIntLit _ 0)) = throwError $ TypeChecker pos ZeroLiternalDiv
+checkTypeE (EMul pos e1 op e2) = checkExprBiOp (getMulOpName op) pos e1 e2 VTInt
+checkTypeE (ESum pos e1 op e2) = checkExprBiOp (getSumOpName op) pos e1 e2 VTInt
+checkTypeE (ERel pos e1 op e2) = checkExprBiOp (getRelOpName op) pos e1 e2 VTInt >> pure VTBool
+checkTypeE (EBAnd pos e1 (OAnd _) e2) = checkExprBiOp "and" pos e1 e2 VTBool
+checkTypeE (EBOr pos e1 (OOr _) e2) = checkExprBiOp "or" pos e1 e2 VTBool
+checkTypeE (ETer pos eb e1 e2) = do
+    t1 <- checkTypeE e1
+    t2 <- checkTypeE e2
+    tb <- checkTypeE eb
+    if tb /= VTBool 
+        then throwError $ TypeChecker pos $ WrongTypeOp "ternary operator condition" VTBool
+        else if t1 /= t2
+            then throwError $ TypeChecker pos $ TernaryMismatch t1 t2
+            else pure t1
+
+
+getMulOpName :: MulOp -> String
+getMulOpName (OMul _) = "multiplication"
+getMulOpName (ODiv _) = "division"
+getMulOpName (OMod _) = "modulo"
+
+getSumOpName :: PlsOp -> String
+getSumOpName (OPlus _)  = "addition"
+getSumOpName (OMinus _) = "subtraction"
+
+getRelOpName :: RelOp -> String
+getRelOpName (REq _)  = "equality"
+getRelOpName (RNeq _) = "inequality"
+getRelOpName (RLt _)  = "less than"
+getRelOpName (RGt _)  = "greater than"
+getRelOpName (RLeq _) = "less or equal"
+getRelOpName (RGeq _) = "greater or equal"
 
 
 getVarType :: BNFC'Position -> Ident -> IM (VarType, VarMutability)
@@ -165,3 +205,19 @@ declareNewVariables pos its m = do
     mapM_ (\(v, t, _) -> modify (Map.insert v (t, m))) items
     pure Nothing
 
+
+checkExprSingleOp :: String -> BNFC'Position -> Expr' BNFC'Position -> VarType -> IM VarType
+checkExprSingleOp opN pos e t = do
+    t' <- checkTypeE e
+    if t == t'
+        then pure t
+        else throwError $ TypeChecker pos $ WrongTypeOp opN t'
+
+
+checkExprBiOp :: String -> BNFC'Position -> Expr' BNFC'Position -> Expr' BNFC'Position -> VarType -> IM VarType
+checkExprBiOp opN pos e1 e2 t = do
+    t1 <- checkTypeE e1
+    t2 <- checkTypeE e2
+    if t1 == t && t2 == t
+        then pure t
+        else throwError $ TypeChecker pos $ WrongTypeBiOp opN t1 t2
