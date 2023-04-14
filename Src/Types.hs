@@ -11,7 +11,7 @@ data VarType
     deriving (Eq)
 
 
-data VarMutability 
+data VarMutability
     = VMMut 
     | VMConst 
     deriving (Eq)
