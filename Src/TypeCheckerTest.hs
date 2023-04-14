@@ -6,6 +6,7 @@ import Src.Jabba.Abs
 import System.Directory.Internal.Prelude (exitFailure)
 import Src.TypeChecker (typeCheck, typeCheckWithEnv, TypeEnv)
 import qualified Data.Map as Map
+import Debug.Trace (trace)
 
 type FileTestCase = (String, ErrType)
 type InlineTestCase = (String, TypeEnv, ErrType)
@@ -17,7 +18,9 @@ testFiles = [
     ("12-003-wrong-type", WrongType (Ident "s") VTString [VTInt]),
     ("12-004-wrong-type-var", WrongType (Ident "s") VTString [VTInt]),
     ("12-005-multi-wrong-type", WrongType (Ident "x") VTInt [VTString]),
-    ("12-006-multi-wrong-type-var", WrongType (Ident "x") VTInt [VTString])
+    ("12-006-multi-wrong-type-var", WrongType (Ident "x") VTInt [VTString]),
+    ("12-007-undef", NotDeclVar (Ident "x")),
+    ("12-008-undef-op", NotDeclVar (Ident "x"))
   ]
 
 inlineTests :: [InlineTestCase]
@@ -49,7 +52,11 @@ testSingleFileCase (name, expected) = do
           putStrLn $ "Expected: " ++ show expected
           putStrLn $ "Got: " ++ show err
           exitFailure
-    Right _ -> putStrLn "Success"
+    Right _ -> do
+      putStrLn $ "Failure " ++ show name
+      putStrLn $ "Expected: " ++ show expected
+      putStrLn $ "Got: " ++ "No error"
+      exitFailure
   where
     go ts = do
       tree <- left ParserErr $ pProgram ts
@@ -69,7 +76,11 @@ testSingleInlineCase (content, env, expected) = do
           putStrLn $ "Expected: " ++ show expected
           putStrLn $ "Got: " ++ show err
           exitFailure
-    Right _ -> putStrLn "Success"
+    Right _ -> do
+      putStrLn $ "Failure " ++ show content
+      putStrLn $ "Expected: " ++ show expected
+      putStrLn $ "Got: " ++ "No error"
+      exitFailure
   where
     go ts = do
       tree <- left ParserErr $ pProgram ts
