@@ -18,14 +18,6 @@ ALEX_OPTS  = --ghc
 
 all : Interpreter Test TypeCheckerTest
 
-Interpreter : Src/Interpreter
-	ln -s Src/Interpreter Interpreter
-	
-Test : Src/Jabba/Test
-	ln -s Src/Jabba/Test Test
-
-TypeCheckerTest : Src/TypeCheckerTest
-	ln -s Src/TypeCheckerTest TypeCheckerTest
 
 # Rules for building the parser.
 
@@ -38,14 +30,14 @@ Src/Jabba/Abs.hs Src/Jabba/Lex.x Src/Jabba/Par.y Src/Jabba/Print.hs Src/Jabba/Te
 %.hs : %.x
 	${ALEX} ${ALEX_OPTS} $<
 
-Src/Interpreter : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/Interpreter.hs
-	${GHC} ${GHC_OPTS} $@
+Interpreter : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/Interpreter.hs
+	${GHC} ${GHC_OPTS} Src/Interpreter -o Interpreter
 
-Src/Jabba/Test : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/Jabba/Test.hs
-	${GHC} ${GHC_OPTS} $@
+Test : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/Jabba/Test.hs
+	${GHC} ${GHC_OPTS} Src/Jabba/Test -o Test
 
-Src/TypeCheckerTest : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/TypeCheckerTest.hs
-	${GHC} ${GHC_OPTS} $@
+TypeCheckerTest : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/TypeCheckerTest.hs
+	${GHC} ${GHC_OPTS} Src/TypeCheckerTest -o TypeCheckerTest
 
 # Rules for cleaning generated files.
 
@@ -53,11 +45,8 @@ clean :
 	-rm -rf Target/
 
 distclean : clean
-	-rm -f Src/Interpreter
 	-rm -f Interpreter
-	-rm -f Src/Jabba/Test
 	-rm -f Test
-	-rm -f Src/TypeCheckerTest
 	-rm -f TypeCheckerTest
 
 # EOF

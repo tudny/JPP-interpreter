@@ -64,8 +64,8 @@ checkTypeItem (DItemVal pos v t e) = do
     et' <- checkTypeE e
     if t' == et' 
         then pure (v, t', pos)
-        else throwError $ TypeChecker pos $ WrongType v t' [et'] 
-checkTypeItem _ = pure (Ident "", VTVoid, Nothing) -- TODO: implement
+        else throwError $ TypeChecker pos $ WrongType v t' [et']
+checkTypeItem (DItem pos v t) = pure (v, absTypeToVarType t, pos)
 
 
 checkTypeE :: Expr -> IM VarType
