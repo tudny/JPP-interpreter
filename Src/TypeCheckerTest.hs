@@ -12,7 +12,10 @@ type InlineTestCase = (String, TypeEnv, ErrType)
 
 testFiles :: [FileTestCase]
 testFiles = [
-    ("12-001-const", ImmutVar (Ident "x"))
+    ("12-001-const", ImmutVar (Ident "x")),
+    ("12-002-multiname", VarAlreadyDecl (Ident "x")),
+    ("12-003-wrong-type", WrongType (Ident "s") VTString [VTInt]),
+    ("12-004-multi-wrong-type", WrongType (Ident "x") VTInt [VTString])
   ]
 
 inlineTests :: [InlineTestCase]
@@ -38,9 +41,11 @@ testSingleFileCase (name, expected) = do
   case go ts of
     Left err -> do
       if checkErrorMatch expected err
-        then putStrLn $ "Success" ++ show name
+        then putStrLn $ "Success " ++ show name
         else do
           putStrLn $ "Failure " ++ show name
+          putStrLn $ "Expected: " ++ show expected
+          putStrLn $ "Got: " ++ show err
           exitFailure
     Right _ -> putStrLn "Success"
   where
@@ -56,9 +61,11 @@ testSingleInlineCase (content, env, expected) = do
   case go ts of
     Left err -> do
       if checkErrorMatch expected err
-        then putStrLn $ "Success" ++ show content
+        then putStrLn $ "Success " ++ show content
         else do
           putStrLn $ "Failure " ++ show content
+          putStrLn $ "Expected: " ++ show expected
+          putStrLn $ "Got: " ++ show err
           exitFailure
     Right _ -> putStrLn "Success"
   where

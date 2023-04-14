@@ -155,6 +155,8 @@ instance Print Src.Jabba.Abs.Instr where
     Src.Jabba.Abs.IRetUnit -> prPrec i 0 (concatD [doc (showString "return"), doc (showString ";")])
     Src.Jabba.Abs.IYield expr -> prPrec i 0 (concatD [doc (showString "yield"), prt 0 expr, doc (showString ";")])
     Src.Jabba.Abs.IYieldUnit -> prPrec i 0 (concatD [doc (showString "yield"), doc (showString ";")])
+    Src.Jabba.Abs.IBreak -> prPrec i 0 (concatD [doc (showString "break"), doc (showString ";")])
+    Src.Jabba.Abs.ICont -> prPrec i 0 (concatD [doc (showString "continue"), doc (showString ";")])
     Src.Jabba.Abs.IIf expr block -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block])
     Src.Jabba.Abs.IIfElse expr block1 block2 -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block1, doc (showString "else"), prt 0 block2])
     Src.Jabba.Abs.IWhile expr block -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block])

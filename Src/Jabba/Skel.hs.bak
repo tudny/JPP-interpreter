@@ -34,6 +34,8 @@ transInstr x = case x of
   Src.Jabba.Abs.IRetUnit -> failure x
   Src.Jabba.Abs.IYield expr -> failure x
   Src.Jabba.Abs.IYieldUnit -> failure x
+  Src.Jabba.Abs.IBreak -> failure x
+  Src.Jabba.Abs.ICont -> failure x
   Src.Jabba.Abs.IIf expr block -> failure x
   Src.Jabba.Abs.IIfElse expr block1 block2 -> failure x
   Src.Jabba.Abs.IWhile expr block -> failure x

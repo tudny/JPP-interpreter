@@ -23,6 +23,8 @@ data Instr
     | IRetUnit
     | IYield Expr
     | IYieldUnit
+    | IBreak
+    | ICont
     | IIf Expr Block
     | IIfElse Expr Block Block
     | IWhile Expr Block

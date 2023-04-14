@@ -4,15 +4,16 @@ import Src.Jabba.Abs ( Ident,
                        Program' (..), Program (..),
                        Instr' (..), Instr (..),
                        Arg' (..), Arg (..),
-                       Item' (..), Item (..), 
+                       Item' (..), Item (..),
                        Decl' (..), Decl (..),
                        Block (..), Type (..),
                        PlsOp (..), MulOp (..),
                        NotOp (..), NegOp (..),
-                       Expr (..), BNFC'Position,
-                       Ident (..)
+                       Expr' (..), Expr (..), 
+                       BNFC'Position, Ident (..)
                        )
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 import Control.Monad.Except (ExceptT, MonadError (throwError), runExceptT)
 import Control.Monad.State (StateT (runStateT), State, runState, evalState, MonadState (get, put), modify)
 import Data.List ( nub )
@@ -22,6 +23,7 @@ import Src.Errors
       ErrHolder (TypeChecker),
       Err )
 import Src.Types ( VarMutability(..), VarType(..), absTypeToVarType )
+import Debug.Trace (trace)
 
 type RetType = Maybe VarType
 
@@ -50,24 +52,26 @@ checkTypeI (IUnit _) = pure Nothing
 checkTypeI (IIncr pos v) = opOnVarType pos v [VTInt]
 checkTypeI (IDecr pos v) = opOnVarType pos v [VTInt]
 checkTypeI (IDecl _ d) = checkTypeD d
-checkTypeI i = pure Nothing
+checkTypeI i = pure Nothing -- TODO: implement
 
 checkTypeD :: Decl -> IM RetType
-checkTypeD (DVar pos its) = mapM_ (checkTypeItem) its >> pure Nothing
-checkTypeD d = pure Nothing
+checkTypeD (DVar pos its) = declareNewVariables pos its VMMut
+checkTypeD (DVal pos its) = declareNewVariables pos its VMConst
 
-checkTypeItem :: Item -> IM (Ident, VarType)
+checkTypeItem :: Item -> IM (Ident, VarType, BNFC'Position)
 checkTypeItem (DItemVal pos v t e) = do
     let t' = absTypeToVarType t
     et' <- checkTypeE e
     if t' == et' 
-        then pure (v, t')
+        then pure (v, t', pos)
         else throwError $ TypeChecker pos $ WrongType v t' [et'] 
-checkTypeItem _ = pure (Ident "", VTVoid)
+checkTypeItem _ = pure (Ident "", VTVoid, Nothing) -- TODO: implement
 
 
 checkTypeE :: Expr -> IM VarType
-checkTypeE _ = pure VTVoid
+checkTypeE (EIntLit _ _) = pure VTInt
+checkTypeE (EStringLit _ _) = pure VTString
+checkTypeE _ = pure VTVoid -- TODO: implement
 
 getVarType :: BNFC'Position -> Ident -> IM (VarType, VarMutability)
 getVarType pos v = do
@@ -84,3 +88,17 @@ opOnVarType pos v ex = do
             VMMut -> pure Nothing
             VMConst -> throwError $ TypeChecker pos $ ImmutVar v
         _ -> throwError $ TypeChecker pos $ WrongType v t [VTInt]
+
+checkAllNamesAreUnique :: Set.Set Ident -> [(Ident, VarType, BNFC'Position)] -> IM ()
+checkAllNamesAreUnique _ [] = pure ()
+checkAllNamesAreUnique s ((v, t, pos):xs) = do
+    if Set.member v s
+        then throwError $ TypeChecker pos $ VarAlreadyDecl v
+        else checkAllNamesAreUnique (Set.insert v s) xs
+
+declareNewVariables :: BNFC'Position -> [Item' BNFC'Position] -> VarMutability -> IM RetType
+declareNewVariables pos its m = do
+    items <- mapM checkTypeItem its
+    checkAllNamesAreUnique Set.empty items
+    mapM_ (\(v, t, _) -> modify (Map.insert v (t, m))) items
+    pure Nothing

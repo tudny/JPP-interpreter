@@ -14,6 +14,7 @@ data ErrType
     | NotDeclVar Ident
     | NotDeclFun Ident
     | WrongType Ident VarType [VarType]
+    | VarAlreadyDecl Ident
     deriving (Eq)
 
 
@@ -41,3 +42,4 @@ instance Show ErrType where
     show (NotDeclVar i) = "variable " ++ showI i ++ " was not declared in current scope."
     show (NotDeclFun i) = "function" ++ showI i ++ " was not declared in current scope."
     show (WrongType i t ex) = "variable " ++ showI i ++ " is of type " ++ show t ++ " but expected " ++ show ex ++ "."
+    show (VarAlreadyDecl i) = "variable " ++ showI i ++ " was already declared in declaration block."
