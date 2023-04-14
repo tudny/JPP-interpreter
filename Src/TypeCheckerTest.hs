@@ -20,7 +20,9 @@ testFiles = [
     ("12-005-multi-wrong-type", WrongType (Ident "x") VTInt [VTString]),
     ("12-006-multi-wrong-type-var", WrongType (Ident "x") VTInt [VTString]),
     ("12-007-undef", NotDeclVar (Ident "x")),
-    ("12-008-undef-op", NotDeclVar (Ident "x"))
+    ("12-008-undef-op", NotDeclVar (Ident "x")),
+    ("12-009-boolen", WrongType (Ident "x") VTInt [VTBool]),
+    ("12-010-boolen2", WrongType (Ident "x") VTString [VTBool])
   ]
 
 inlineTests :: [InlineTestCase]

@@ -80,6 +80,8 @@ checkTypeE :: Expr -> IM VarType
 checkTypeE (EVarName pos v) = fst <$> getVarType pos v
 checkTypeE (EIntLit _ _) = pure VTInt
 checkTypeE (EStringLit _ _) = pure VTString
+checkTypeE (EBoolLitFalse _) = pure VTBool
+checkTypeE (EBoolLitTrue _) = pure VTBool
 checkTypeE _ = pure VTVoid -- TODO: implement
 
 
