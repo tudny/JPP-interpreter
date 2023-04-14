@@ -31,6 +31,65 @@ inlineTests = [
       "x++;", 
       Map.fromList [(Ident "x", (VTInt, VMConst))], 
       ImmutVar (Ident "x")
+    ),
+    (
+      "f(1);",
+      Map.fromList [(Ident "f", (VTFun [] VTInt, VMConst))],
+      WrongNumberOfArgs (Ident "f") 0 1
+    ),
+    (
+      "f();",
+      Map.fromList [(Ident "f", (VTFun [(VTInt, VMConst, VRRef)] VTInt, VMConst))],
+      WrongNumberOfArgs (Ident "f") 1 0
+    ),
+    (
+      "f(1, 2, 3, 4, 5, 6);",
+      Map.fromList [(Ident "f", (VTFun [(VTInt, VMConst, VRRef)] VTInt, VMConst))],
+      WrongNumberOfArgs (Ident "f") 1 6
+    ),
+    (
+      "f(\"abc\");",
+      Map.fromList [(Ident "f", (VTFun [(VTInt, VMConst, VRRef)] VTInt, VMConst))],
+      WrongTypeArg 0 VTString VTInt
+    ),
+    (
+      "f(1, \"abc\");",
+      Map.fromList [(Ident "f", (VTFun [(VTInt, VMConst, VRCopy), (VTInt, VMConst, VRCopy)] VTInt, VMConst))],
+      WrongTypeArg 1 VTString VTInt
+    ),
+    (
+      "f(x);",
+      Map.fromList [(Ident "f", (VTFun [(VTInt, VMConst, VRRef)] VTInt, VMConst))],
+      NotDeclVar (Ident "x")
+    ),
+    (
+      "f(10);",
+      Map.fromList [(Ident "f", (VTFun [(VTInt, VMMut, VRRef)] VTInt, VMConst))],
+      ExprMutPass 0
+    ),
+    (
+      "f(x);",
+      Map.fromList [
+        (Ident "f", (VTFun [(VTInt, VMMut, VRRef)] VTInt, VMConst)), -- f(var x: Integer) -> Integer
+        (Ident "x", (VTInt, VMConst)) -- val x: Integer
+        ],
+      ImmutMutPass 0
+    ),
+    (
+      "f(x + 1);",
+      Map.fromList [
+        (Ident "f", (VTFun [(VTInt, VMMut, VRRef)] VTInt, VMConst)), -- f(var x: Integer) -> Integer
+        (Ident "x", (VTInt, VMConst)) -- val x: Integer
+        ],
+      ExprMutPass 0
+    ),
+    (
+      "f(x + 0);",
+      Map.fromList [
+        (Ident "f", (VTFun [(VTInt, VMMut, VRRef)] VTInt, VMConst)), -- f(var x: Integer) -> Integer
+        (Ident "x", (VTInt, VMConst)) -- val x: Integer
+        ],
+      ExprMutPass 0
     )
   ]
 
@@ -72,7 +131,7 @@ testSingleInlineCase (content, env, expected) = do
   case go ts of
     Left err -> do
       if checkErrorMatch expected err
-        then putStrLn $ "Success " ++ show content
+        then putStrLn $ "Success " ++ "\"" ++ take 40 content ++ "\""
         else do
           putStrLn $ "Failure " ++ show content
           putStrLn $ "Expected: " ++ show expected

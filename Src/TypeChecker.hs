@@ -22,7 +22,7 @@ import Src.Errors
     ( ErrType (..),
       ErrHolder (TypeChecker),
       Err )
-import Src.Types ( VarMutability(..), VarType(..), absTypeToVarType )
+import Src.Types ( VarMutability(..), VarType(..), absTypeToVarType, VarRef (VRRef, VRCopy) )
 import Debug.Trace (trace)
 
 type RetType = Maybe VarType
@@ -82,6 +82,16 @@ checkTypeE (EIntLit _ _) = pure VTInt
 checkTypeE (EStringLit _ _) = pure VTString
 checkTypeE (EBoolLitFalse _) = pure VTBool
 checkTypeE (EBoolLitTrue _) = pure VTBool
+checkTypeE (ERun pos fn es) = do
+    env <- get
+    (args, ret) <- getF pos fn
+    callArgs <- mapM (getCallExprType pos) es
+    if length args /= length callArgs
+        then throwError $ TypeChecker pos $ WrongNumberOfArgs fn (length args) (length callArgs)
+        else do
+            let args' = zip3 callArgs args [0..]
+            mapM_ (checkCallArgument pos) args'
+            pure ret
 checkTypeE _ = pure VTVoid -- TODO: implement
 
 
@@ -91,6 +101,43 @@ getVarType pos v = do
     case Map.lookup v env of
         Just (t, m) -> pure (t, m)
         Nothing -> throwError $ TypeChecker pos $ NotDeclVar v
+
+
+getF :: BNFC'Position -> Ident -> IM ([(VarType, VarMutability, VarRef)], VarType)
+getF pos fn = do
+    env <- get
+    case Map.lookup fn env of
+        Just (VTFun args ret, _) -> pure (args, ret)
+        _ -> throwError $ TypeChecker pos $ NotDeclFun fn
+
+
+getCallExprType :: BNFC'Position -> Expr -> IM (VarType, Maybe VarMutability)
+getCallExprType _ (EVarName pos v) = do
+    (t, m) <- getVarType undefined v
+    pure (t, Just m)
+getCallExprType _ e = do
+    t <- checkTypeE e
+    pure (t, Nothing)
+
+
+checkCallArgument :: BNFC'Position -> ((VarType, Maybe VarMutability), (VarType, VarMutability, VarRef), Int) -> IM ()
+checkCallArgument pos ((t, mm), (t', m, r), id) = do
+    checkCallArgumentType pos t t' id
+    checkCallArgumentMutability pos mm (m, r) id
+
+
+checkCallArgumentType :: BNFC'Position -> VarType -> VarType -> Int -> IM ()
+checkCallArgumentType pos t t' id = do
+    if t == t'
+        then pure ()
+        else throwError $ TypeChecker pos $ WrongTypeArg id t t'
+
+
+-- There are 12 cases to check, but only 2 are problematic.
+checkCallArgumentMutability :: BNFC'Position -> Maybe VarMutability -> (VarMutability, VarRef) -> Int -> IM ()
+checkCallArgumentMutability pos Nothing (_, VRRef) id = throwError $ TypeChecker pos $ ExprMutPass id
+checkCallArgumentMutability pos (Just VMConst) (VMMut, VRRef) id = throwError $ TypeChecker pos $ ImmutMutPass id
+checkCallArgumentMutability _ _ _ _ = pure ()
 
 
 opOnVarType :: BNFC'Position -> Ident -> [VarType] -> IM RetType

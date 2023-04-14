@@ -7,13 +7,19 @@ data VarType
     | VTBool 
     | VTString 
     | VTVoid 
-    | VTFun [VarType] VarType 
+    | VTFun [(VarType, VarMutability, VarRef)] VarType 
     deriving (Eq)
 
 
 data VarMutability
     = VMMut 
     | VMConst 
+    deriving (Eq)
+
+
+data VarRef
+    = VRRef
+    | VRCopy
     deriving (Eq)
 
 
@@ -36,3 +42,8 @@ instance Show VarType where
 instance Show VarMutability where
     show VMMut = "mut"
     show VMConst = "const"
+
+
+instance Show VarRef where
+    show VRRef = "ref"
+    show VRCopy = "copy"

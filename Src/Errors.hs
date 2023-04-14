@@ -14,7 +14,11 @@ data ErrType
     | NotDeclVar Ident
     | NotDeclFun Ident
     | WrongType Ident VarType [VarType]
+    | WrongTypeArg Int VarType VarType
     | VarAlreadyDecl Ident
+    | WrongNumberOfArgs Ident Int Int
+    | ExprMutPass Int
+    | ImmutMutPass Int
     deriving (Eq)
 
 
@@ -42,4 +46,8 @@ instance Show ErrType where
     show (NotDeclVar i) = "variable " ++ showI i ++ " was not declared in current scope."
     show (NotDeclFun i) = "function" ++ showI i ++ " was not declared in current scope."
     show (WrongType i t ex) = "variable " ++ showI i ++ " is of type " ++ show t ++ " but expected " ++ show ex ++ "."
+    show (WrongTypeArg i t ex) = "argument " ++ show (i + 1) ++ " is of type " ++ show t ++ " but expected " ++ show ex ++ "."
     show (VarAlreadyDecl i) = "variable " ++ showI i ++ " was already declared in declaration block."
+    show (WrongNumberOfArgs i ex got) = "function " ++ showI i ++ " was called with " ++ show got ++ " arguments but expected " ++ show ex ++ " arguments."
+    show (ExprMutPass i) = "expression " ++ show (i + 1) ++ " was passed to a mutable reference argument."
+    show (ImmutMutPass i) = "immutable variable " ++ show i ++ " was passed to a mutable reference argument."
