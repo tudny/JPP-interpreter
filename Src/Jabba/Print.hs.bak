@@ -140,129 +140,129 @@ instance Print Double where
 
 instance Print Src.Jabba.Abs.Ident where
   prt _ (Src.Jabba.Abs.Ident i) = doc $ showString i
-instance Print Src.Jabba.Abs.Program where
+instance Print (Src.Jabba.Abs.Program' a) where
   prt i = \case
-    Src.Jabba.Abs.PProgram instrs -> prPrec i 0 (concatD [prt 0 instrs])
+    Src.Jabba.Abs.PProgram _ instrs -> prPrec i 0 (concatD [prt 0 instrs])
 
-instance Print Src.Jabba.Abs.Instr where
+instance Print (Src.Jabba.Abs.Instr' a) where
   prt i = \case
-    Src.Jabba.Abs.DFun id_ args type_ block -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 id_, doc (showString "("), prt 0 args, doc (showString ")"), doc (showString ":"), prt 0 type_, prt 0 block])
-    Src.Jabba.Abs.IUnit -> prPrec i 0 (concatD [doc (showString ";")])
-    Src.Jabba.Abs.IIncr id_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString "++"), doc (showString ";")])
-    Src.Jabba.Abs.IDecr id_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString "--"), doc (showString ";")])
-    Src.Jabba.Abs.IAss id_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString "="), prt 0 expr, doc (showString ";")])
-    Src.Jabba.Abs.IRet expr -> prPrec i 0 (concatD [doc (showString "return"), prt 0 expr, doc (showString ";")])
-    Src.Jabba.Abs.IRetUnit -> prPrec i 0 (concatD [doc (showString "return"), doc (showString ";")])
-    Src.Jabba.Abs.IYield expr -> prPrec i 0 (concatD [doc (showString "yield"), prt 0 expr, doc (showString ";")])
-    Src.Jabba.Abs.IYieldUnit -> prPrec i 0 (concatD [doc (showString "yield"), doc (showString ";")])
-    Src.Jabba.Abs.IBreak -> prPrec i 0 (concatD [doc (showString "break"), doc (showString ";")])
-    Src.Jabba.Abs.ICont -> prPrec i 0 (concatD [doc (showString "continue"), doc (showString ";")])
-    Src.Jabba.Abs.IIf expr block -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block])
-    Src.Jabba.Abs.IIfElse expr block1 block2 -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block1, doc (showString "else"), prt 0 block2])
-    Src.Jabba.Abs.IWhile expr block -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block])
-    Src.Jabba.Abs.IWhileFin expr block1 block2 -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block1, doc (showString "finally"), prt 0 block2])
-    Src.Jabba.Abs.IFor id_ expr1 expr2 block -> prPrec i 0 (concatD [doc (showString "for"), prt 0 id_, doc (showString "="), prt 0 expr1, doc (showString ".."), prt 0 expr2, prt 0 block])
-    Src.Jabba.Abs.IForGen id_ expr block -> prPrec i 0 (concatD [doc (showString "for"), prt 0 id_, doc (showString "in"), prt 0 expr, prt 0 block])
-    Src.Jabba.Abs.IExpr expr -> prPrec i 0 (concatD [prt 0 expr, doc (showString ";")])
-    Src.Jabba.Abs.IDecl decl -> prPrec i 0 (concatD [prt 0 decl, doc (showString ";")])
+    Src.Jabba.Abs.DFun _ id_ args type_ block -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 id_, doc (showString "("), prt 0 args, doc (showString ")"), doc (showString ":"), prt 0 type_, prt 0 block])
+    Src.Jabba.Abs.IUnit _ -> prPrec i 0 (concatD [doc (showString ";")])
+    Src.Jabba.Abs.IIncr _ id_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString "++"), doc (showString ";")])
+    Src.Jabba.Abs.IDecr _ id_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString "--"), doc (showString ";")])
+    Src.Jabba.Abs.IAss _ id_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString "="), prt 0 expr, doc (showString ";")])
+    Src.Jabba.Abs.IRet _ expr -> prPrec i 0 (concatD [doc (showString "return"), prt 0 expr, doc (showString ";")])
+    Src.Jabba.Abs.IRetUnit _ -> prPrec i 0 (concatD [doc (showString "return"), doc (showString ";")])
+    Src.Jabba.Abs.IYield _ expr -> prPrec i 0 (concatD [doc (showString "yield"), prt 0 expr, doc (showString ";")])
+    Src.Jabba.Abs.IYieldUnit _ -> prPrec i 0 (concatD [doc (showString "yield"), doc (showString ";")])
+    Src.Jabba.Abs.IBreak _ -> prPrec i 0 (concatD [doc (showString "break"), doc (showString ";")])
+    Src.Jabba.Abs.ICont _ -> prPrec i 0 (concatD [doc (showString "continue"), doc (showString ";")])
+    Src.Jabba.Abs.IIf _ expr block -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block])
+    Src.Jabba.Abs.IIfElse _ expr block1 block2 -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block1, doc (showString "else"), prt 0 block2])
+    Src.Jabba.Abs.IWhile _ expr block -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block])
+    Src.Jabba.Abs.IWhileFin _ expr block1 block2 -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block1, doc (showString "finally"), prt 0 block2])
+    Src.Jabba.Abs.IFor _ id_ expr1 expr2 block -> prPrec i 0 (concatD [doc (showString "for"), prt 0 id_, doc (showString "="), prt 0 expr1, doc (showString ".."), prt 0 expr2, prt 0 block])
+    Src.Jabba.Abs.IForGen _ id_ expr block -> prPrec i 0 (concatD [doc (showString "for"), prt 0 id_, doc (showString "in"), prt 0 expr, prt 0 block])
+    Src.Jabba.Abs.IExpr _ expr -> prPrec i 0 (concatD [prt 0 expr, doc (showString ";")])
+    Src.Jabba.Abs.IDecl _ decl -> prPrec i 0 (concatD [prt 0 decl, doc (showString ";")])
 
-instance Print Src.Jabba.Abs.Arg where
+instance Print (Src.Jabba.Abs.Arg' a) where
   prt i = \case
-    Src.Jabba.Abs.RefMutArg id_ type_ -> prPrec i 0 (concatD [doc (showString "var"), prt 0 id_, doc (showString ":"), prt 0 type_])
-    Src.Jabba.Abs.RefConstArg id_ type_ -> prPrec i 0 (concatD [doc (showString "val"), prt 0 id_, doc (showString ":"), prt 0 type_])
-    Src.Jabba.Abs.CopyMutArg id_ type_ -> prPrec i 0 (concatD [doc (showString "var"), prt 0 id_, doc (showString ":"), doc (showString "new"), prt 0 type_])
-    Src.Jabba.Abs.CopyConstArg id_ type_ -> prPrec i 0 (concatD [doc (showString "val"), prt 0 id_, doc (showString ":"), doc (showString "new"), prt 0 type_])
+    Src.Jabba.Abs.RefMutArg _ id_ type_ -> prPrec i 0 (concatD [doc (showString "var"), prt 0 id_, doc (showString ":"), prt 0 type_])
+    Src.Jabba.Abs.RefConstArg _ id_ type_ -> prPrec i 0 (concatD [doc (showString "val"), prt 0 id_, doc (showString ":"), prt 0 type_])
+    Src.Jabba.Abs.CopyMutArg _ id_ type_ -> prPrec i 0 (concatD [doc (showString "var"), prt 0 id_, doc (showString ":"), doc (showString "new"), prt 0 type_])
+    Src.Jabba.Abs.CopyConstArg _ id_ type_ -> prPrec i 0 (concatD [doc (showString "val"), prt 0 id_, doc (showString ":"), doc (showString "new"), prt 0 type_])
 
-instance Print [Src.Jabba.Abs.Arg] where
+instance Print [Src.Jabba.Abs.Arg' a] where
   prt _ [] = concatD []
   prt _ [x] = concatD [prt 0 x]
   prt _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
 
-instance Print Src.Jabba.Abs.Item where
+instance Print (Src.Jabba.Abs.Item' a) where
   prt i = \case
-    Src.Jabba.Abs.DItemVal id_ type_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString ":"), prt 0 type_, doc (showString "="), prt 0 expr])
-    Src.Jabba.Abs.DItem id_ type_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString ":"), prt 0 type_])
+    Src.Jabba.Abs.DItemVal _ id_ type_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString ":"), prt 0 type_, doc (showString "="), prt 0 expr])
+    Src.Jabba.Abs.DItem _ id_ type_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString ":"), prt 0 type_])
 
-instance Print [Src.Jabba.Abs.Item] where
+instance Print [Src.Jabba.Abs.Item' a] where
   prt _ [] = concatD []
   prt _ [x] = concatD [prt 0 x]
   prt _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
 
-instance Print Src.Jabba.Abs.Decl where
+instance Print (Src.Jabba.Abs.Decl' a) where
   prt i = \case
-    Src.Jabba.Abs.DVar items -> prPrec i 0 (concatD [doc (showString "var"), prt 0 items])
-    Src.Jabba.Abs.DVal items -> prPrec i 0 (concatD [doc (showString "val"), prt 0 items])
+    Src.Jabba.Abs.DVar _ items -> prPrec i 0 (concatD [doc (showString "var"), prt 0 items])
+    Src.Jabba.Abs.DVal _ items -> prPrec i 0 (concatD [doc (showString "val"), prt 0 items])
 
-instance Print Src.Jabba.Abs.Block where
+instance Print (Src.Jabba.Abs.Block' a) where
   prt i = \case
-    Src.Jabba.Abs.IBlock instrs -> prPrec i 0 (concatD [doc (showString "{"), prt 0 instrs, doc (showString "}")])
+    Src.Jabba.Abs.IBlock _ instrs -> prPrec i 0 (concatD [doc (showString "{"), prt 0 instrs, doc (showString "}")])
 
-instance Print [Src.Jabba.Abs.Instr] where
+instance Print [Src.Jabba.Abs.Instr' a] where
   prt _ [] = concatD []
   prt _ (x:xs) = concatD [prt 0 x, prt 0 xs]
 
-instance Print Src.Jabba.Abs.Type where
+instance Print (Src.Jabba.Abs.Type' a) where
   prt i = \case
-    Src.Jabba.Abs.TInt -> prPrec i 0 (concatD [doc (showString "Integer")])
-    Src.Jabba.Abs.TBool -> prPrec i 0 (concatD [doc (showString "Boolean")])
-    Src.Jabba.Abs.TString -> prPrec i 0 (concatD [doc (showString "String")])
-    Src.Jabba.Abs.TGen type_ -> prPrec i 0 (concatD [doc (showString "Gen"), doc (showString "["), prt 0 type_, doc (showString "]")])
-    Src.Jabba.Abs.TVoid -> prPrec i 0 (concatD [doc (showString "Unit")])
+    Src.Jabba.Abs.TInt _ -> prPrec i 0 (concatD [doc (showString "Integer")])
+    Src.Jabba.Abs.TBool _ -> prPrec i 0 (concatD [doc (showString "Boolean")])
+    Src.Jabba.Abs.TString _ -> prPrec i 0 (concatD [doc (showString "String")])
+    Src.Jabba.Abs.TGen _ type_ -> prPrec i 0 (concatD [doc (showString "Gen"), doc (showString "["), prt 0 type_, doc (showString "]")])
+    Src.Jabba.Abs.TVoid _ -> prPrec i 0 (concatD [doc (showString "Unit")])
 
-instance Print Src.Jabba.Abs.PlsOp where
+instance Print (Src.Jabba.Abs.PlsOp' a) where
   prt i = \case
-    Src.Jabba.Abs.OPlus -> prPrec i 0 (concatD [doc (showString "+")])
-    Src.Jabba.Abs.OMinus -> prPrec i 0 (concatD [doc (showString "-")])
+    Src.Jabba.Abs.OPlus _ -> prPrec i 0 (concatD [doc (showString "+")])
+    Src.Jabba.Abs.OMinus _ -> prPrec i 0 (concatD [doc (showString "-")])
 
-instance Print Src.Jabba.Abs.MulOp where
+instance Print (Src.Jabba.Abs.MulOp' a) where
   prt i = \case
-    Src.Jabba.Abs.OMul -> prPrec i 0 (concatD [doc (showString "*")])
-    Src.Jabba.Abs.ODiv -> prPrec i 0 (concatD [doc (showString "/")])
-    Src.Jabba.Abs.OMod -> prPrec i 0 (concatD [doc (showString "%")])
+    Src.Jabba.Abs.OMul _ -> prPrec i 0 (concatD [doc (showString "*")])
+    Src.Jabba.Abs.ODiv _ -> prPrec i 0 (concatD [doc (showString "/")])
+    Src.Jabba.Abs.OMod _ -> prPrec i 0 (concatD [doc (showString "%")])
 
-instance Print Src.Jabba.Abs.NotOp where
+instance Print (Src.Jabba.Abs.NotOp' a) where
   prt i = \case
-    Src.Jabba.Abs.ONot -> prPrec i 0 (concatD [doc (showString "!")])
+    Src.Jabba.Abs.ONot _ -> prPrec i 0 (concatD [doc (showString "!")])
 
-instance Print Src.Jabba.Abs.NegOp where
+instance Print (Src.Jabba.Abs.NegOp' a) where
   prt i = \case
-    Src.Jabba.Abs.ONeg -> prPrec i 0 (concatD [doc (showString "-")])
+    Src.Jabba.Abs.ONeg _ -> prPrec i 0 (concatD [doc (showString "-")])
 
-instance Print Src.Jabba.Abs.AndOp where
+instance Print (Src.Jabba.Abs.AndOp' a) where
   prt i = \case
-    Src.Jabba.Abs.OAnd -> prPrec i 0 (concatD [doc (showString "&&")])
+    Src.Jabba.Abs.OAnd _ -> prPrec i 0 (concatD [doc (showString "&&")])
 
-instance Print Src.Jabba.Abs.OrOp where
+instance Print (Src.Jabba.Abs.OrOp' a) where
   prt i = \case
-    Src.Jabba.Abs.OOr -> prPrec i 0 (concatD [doc (showString "||")])
+    Src.Jabba.Abs.OOr _ -> prPrec i 0 (concatD [doc (showString "||")])
 
-instance Print Src.Jabba.Abs.RelOp where
+instance Print (Src.Jabba.Abs.RelOp' a) where
   prt i = \case
-    Src.Jabba.Abs.REq -> prPrec i 0 (concatD [doc (showString "==")])
-    Src.Jabba.Abs.RNeq -> prPrec i 0 (concatD [doc (showString "!=")])
-    Src.Jabba.Abs.RLt -> prPrec i 0 (concatD [doc (showString "<")])
-    Src.Jabba.Abs.RGt -> prPrec i 0 (concatD [doc (showString ">")])
-    Src.Jabba.Abs.RLeq -> prPrec i 0 (concatD [doc (showString "<=")])
-    Src.Jabba.Abs.RGeq -> prPrec i 0 (concatD [doc (showString ">=")])
+    Src.Jabba.Abs.REq _ -> prPrec i 0 (concatD [doc (showString "==")])
+    Src.Jabba.Abs.RNeq _ -> prPrec i 0 (concatD [doc (showString "!=")])
+    Src.Jabba.Abs.RLt _ -> prPrec i 0 (concatD [doc (showString "<")])
+    Src.Jabba.Abs.RGt _ -> prPrec i 0 (concatD [doc (showString ">")])
+    Src.Jabba.Abs.RLeq _ -> prPrec i 0 (concatD [doc (showString "<=")])
+    Src.Jabba.Abs.RGeq _ -> prPrec i 0 (concatD [doc (showString ">=")])
 
-instance Print Src.Jabba.Abs.Expr where
+instance Print (Src.Jabba.Abs.Expr' a) where
   prt i = \case
-    Src.Jabba.Abs.EVarName id_ -> prPrec i 6 (concatD [prt 0 id_])
-    Src.Jabba.Abs.EIntLit n -> prPrec i 6 (concatD [prt 0 n])
-    Src.Jabba.Abs.EBoolLitTrue -> prPrec i 6 (concatD [doc (showString "true")])
-    Src.Jabba.Abs.EBoolLitFalse -> prPrec i 6 (concatD [doc (showString "false")])
-    Src.Jabba.Abs.ERun id_ exprs -> prPrec i 6 (concatD [prt 0 id_, doc (showString "("), prt 0 exprs, doc (showString ")")])
-    Src.Jabba.Abs.EStringLit str -> prPrec i 6 (concatD [printString str])
-    Src.Jabba.Abs.ENeg negop expr -> prPrec i 5 (concatD [prt 0 negop, prt 6 expr])
-    Src.Jabba.Abs.ENot notop expr -> prPrec i 5 (concatD [prt 0 notop, prt 6 expr])
-    Src.Jabba.Abs.EMul expr1 mulop expr2 -> prPrec i 4 (concatD [prt 4 expr1, prt 0 mulop, prt 5 expr2])
-    Src.Jabba.Abs.ESum expr1 plsop expr2 -> prPrec i 3 (concatD [prt 3 expr1, prt 0 plsop, prt 4 expr2])
-    Src.Jabba.Abs.ERel expr1 relop expr2 -> prPrec i 2 (concatD [prt 2 expr1, prt 0 relop, prt 3 expr2])
-    Src.Jabba.Abs.EBAnd expr1 andop expr2 -> prPrec i 1 (concatD [prt 2 expr1, prt 0 andop, prt 1 expr2])
-    Src.Jabba.Abs.EBOr expr1 orop expr2 -> prPrec i 0 (concatD [prt 1 expr1, prt 0 orop, prt 0 expr2])
-    Src.Jabba.Abs.ETer expr1 expr2 expr3 -> prPrec i 0 (concatD [prt 1 expr1, doc (showString "?"), prt 1 expr2, doc (showString ":"), prt 0 expr3])
+    Src.Jabba.Abs.EVarName _ id_ -> prPrec i 6 (concatD [prt 0 id_])
+    Src.Jabba.Abs.EIntLit _ n -> prPrec i 6 (concatD [prt 0 n])
+    Src.Jabba.Abs.EBoolLitTrue _ -> prPrec i 6 (concatD [doc (showString "true")])
+    Src.Jabba.Abs.EBoolLitFalse _ -> prPrec i 6 (concatD [doc (showString "false")])
+    Src.Jabba.Abs.ERun _ id_ exprs -> prPrec i 6 (concatD [prt 0 id_, doc (showString "("), prt 0 exprs, doc (showString ")")])
+    Src.Jabba.Abs.EStringLit _ str -> prPrec i 6 (concatD [printString str])
+    Src.Jabba.Abs.ENeg _ negop expr -> prPrec i 5 (concatD [prt 0 negop, prt 6 expr])
+    Src.Jabba.Abs.ENot _ notop expr -> prPrec i 5 (concatD [prt 0 notop, prt 6 expr])
+    Src.Jabba.Abs.EMul _ expr1 mulop expr2 -> prPrec i 4 (concatD [prt 4 expr1, prt 0 mulop, prt 5 expr2])
+    Src.Jabba.Abs.ESum _ expr1 plsop expr2 -> prPrec i 3 (concatD [prt 3 expr1, prt 0 plsop, prt 4 expr2])
+    Src.Jabba.Abs.ERel _ expr1 relop expr2 -> prPrec i 2 (concatD [prt 2 expr1, prt 0 relop, prt 3 expr2])
+    Src.Jabba.Abs.EBAnd _ expr1 andop expr2 -> prPrec i 1 (concatD [prt 2 expr1, prt 0 andop, prt 1 expr2])
+    Src.Jabba.Abs.EBOr _ expr1 orop expr2 -> prPrec i 0 (concatD [prt 1 expr1, prt 0 orop, prt 0 expr2])
+    Src.Jabba.Abs.ETer _ expr1 expr2 expr3 -> prPrec i 0 (concatD [prt 1 expr1, doc (showString "?"), prt 1 expr2, doc (showString ":"), prt 0 expr3])
 
-instance Print [Src.Jabba.Abs.Expr] where
+instance Print [Src.Jabba.Abs.Expr' a] where
   prt _ [] = concatD []
   prt _ [x] = concatD [prt 0 x]
   prt _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]

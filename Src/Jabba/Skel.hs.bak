@@ -19,110 +19,110 @@ transIdent :: Src.Jabba.Abs.Ident -> Result
 transIdent x = case x of
   Src.Jabba.Abs.Ident string -> failure x
 
-transProgram :: Src.Jabba.Abs.Program -> Result
+transProgram :: Show a => Src.Jabba.Abs.Program' a -> Result
 transProgram x = case x of
-  Src.Jabba.Abs.PProgram instrs -> failure x
+  Src.Jabba.Abs.PProgram _ instrs -> failure x
 
-transInstr :: Src.Jabba.Abs.Instr -> Result
+transInstr :: Show a => Src.Jabba.Abs.Instr' a -> Result
 transInstr x = case x of
-  Src.Jabba.Abs.DFun ident args type_ block -> failure x
-  Src.Jabba.Abs.IUnit -> failure x
-  Src.Jabba.Abs.IIncr ident -> failure x
-  Src.Jabba.Abs.IDecr ident -> failure x
-  Src.Jabba.Abs.IAss ident expr -> failure x
-  Src.Jabba.Abs.IRet expr -> failure x
-  Src.Jabba.Abs.IRetUnit -> failure x
-  Src.Jabba.Abs.IYield expr -> failure x
-  Src.Jabba.Abs.IYieldUnit -> failure x
-  Src.Jabba.Abs.IBreak -> failure x
-  Src.Jabba.Abs.ICont -> failure x
-  Src.Jabba.Abs.IIf expr block -> failure x
-  Src.Jabba.Abs.IIfElse expr block1 block2 -> failure x
-  Src.Jabba.Abs.IWhile expr block -> failure x
-  Src.Jabba.Abs.IWhileFin expr block1 block2 -> failure x
-  Src.Jabba.Abs.IFor ident expr1 expr2 block -> failure x
-  Src.Jabba.Abs.IForGen ident expr block -> failure x
-  Src.Jabba.Abs.IExpr expr -> failure x
-  Src.Jabba.Abs.IDecl decl -> failure x
+  Src.Jabba.Abs.DFun _ ident args type_ block -> failure x
+  Src.Jabba.Abs.IUnit _ -> failure x
+  Src.Jabba.Abs.IIncr _ ident -> failure x
+  Src.Jabba.Abs.IDecr _ ident -> failure x
+  Src.Jabba.Abs.IAss _ ident expr -> failure x
+  Src.Jabba.Abs.IRet _ expr -> failure x
+  Src.Jabba.Abs.IRetUnit _ -> failure x
+  Src.Jabba.Abs.IYield _ expr -> failure x
+  Src.Jabba.Abs.IYieldUnit _ -> failure x
+  Src.Jabba.Abs.IBreak _ -> failure x
+  Src.Jabba.Abs.ICont _ -> failure x
+  Src.Jabba.Abs.IIf _ expr block -> failure x
+  Src.Jabba.Abs.IIfElse _ expr block1 block2 -> failure x
+  Src.Jabba.Abs.IWhile _ expr block -> failure x
+  Src.Jabba.Abs.IWhileFin _ expr block1 block2 -> failure x
+  Src.Jabba.Abs.IFor _ ident expr1 expr2 block -> failure x
+  Src.Jabba.Abs.IForGen _ ident expr block -> failure x
+  Src.Jabba.Abs.IExpr _ expr -> failure x
+  Src.Jabba.Abs.IDecl _ decl -> failure x
 
-transArg :: Src.Jabba.Abs.Arg -> Result
+transArg :: Show a => Src.Jabba.Abs.Arg' a -> Result
 transArg x = case x of
-  Src.Jabba.Abs.RefMutArg ident type_ -> failure x
-  Src.Jabba.Abs.RefConstArg ident type_ -> failure x
-  Src.Jabba.Abs.CopyMutArg ident type_ -> failure x
-  Src.Jabba.Abs.CopyConstArg ident type_ -> failure x
+  Src.Jabba.Abs.RefMutArg _ ident type_ -> failure x
+  Src.Jabba.Abs.RefConstArg _ ident type_ -> failure x
+  Src.Jabba.Abs.CopyMutArg _ ident type_ -> failure x
+  Src.Jabba.Abs.CopyConstArg _ ident type_ -> failure x
 
-transItem :: Src.Jabba.Abs.Item -> Result
+transItem :: Show a => Src.Jabba.Abs.Item' a -> Result
 transItem x = case x of
-  Src.Jabba.Abs.DItemVal ident type_ expr -> failure x
-  Src.Jabba.Abs.DItem ident type_ -> failure x
+  Src.Jabba.Abs.DItemVal _ ident type_ expr -> failure x
+  Src.Jabba.Abs.DItem _ ident type_ -> failure x
 
-transDecl :: Src.Jabba.Abs.Decl -> Result
+transDecl :: Show a => Src.Jabba.Abs.Decl' a -> Result
 transDecl x = case x of
-  Src.Jabba.Abs.DVar items -> failure x
-  Src.Jabba.Abs.DVal items -> failure x
+  Src.Jabba.Abs.DVar _ items -> failure x
+  Src.Jabba.Abs.DVal _ items -> failure x
 
-transBlock :: Src.Jabba.Abs.Block -> Result
+transBlock :: Show a => Src.Jabba.Abs.Block' a -> Result
 transBlock x = case x of
-  Src.Jabba.Abs.IBlock instrs -> failure x
+  Src.Jabba.Abs.IBlock _ instrs -> failure x
 
-transType :: Src.Jabba.Abs.Type -> Result
+transType :: Show a => Src.Jabba.Abs.Type' a -> Result
 transType x = case x of
-  Src.Jabba.Abs.TInt -> failure x
-  Src.Jabba.Abs.TBool -> failure x
-  Src.Jabba.Abs.TString -> failure x
-  Src.Jabba.Abs.TGen type_ -> failure x
-  Src.Jabba.Abs.TVoid -> failure x
+  Src.Jabba.Abs.TInt _ -> failure x
+  Src.Jabba.Abs.TBool _ -> failure x
+  Src.Jabba.Abs.TString _ -> failure x
+  Src.Jabba.Abs.TGen _ type_ -> failure x
+  Src.Jabba.Abs.TVoid _ -> failure x
 
-transPlsOp :: Src.Jabba.Abs.PlsOp -> Result
+transPlsOp :: Show a => Src.Jabba.Abs.PlsOp' a -> Result
 transPlsOp x = case x of
-  Src.Jabba.Abs.OPlus -> failure x
-  Src.Jabba.Abs.OMinus -> failure x
+  Src.Jabba.Abs.OPlus _ -> failure x
+  Src.Jabba.Abs.OMinus _ -> failure x
 
-transMulOp :: Src.Jabba.Abs.MulOp -> Result
+transMulOp :: Show a => Src.Jabba.Abs.MulOp' a -> Result
 transMulOp x = case x of
-  Src.Jabba.Abs.OMul -> failure x
-  Src.Jabba.Abs.ODiv -> failure x
-  Src.Jabba.Abs.OMod -> failure x
+  Src.Jabba.Abs.OMul _ -> failure x
+  Src.Jabba.Abs.ODiv _ -> failure x
+  Src.Jabba.Abs.OMod _ -> failure x
 
-transNotOp :: Src.Jabba.Abs.NotOp -> Result
+transNotOp :: Show a => Src.Jabba.Abs.NotOp' a -> Result
 transNotOp x = case x of
-  Src.Jabba.Abs.ONot -> failure x
+  Src.Jabba.Abs.ONot _ -> failure x
 
-transNegOp :: Src.Jabba.Abs.NegOp -> Result
+transNegOp :: Show a => Src.Jabba.Abs.NegOp' a -> Result
 transNegOp x = case x of
-  Src.Jabba.Abs.ONeg -> failure x
+  Src.Jabba.Abs.ONeg _ -> failure x
 
-transAndOp :: Src.Jabba.Abs.AndOp -> Result
+transAndOp :: Show a => Src.Jabba.Abs.AndOp' a -> Result
 transAndOp x = case x of
-  Src.Jabba.Abs.OAnd -> failure x
+  Src.Jabba.Abs.OAnd _ -> failure x
 
-transOrOp :: Src.Jabba.Abs.OrOp -> Result
+transOrOp :: Show a => Src.Jabba.Abs.OrOp' a -> Result
 transOrOp x = case x of
-  Src.Jabba.Abs.OOr -> failure x
+  Src.Jabba.Abs.OOr _ -> failure x
 
-transRelOp :: Src.Jabba.Abs.RelOp -> Result
+transRelOp :: Show a => Src.Jabba.Abs.RelOp' a -> Result
 transRelOp x = case x of
-  Src.Jabba.Abs.REq -> failure x
-  Src.Jabba.Abs.RNeq -> failure x
-  Src.Jabba.Abs.RLt -> failure x
-  Src.Jabba.Abs.RGt -> failure x
-  Src.Jabba.Abs.RLeq -> failure x
-  Src.Jabba.Abs.RGeq -> failure x
+  Src.Jabba.Abs.REq _ -> failure x
+  Src.Jabba.Abs.RNeq _ -> failure x
+  Src.Jabba.Abs.RLt _ -> failure x
+  Src.Jabba.Abs.RGt _ -> failure x
+  Src.Jabba.Abs.RLeq _ -> failure x
+  Src.Jabba.Abs.RGeq _ -> failure x
 
-transExpr :: Src.Jabba.Abs.Expr -> Result
+transExpr :: Show a => Src.Jabba.Abs.Expr' a -> Result
 transExpr x = case x of
-  Src.Jabba.Abs.EVarName ident -> failure x
-  Src.Jabba.Abs.EIntLit integer -> failure x
-  Src.Jabba.Abs.EBoolLitTrue -> failure x
-  Src.Jabba.Abs.EBoolLitFalse -> failure x
-  Src.Jabba.Abs.ERun ident exprs -> failure x
-  Src.Jabba.Abs.EStringLit string -> failure x
-  Src.Jabba.Abs.ENeg negop expr -> failure x
-  Src.Jabba.Abs.ENot notop expr -> failure x
-  Src.Jabba.Abs.EMul expr1 mulop expr2 -> failure x
-  Src.Jabba.Abs.ESum expr1 plsop expr2 -> failure x
-  Src.Jabba.Abs.ERel expr1 relop expr2 -> failure x
-  Src.Jabba.Abs.EBAnd expr1 andop expr2 -> failure x
-  Src.Jabba.Abs.EBOr expr1 orop expr2 -> failure x
-  Src.Jabba.Abs.ETer expr1 expr2 expr3 -> failure x
+  Src.Jabba.Abs.EVarName _ ident -> failure x
+  Src.Jabba.Abs.EIntLit _ integer -> failure x
+  Src.Jabba.Abs.EBoolLitTrue _ -> failure x
+  Src.Jabba.Abs.EBoolLitFalse _ -> failure x
+  Src.Jabba.Abs.ERun _ ident exprs -> failure x
+  Src.Jabba.Abs.EStringLit _ string -> failure x
+  Src.Jabba.Abs.ENeg _ negop expr -> failure x
+  Src.Jabba.Abs.ENot _ notop expr -> failure x
+  Src.Jabba.Abs.EMul _ expr1 mulop expr2 -> failure x
+  Src.Jabba.Abs.ESum _ expr1 plsop expr2 -> failure x
+  Src.Jabba.Abs.ERel _ expr1 relop expr2 -> failure x
+  Src.Jabba.Abs.EBAnd _ expr1 andop expr2 -> failure x
+  Src.Jabba.Abs.EBOr _ expr1 orop expr2 -> failure x
+  Src.Jabba.Abs.ETer _ expr1 expr2 expr3 -> failure x

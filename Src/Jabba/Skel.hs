@@ -44,6 +44,7 @@ transInstr x = case x of
   Src.Jabba.Abs.IForGen _ ident expr block -> failure x
   Src.Jabba.Abs.IExpr _ expr -> failure x
   Src.Jabba.Abs.IDecl _ decl -> failure x
+  Src.Jabba.Abs.IBBlock _ block -> failure x
 
 transArg :: Show a => Src.Jabba.Abs.Arg' a -> Result
 transArg x = case x of

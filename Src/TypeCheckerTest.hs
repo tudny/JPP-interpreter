@@ -22,7 +22,19 @@ testFiles = [
     ("12-007-undef", NotDeclVar (Ident "x")),
     ("12-008-undef-op", NotDeclVar (Ident "x")),
     ("12-009-boolen", WrongType (Ident "x") VTInt [VTBool]),
-    ("12-010-boolen2", WrongType (Ident "x") VTString [VTBool])
+    ("12-010-boolen2", WrongType (Ident "x") VTString [VTBool]),
+    ("12-011-top-level-return", TopLevelProgramReturn VTInt),
+    ("12-012-top-level-maybe-return", TopLevelProgramMaybeReturn VTInt),
+    ("12-013-top-level-return2", TopLevelProgramReturn VTInt),
+    ("12-014-top-level-maybe-return2", TopLevelProgramMaybeReturn VTInt),
+    ("12-015-top-level-return3", TopLevelProgramReturn VTInt),
+    ("12-016-top-level-return4", TopLevelProgramReturn VTInt),
+    ("12-017-top-level-loop-flow", TopLevelProgramLoopFlow),
+    ("12-018-top-level-loop-flow2", TopLevelProgramLoopFlow),
+    ("12-019-top-level-loop-flow3", NotDeclVar (Ident "x")),
+    ("12-020-top-level-loop-flow4", NotDeclVar (Ident "x")),
+    ("12-021-top-level-loop-flow5", NotDeclVar (Ident "x")),
+    ("12-022-top-level-return-flow", TopLevelProgramReturn VTInt)
   ]
 
 inlineTests :: [InlineTestCase]

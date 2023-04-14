@@ -165,6 +165,7 @@ instance Print (Src.Jabba.Abs.Instr' a) where
     Src.Jabba.Abs.IForGen _ id_ expr block -> prPrec i 0 (concatD [doc (showString "for"), prt 0 id_, doc (showString "in"), prt 0 expr, prt 0 block])
     Src.Jabba.Abs.IExpr _ expr -> prPrec i 0 (concatD [prt 0 expr, doc (showString ";")])
     Src.Jabba.Abs.IDecl _ decl -> prPrec i 0 (concatD [prt 0 decl, doc (showString ";")])
+    Src.Jabba.Abs.IBBlock _ block -> prPrec i 0 (concatD [prt 0 block])
 
 instance Print (Src.Jabba.Abs.Arg' a) where
   prt i = \case

@@ -73,6 +73,8 @@ IExpr.          Instr ::= Expr ";" ;
 
 IDecl.          Instr ::= Decl ";" ;
 
+IBBlock.        Instr ::= Block ;
+
 -- Types --------------------------------------------------
 
 TInt.           Type ::= "Integer" ;

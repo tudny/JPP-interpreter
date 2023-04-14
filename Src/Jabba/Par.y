@@ -112,6 +112,7 @@ Instr
   | 'for' Ident 'in' Expr Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IForGen (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4) (snd $5)) }
   | Expr ';' { (fst $1, Src.Jabba.Abs.IExpr (fst $1) (snd $1)) }
   | Decl ';' { (fst $1, Src.Jabba.Abs.IDecl (fst $1) (snd $1)) }
+  | Block { (fst $1, Src.Jabba.Abs.IBBlock (fst $1) (snd $1)) }
 
 Arg :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Arg) }
 Arg

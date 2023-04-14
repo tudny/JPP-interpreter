@@ -24,6 +24,11 @@ data ErrType
     | TernaryMismatch VarType VarType
     | ZeroLiternalDiv
     | ConstantAssign Ident
+    | MismatchedReturnTypes VarType VarType
+    | TopLevelProgramReturn VarType
+    | TopLevelProgramMaybeReturn VarType
+    | ForRangeTypeMismatch VarType VarType
+    | TopLevelProgramLoopFlow
     deriving (Eq)
 
 
@@ -55,8 +60,14 @@ instance Show ErrType where
     show (VarAlreadyDecl i) = "variable " ++ showI i ++ " was already declared in declaration block."
     show (WrongNumberOfArgs i ex got) = "function " ++ showI i ++ " was called with " ++ show got ++ " arguments but expected " ++ show ex ++ " arguments."
     show (ExprMutPass i) = "expression " ++ show (i + 1) ++ " was passed to a mutable reference argument."
-    show (ImmutMutPass i) = "immutable variable " ++ show i ++ " was passed to a mutable reference argument."
+    show (ImmutMutPass i) = "immutable variable " ++ show (i + 1) ++ " was passed to a mutable reference argument."
     show (WrongTypeOp op t) = "operator " ++ op ++ " is not defined for type " ++ show t ++ "."
     show (WrongTypeBiOp op t1 t2) = "operator " ++ op ++ " is not defined for types " ++ show t1 ++ " and " ++ show t2 ++ "."
     show (TernaryMismatch t1 t2) = "ternary operator has type " ++ show t1 ++ " and " ++ show t2 ++ " as branches."
     show ZeroLiternalDiv = "division by zero literal."
+    show (ConstantAssign i) = "variable " ++ showI i ++ " is immutable and cannot be assigned to."
+    show (MismatchedReturnTypes t1 t2) = "function returns type " ++ show t1 ++ " but expected " ++ show t2 ++ "."
+    show (TopLevelProgramReturn t) = "top level program returns type " ++ show t ++ " but expected nothing."
+    show (TopLevelProgramMaybeReturn t) = "top level program may return type " ++ show t ++ " but expected nothing."
+    show (ForRangeTypeMismatch t1 t2) = "for range has type " ++ show t1 ++ " and " ++ show t2 ++ " as bounds."
+    show TopLevelProgramLoopFlow = "top level program contains loop flow statement."

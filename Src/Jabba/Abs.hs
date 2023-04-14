@@ -43,6 +43,7 @@ data Instr' a
     | IForGen a Ident (Expr' a) (Block' a)
     | IExpr a (Expr' a)
     | IDecl a (Decl' a)
+    | IBBlock a (Block' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Arg = Arg' BNFC'Position
@@ -160,6 +161,7 @@ instance HasPosition Instr where
     IForGen p _ _ _ -> p
     IExpr p _ -> p
     IDecl p _ -> p
+    IBBlock p _ -> p
 
 instance HasPosition Arg where
   hasPosition = \case

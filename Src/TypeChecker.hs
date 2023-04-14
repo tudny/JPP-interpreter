@@ -16,7 +16,7 @@ import Src.Jabba.Abs ( Ident,
                        AndOp' (..), AndOp (..),
                        OrOp' (..), OrOp (..),
                        Expr' (..), Expr (..),
-                       BNFC'Position, Ident (..),
+                       BNFC'Position, Ident (..), HasPosition (hasPosition)
                        )
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -28,10 +28,16 @@ import Src.Errors
     ( ErrType (..),
       ErrHolder (TypeChecker),
       Err )
-import Src.Types ( VarMutability(..), VarType(..), absTypeToVarType, VarRef (VRRef, VRCopy) )
+import Src.Types ( VarMutability (..), VarType (..), absTypeToVarType, VarRef (..) )
 import Debug.Trace (trace)
 
-type RetType = Maybe VarType
+data RetType'
+    = None
+    | Definitive VarType
+    | Branching VarType
+
+--             return     loop flow control
+type RetType = (RetType', Bool)
 
 type TypeEnv = Map.Map Ident (VarType, VarMutability)
 type IM a = ExceptT ErrHolder (State TypeEnv) a
@@ -55,12 +61,18 @@ typeCheckWithEnv env p = evalState (runExceptT (checkTypeP p)) env
 
 
 checkTypeP :: Program -> IM ()
-checkTypeP (PProgram _ is) = mapM_ checkTypeI is
+checkTypeP (PProgram pos is) = do
+    retType <- checkTypeB (IBlock pos is)
+    case retType of
+        (None, False) -> pure ()
+        (Definitive t, _) -> throwError $ TypeChecker pos $ TopLevelProgramReturn t
+        (Branching t, _) -> throwError $ TypeChecker pos $ TopLevelProgramMaybeReturn t
+        (None, True) -> throwError $ TypeChecker pos TopLevelProgramLoopFlow
 
 
 checkTypeI :: Instr -> IM RetType
-checkTypeI (IUnit _) = pure Nothing
-checkTypeI (IExpr _ e) = checkTypeE e >> pure Nothing
+checkTypeI (IUnit _) = pure (None, False)
+checkTypeI (IExpr _ e) = checkTypeE e >> pure (None, False)
 checkTypeI (IIncr pos v) = opOnVarType pos v [VTInt]
 checkTypeI (IDecr pos v) = opOnVarType pos v [VTInt]
 checkTypeI (IDecl _ d) = checkTypeD d
@@ -71,8 +83,86 @@ checkTypeI (IAss pos v e) = do
         then throwError $ TypeChecker pos $ ConstantAssign v
     else if t /= et
         then throwError $ TypeChecker pos $ WrongType v t [et]
-    else pure Nothing
-checkTypeI i = pure Nothing -- TODO: implement
+    else pure (None, False)
+checkTypeI (IRet _ e) = checkTypeE e >>= (\x -> pure (x, False)) . Definitive
+checkTypeI (IRetUnit pos) = pure (Definitive VTVoid, False)
+checkTypeI (IYield _ e) = undefined
+checkTypeI (IYieldUnit _) = undefined
+checkTypeI (IBreak _) = pure (None, True)
+checkTypeI (ICont _) = pure (None, True)
+checkTypeI (IIf pos eb bl) = checkTypeI (IIfElse pos eb bl (IBlock pos []))
+checkTypeI (IIfElse pos eb bl1 bl2) = do
+    eb' <- checkTypeE eb
+    if eb' /= VTBool
+        then throwError $ TypeChecker pos $ WrongTypeOp "if else condition" eb'
+        else do
+            (bl1Ret, loopFlow1) <- checkTypeB bl1
+            (bl2Ret, loopFlow2) <- checkTypeB bl2
+            let loopFlow = loopFlow1 || loopFlow2
+            case (bl1Ret, bl2Ret) of
+              (None, None) -> pure None
+              (Definitive vt, None) -> pure $ Branching vt
+              (None, Definitive vt) -> pure $ Branching vt
+              (Branching vt, None)  -> pure $ Branching vt
+              (None, Branching vt)  -> pure $ Branching vt
+              (Definitive vt1, Definitive vt2) -> go vt1 vt2 Definitive
+              (Branching  vt1, Branching  vt2) -> go vt1 vt2 Branching
+              (Definitive vt1, Branching  vt2) -> go vt1 vt2 Branching
+              (Branching  vt1, Definitive vt2) -> go vt1 vt2 Branching
+              >>= \x -> pure (x, loopFlow)
+            where
+                go :: VarType -> VarType -> (VarType -> RetType') -> IM RetType'
+                go vt1 vt2 f =
+                    if vt1 == vt2
+                        then pure $ f vt1
+                        else throwError $ TypeChecker pos $ MismatchedReturnTypes vt1 vt2
+checkTypeI (IWhile pos eb bl) = checkTypeI (IIf pos eb bl) >>= \(x, _) -> pure (x, False)
+checkTypeI (IWhileFin pos eb (IBlock _ bIs) (IBlock _ finIs)) = do
+    retType <- checkTypeI (IWhile pos eb $ IBlock pos bIs)
+    finRetType <- checkTypeB (IBlock pos finIs)
+    mergeRetTypes pos retType finRetType
+checkTypeI (IFor pos v e1 e2 bl) = do
+    n1 <- checkTypeE e1
+    n2 <- checkTypeE e2
+    if n1 /= VTInt || n2 /= VTInt
+        then throwError $ TypeChecker pos $ ForRangeTypeMismatch n1 n2
+        else localState (Map.insert v (VTInt, VMConst)) $ checkTypeI (IWhile pos (EBoolLitTrue pos) bl)
+        >>= \(x, _) -> pure (x, False)
+checkTypeI IForGen {} = undefined
+checkTypeI (IBBlock _ b) = checkTypeB b
+checkTypeI (DFun pos v args t b) = undefined -- TODO: implement
+
+
+checkTypeB :: Block -> IM RetType
+checkTypeB (IBlock _ is) = localState id $ checkTypeBHelper (None, False) is
+
+--                  previous   next  
+checkTypeBHelper :: RetType -> [Instr] -> IM RetType
+checkTypeBHelper prev [] = pure prev
+checkTypeBHelper prev (i:is) = do
+    ir <- checkTypeI i
+    let pos = hasPosition i
+    merged <- mergeRetTypes pos prev ir
+    checkTypeBHelper merged is
+
+
+mergeRetTypes :: BNFC'Position -> RetType -> RetType -> IM RetType
+mergeRetTypes pos (r1, l1) (r2, l2) = do
+    let loopFlow = l1 || l2
+    case (r1, r2) of
+        (None, _) -> pure r2
+        (_, None) -> pure r1
+        (Branching  t1, Definitive t2) -> merge t1 t2 Definitive
+        (Branching  t1, Branching  t2) -> merge t1 t2 Branching
+        (Definitive t1, Branching  t2) -> merge t1 t2 Definitive
+        (Definitive t1, Definitive t2) -> merge t1 t2 Definitive
+        >>= \x -> pure (x, loopFlow)
+    where
+        merge :: VarType -> VarType -> (VarType -> RetType') -> IM RetType'
+        merge t1 t2 f =
+            if t1 == t2
+                then pure $ f t1
+                else throwError $ TypeChecker pos $ MismatchedReturnTypes t1 t2
 
 
 checkTypeD :: Decl -> IM RetType
@@ -118,7 +208,7 @@ checkTypeE (ETer pos eb e1 e2) = do
     t1 <- checkTypeE e1
     t2 <- checkTypeE e2
     tb <- checkTypeE eb
-    if tb /= VTBool 
+    if tb /= VTBool
         then throwError $ TypeChecker pos $ WrongTypeOp "ternary operator condition" tb
         else if t1 /= t2
             then throwError $ TypeChecker pos $ TernaryMismatch t1 t2
@@ -193,7 +283,7 @@ opOnVarType pos v ex = do
     (t, m) <- getVarType pos v
     case t of
         VTInt -> case m of
-            VMMut -> pure Nothing
+            VMMut -> pure (None, False)
             VMConst -> throwError $ TypeChecker pos $ ImmutVar v
         _ -> throwError $ TypeChecker pos $ WrongType v t [VTInt]
 
@@ -211,7 +301,7 @@ declareNewVariables pos its m = do
     items <- mapM checkTypeItem its
     checkAllNamesAreUnique Set.empty items
     mapM_ (\(v, t, _) -> modify (Map.insert v (t, m))) items
-    pure Nothing
+    pure (None, False)
 
 
 checkExprSingleOp :: String -> BNFC'Position -> Expr' BNFC'Position -> VarType -> IM VarType
