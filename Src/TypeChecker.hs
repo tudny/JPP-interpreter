@@ -64,6 +64,14 @@ checkTypeI (IExpr _ e) = checkTypeE e >> pure Nothing
 checkTypeI (IIncr pos v) = opOnVarType pos v [VTInt]
 checkTypeI (IDecr pos v) = opOnVarType pos v [VTInt]
 checkTypeI (IDecl _ d) = checkTypeD d
+checkTypeI (IAss pos v e) = do
+    (t, m) <- getVarType pos v
+    et <- checkTypeE e
+    if m == VMConst
+        then throwError $ TypeChecker pos $ ConstantAssign v
+    else if t /= et
+        then throwError $ TypeChecker pos $ WrongType v t [et]
+    else pure Nothing
 checkTypeI i = pure Nothing -- TODO: implement
 
 
@@ -111,7 +119,7 @@ checkTypeE (ETer pos eb e1 e2) = do
     t2 <- checkTypeE e2
     tb <- checkTypeE eb
     if tb /= VTBool 
-        then throwError $ TypeChecker pos $ WrongTypeOp "ternary operator condition" VTBool
+        then throwError $ TypeChecker pos $ WrongTypeOp "ternary operator condition" tb
         else if t1 /= t2
             then throwError $ TypeChecker pos $ TernaryMismatch t1 t2
             else pure t1

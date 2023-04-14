@@ -262,6 +262,21 @@ inlineTests = [
       TernaryMismatch VTInt VTString
     ),
     (
+      "var x: Boolean = (a < b); z;",
+      Map.fromList [
+        (Ident "a", (VTInt, VMConst)),
+        (Ident "b", (VTInt, VMConst))
+        ],
+      NotDeclVar (Ident "z")
+    ),
+    (
+      "var x: Boolean = (!b); z;",
+      Map.fromList [
+        (Ident "b", (VTBool, VMConst))
+        ],
+      NotDeclVar (Ident "z")
+    ),
+    (
       "(x && y || z) ? 1 : 2;",
       Map.fromList [
         (Ident "x", (VTBool, VMConst)),
@@ -277,6 +292,50 @@ inlineTests = [
         (Ident "y", (VTBool, VMConst))
         ],
       TernaryMismatch VTString VTInt
+    ),
+    (
+      "1 ? 2 : 3;",
+      Map.empty,
+      WrongTypeOp "ternary operator condition" VTInt
+    ),
+    (
+      "x = 1;",
+      Map.fromList [
+        (Ident "x", (VTInt, VMConst))
+        ],
+      ConstantAssign (Ident "x")
+    ),
+    (
+      "x = 1;",
+      Map.fromList [
+        (Ident "x", (VTString, VMMut))
+        ],
+      WrongType (Ident "x") VTString [VTInt]
+    ),
+    (
+      "val x: Integer = 1; x = 2;",
+      Map.empty,
+      ConstantAssign (Ident "x")
+    ),
+    (
+      "var x: String = \"abc\"; x = 2;",
+      Map.empty,
+      WrongType (Ident "x") VTString [VTInt]
+    ),
+    (
+      "var x: Boolean = true; x = 2;",
+      Map.empty,
+      WrongType (Ident "x") VTBool [VTInt]
+    ),
+    (
+      "var x: Integer = 1; x = \"abc\";",
+      Map.empty,
+      WrongType (Ident "x") VTInt [VTString]
+    ),
+    (
+      "var x: Integer = 1; x = true;",
+      Map.empty,
+      WrongType (Ident "x") VTInt [VTBool]
     )
   ]
 

@@ -23,6 +23,7 @@ data ErrType
     | WrongTypeBiOp String VarType VarType
     | TernaryMismatch VarType VarType
     | ZeroLiternalDiv
+    | ConstantAssign Ident
     deriving (Eq)
 
 
