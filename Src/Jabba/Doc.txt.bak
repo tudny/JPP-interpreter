@@ -57,6 +57,7 @@ All other symbols are terminals.
 
   | //Program// | -> | //[Instr]//
   | //Instr// | -> | ``fun`` //Ident// ``(`` //[Arg]// ``)`` ``:`` //Type// //Block//
+  |  |  **|**  | ``fun`` //Ident// ``(`` //[Arg]// ``)`` //Block//
   |  |  **|**  | ``;``
   |  |  **|**  | //Ident// ``++`` ``;``
   |  |  **|**  | //Ident// ``--`` ``;``
@@ -75,6 +76,7 @@ All other symbols are terminals.
   |  |  **|**  | ``for`` //Ident// ``in`` //Expr// //Block//
   |  |  **|**  | //Expr// ``;``
   |  |  **|**  | //Decl// ``;``
+  |  |  **|**  | //Block//
   | //Arg// | -> | ``var`` //Ident// ``:`` //Type//
   |  |  **|**  | ``val`` //Ident// ``:`` //Type//
   |  |  **|**  | ``var`` //Ident// ``:`` ``new`` //Type//

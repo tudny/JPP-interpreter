@@ -26,6 +26,7 @@ transProgram x = case x of
 transInstr :: Show a => Src.Jabba.Abs.Instr' a -> Result
 transInstr x = case x of
   Src.Jabba.Abs.DFun _ ident args type_ block -> failure x
+  Src.Jabba.Abs.DFunUnit _ ident args block -> failure x
   Src.Jabba.Abs.IUnit _ -> failure x
   Src.Jabba.Abs.IIncr _ ident -> failure x
   Src.Jabba.Abs.IDecr _ ident -> failure x
@@ -44,6 +45,7 @@ transInstr x = case x of
   Src.Jabba.Abs.IForGen _ ident expr block -> failure x
   Src.Jabba.Abs.IExpr _ expr -> failure x
   Src.Jabba.Abs.IDecl _ decl -> failure x
+  Src.Jabba.Abs.IBBlock _ block -> failure x
 
 transArg :: Show a => Src.Jabba.Abs.Arg' a -> Result
 transArg x = case x of

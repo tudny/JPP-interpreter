@@ -94,6 +94,7 @@ Program
 Instr :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Instr) }
 Instr
   : 'fun' Ident '(' ListArg ')' ':' Type Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.DFun (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4) (snd $7) (snd $8)) }
+  | 'fun' Ident '(' ListArg ')' Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.DFunUnit (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4) (snd $6)) }
   | ';' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IUnit (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | Ident '++' ';' { (fst $1, Src.Jabba.Abs.IIncr (fst $1) (snd $1)) }
   | Ident '--' ';' { (fst $1, Src.Jabba.Abs.IDecr (fst $1) (snd $1)) }
@@ -130,6 +131,7 @@ ListArg
 Item :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Item) }
 Item
   : Ident ':' Type '=' Expr { (fst $1, Src.Jabba.Abs.DItemVal (fst $1) (snd $1) (snd $3) (snd $5)) }
+  | Ident '=' Expr { (fst $1, Src.Jabba.Abs.DItemAuto (fst $1) (snd $1) (snd $3)) }
   | Ident ':' Type { (fst $1, Src.Jabba.Abs.DItem (fst $1) (snd $1) (snd $3)) }
 
 ListItem :: { (Src.Jabba.Abs.BNFC'Position, [Src.Jabba.Abs.Item]) }

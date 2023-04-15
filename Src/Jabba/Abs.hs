@@ -25,6 +25,7 @@ data Program' a = PProgram a [Instr' a]
 type Instr = Instr' BNFC'Position
 data Instr' a
     = DFun a Ident [Arg' a] (Type' a) (Block' a)
+    | DFunUnit a Ident [Arg' a] (Block' a)
     | IUnit a
     | IIncr a Ident
     | IDecr a Ident
@@ -56,7 +57,9 @@ data Arg' a
 
 type Item = Item' BNFC'Position
 data Item' a
-    = DItemVal a Ident (Type' a) (Expr' a) | DItem a Ident (Type' a)
+    = DItemVal a Ident (Type' a) (Expr' a)
+    | DItemAuto a Ident (Expr' a)
+    | DItem a Ident (Type' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Decl = Decl' BNFC'Position
@@ -143,6 +146,7 @@ instance HasPosition Program where
 instance HasPosition Instr where
   hasPosition = \case
     DFun p _ _ _ _ -> p
+    DFunUnit p _ _ _ -> p
     IUnit p -> p
     IIncr p _ -> p
     IDecr p _ -> p
@@ -173,6 +177,7 @@ instance HasPosition Arg where
 instance HasPosition Item where
   hasPosition = \case
     DItemVal p _ _ _ -> p
+    DItemAuto p _ _ -> p
     DItem p _ _ -> p
 
 instance HasPosition Decl where

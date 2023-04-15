@@ -4,9 +4,11 @@ import Src.Types
 import Src.Jabba.Par
 import Src.Jabba.Abs
 import System.Directory.Internal.Prelude (exitFailure)
-import Src.TypeChecker (typeCheck, typeCheckWithEnv, Env (Env))
+import Src.TypeChecker (typeCheck, typeCheckWithEnv, Env (Env), emptyEnv)
 import qualified Data.Map as Map
 import Debug.Trace (trace)
+
+type TestCase = (String, String, Env, ErrType)
 
 type FileTestCase = (String, ErrType)
 type InlineTestCase = (String, Env, ErrType)
@@ -367,14 +369,14 @@ checkErrorMatch t h =
         TypeChecker _ t' -> t == t'
         _ -> False
 
-testSingleFileCase :: FileTestCase -> IO ()
-testSingleFileCase (name, expected) = do
-  fileContent <- readFile ("bad/" ++ name ++ ".jbb")
-  let ts = myLexer fileContent
+
+testSingleInlineCase :: TestCase -> IO ()
+testSingleInlineCase (name, content, env, expected) = do
+  let ts = myLexer content
   case go ts of
     Left err -> do
       if checkErrorMatch expected err
-        then putStrLn $ "Success " ++ show name
+        then putStrLn $ "Success " ++ "\"" ++ take 40 name ++ "\""
         else do
           putStrLn $ "Failure " ++ show name
           putStrLn $ "Expected: " ++ show expected
@@ -388,32 +390,17 @@ testSingleFileCase (name, expected) = do
   where
     go ts = do
       tree <- left ParserErr $ pProgram ts
-      typeCheck tree
-      pure ()
-
-
-testSingleInlineCase :: InlineTestCase -> IO ()
-testSingleInlineCase (content, env, expected) = do
-  let ts = myLexer content
-  case go ts of
-    Left err -> do
-      if checkErrorMatch expected err
-        then putStrLn $ "Success " ++ "\"" ++ take 40 content ++ "\""
-        else do
-          putStrLn $ "Failure " ++ show content
-          putStrLn $ "Expected: " ++ show expected
-          putStrLn $ "Got: " ++ show err
-          exitFailure
-    Right _ -> do
-      putStrLn $ "Failure " ++ show content
-      putStrLn $ "Expected: " ++ show expected
-      putStrLn $ "Got: " ++ "No error"
-      exitFailure
-  where
-    go ts = do
-      tree <- left ParserErr $ pProgram ts
       typeCheckWithEnv env tree
       pure ()
+
+
+fileCaseResolve :: FileTestCase -> IO TestCase
+fileCaseResolve (name, expected) = do
+  fileContent <- readFile ("bad/" ++ name ++ ".jbb")
+  pure (name, fileContent, emptyEnv, expected)
+
+inlineCaseResolve :: InlineTestCase -> IO TestCase
+inlineCaseResolve (content, env, expected) = pure (content, content, env, expected)
 
 
 main :: IO ()
@@ -421,5 +408,6 @@ main = do
   putStrLn "Running tests..."
   putStrLn $ "Detected files number: " ++ show (length testFiles)
   putStrLn $ "Detected inline tests number: " ++ show (length inlineTests) 
-  mapM_ testSingleFileCase testFiles
-  mapM_ testSingleInlineCase inlineTests
+  fileCases <- mapM fileCaseResolve testFiles
+  inlineCases <- mapM inlineCaseResolve inlineTests
+  mapM_ testSingleInlineCase $ fileCases ++ inlineCases

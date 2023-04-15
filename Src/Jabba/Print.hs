@@ -147,6 +147,7 @@ instance Print (Src.Jabba.Abs.Program' a) where
 instance Print (Src.Jabba.Abs.Instr' a) where
   prt i = \case
     Src.Jabba.Abs.DFun _ id_ args type_ block -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 id_, doc (showString "("), prt 0 args, doc (showString ")"), doc (showString ":"), prt 0 type_, prt 0 block])
+    Src.Jabba.Abs.DFunUnit _ id_ args block -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 id_, doc (showString "("), prt 0 args, doc (showString ")"), prt 0 block])
     Src.Jabba.Abs.IUnit _ -> prPrec i 0 (concatD [doc (showString ";")])
     Src.Jabba.Abs.IIncr _ id_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString "++"), doc (showString ";")])
     Src.Jabba.Abs.IDecr _ id_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString "--"), doc (showString ";")])
@@ -182,6 +183,7 @@ instance Print [Src.Jabba.Abs.Arg' a] where
 instance Print (Src.Jabba.Abs.Item' a) where
   prt i = \case
     Src.Jabba.Abs.DItemVal _ id_ type_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString ":"), prt 0 type_, doc (showString "="), prt 0 expr])
+    Src.Jabba.Abs.DItemAuto _ id_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString "="), prt 0 expr])
     Src.Jabba.Abs.DItem _ id_ type_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString ":"), prt 0 type_])
 
 instance Print [Src.Jabba.Abs.Item' a] where

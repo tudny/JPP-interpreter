@@ -152,6 +152,7 @@ checkTypeI (IFor pos v e1 e2 bl) = do
         >>= \(x, _) -> pure (x, False)
 checkTypeI IForGen {} = undefined
 checkTypeI (IBBlock _ b) = checkTypeB b
+checkTypeI (DFunUnit pos fName args b) = checkTypeI (DFun pos fName args (TVoid pos) b)
 checkTypeI (DFun pos fName args t b) = do
     args' <- mapM resolveFnArg args
     checkAllNamesAreUnique Set.empty $ map (\(i, t, _, _, p) -> (i, t, p)) args'
@@ -232,6 +233,9 @@ checkTypeItem (DItemVal pos v t e) = do
         then pure (v, t', pos)
         else throwError $ TypeChecker pos $ WrongType v t' [et']
 checkTypeItem (DItem pos v t) = pure (v, absTypeToVarType t, pos)
+checkTypeItem (DItemAuto pos v e) = do
+    et' <- checkTypeE e
+    pure (v, et', pos)
 
 
 checkTypeE :: Expr -> IM VarType

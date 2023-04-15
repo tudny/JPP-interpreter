@@ -25,6 +25,7 @@ data Program' a = PProgram a [Instr' a]
 type Instr = Instr' BNFC'Position
 data Instr' a
     = DFun a Ident [Arg' a] (Type' a) (Block' a)
+    | DFunUnit a Ident [Arg' a] (Block' a)
     | IUnit a
     | IIncr a Ident
     | IDecr a Ident
@@ -43,6 +44,7 @@ data Instr' a
     | IForGen a Ident (Expr' a) (Block' a)
     | IExpr a (Expr' a)
     | IDecl a (Decl' a)
+    | IBBlock a (Block' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Arg = Arg' BNFC'Position
@@ -142,6 +144,7 @@ instance HasPosition Program where
 instance HasPosition Instr where
   hasPosition = \case
     DFun p _ _ _ _ -> p
+    DFunUnit p _ _ _ -> p
     IUnit p -> p
     IIncr p _ -> p
     IDecr p _ -> p
@@ -160,6 +163,7 @@ instance HasPosition Instr where
     IForGen p _ _ _ -> p
     IExpr p _ -> p
     IDecl p _ -> p
+    IBBlock p _ -> p
 
 instance HasPosition Arg where
   hasPosition = \case

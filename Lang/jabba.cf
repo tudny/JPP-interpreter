@@ -7,6 +7,8 @@ PProgram.       Program ::= [Instr] ;
 
 DFun.           Instr ::= "fun" Ident "(" [Arg] ")" ":" Type Block ;
 
+DFunUnit.       Instr ::= "fun" Ident "(" [Arg] ")" Block ;
+
 -- separator nonempty       TopDecl "" ;
 
 RefMutArg.      Arg ::= "var" Ident ":" Type;
@@ -22,6 +24,8 @@ separator       Arg "," ;
 -- Declarations -------------------------------------------
 
 DItemVal.       Item ::= Ident ":" Type "=" Expr ;
+
+DItemAuto.      Item ::= Ident "=" Expr ;
 
 DItem.          Item ::= Ident ":" Type ;
 

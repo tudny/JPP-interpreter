@@ -26,6 +26,7 @@ transProgram x = case x of
 transInstr :: Show a => Src.Jabba.Abs.Instr' a -> Result
 transInstr x = case x of
   Src.Jabba.Abs.DFun _ ident args type_ block -> failure x
+  Src.Jabba.Abs.DFunUnit _ ident args block -> failure x
   Src.Jabba.Abs.IUnit _ -> failure x
   Src.Jabba.Abs.IIncr _ ident -> failure x
   Src.Jabba.Abs.IDecr _ ident -> failure x
@@ -56,6 +57,7 @@ transArg x = case x of
 transItem :: Show a => Src.Jabba.Abs.Item' a -> Result
 transItem x = case x of
   Src.Jabba.Abs.DItemVal _ ident type_ expr -> failure x
+  Src.Jabba.Abs.DItemAuto _ ident expr -> failure x
   Src.Jabba.Abs.DItem _ ident type_ -> failure x
 
 transDecl :: Show a => Src.Jabba.Abs.Decl' a -> Result
