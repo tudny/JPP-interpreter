@@ -27,7 +27,9 @@ import Control.Monad.Reader (ReaderT, runReaderT, ask, local)
 import Control.Monad.State (StateT, evalStateT, get, put, modify, gets)
 import qualified Data.Map as Map (Map, empty, insert, lookup, fromList)
 import Debug.Trace (trace) -- TODO: remove
-import Data.Maybe (isJust)
+-- TODO: remove
+import Data.Maybe (isJust, isNothing)
+import Data.List (zip4)
 
 -- =============================================================================
 
@@ -43,6 +45,10 @@ envGet i (Env m) = case Map.lookup i m of
 
 insertEnv :: Ident -> Loc -> Env -> Env
 insertEnv i l (Env m) = Env $ Map.insert i l m
+
+insertEnvMany :: [(Ident, Loc)] -> Env -> Env
+insertEnvMany [] e = e
+insertEnvMany ((i, l):xs) e = insertEnvMany xs $ insertEnv i l e
 
 type ModEnv = Env -> Env
 
@@ -92,6 +98,14 @@ storeGet l (Store _ m) = case Map.lookup l m of
     Nothing -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
     Just v -> pure v
 
+reserveN :: Int -> IM [Loc]
+reserveN n = do
+    store <- get
+    -- first we reserve memory for all variables
+    let (locs, store') = foldl (\ (ls, s) _ -> let (nl, s') = newlock s in (nl:ls, s')) ([], store) [1..n]
+    put store'
+    pure locs
+
 type ModStore = Store -> Store
 
 -- =============================================================================
@@ -114,9 +128,7 @@ evalP (PProgram _ is) = void $ evalIs is
 
 
 evalIs :: [Instr] -> IM RetType
-
 evalIs [] = pure (Nothing, Nothing)
-
 evalIs ((IExpr _ e):is) = do
     n <- evalE e
     trace ("Expr: " ++ show n) $ evalIs is
@@ -169,9 +181,22 @@ evalIs ((IFor _ v e1 e2 b):is) = do
     loc <- newlockM
     local (insertEnv v loc) (runFor loc range b) >>= handleRetType is
 evalIs ((IBBlock _ b):is) = evalB b >>= handleRetType is
+evalIs ((DFun _ fN args t b):is) = do
+    let args' = map resolveDeclArg args
+    env <- ask
+    loc <- newlockM
+    let f = VTFun args' b (insertEnv fN loc env)
+    modify $ insert loc f
+    local (insertEnv fN loc) (evalIs is)
+evalIs ((DFunUnit pos fN args b):is) = evalIs (DFun pos fN args (TVoid pos) b:is)
 
 
-evalIs _ = undefined -- TODO: implement
+
+resolveDeclArg :: Arg -> (Ident, VarRef)
+resolveDeclArg (RefMutArg    _ i _) = (i, VRRef)
+resolveDeclArg (RefConstArg  _ i _) = (i, VRRef)
+resolveDeclArg (CopyMutArg   _ i _) = (i, VRCopy)
+resolveDeclArg (CopyConstArg _ i _) = (i, VRCopy)
 
 
 
@@ -206,20 +231,23 @@ modIntVar v f = do
 
 
 evalD :: Decl -> IM ModEnv
-evalD (DVar _ vars) = addVarsToEnv vars
-evalD (DVal _ vars) = addVarsToEnv vars
+evalD (DVar _ vars) = addItemsToEnv vars
+evalD (DVal _ vars) = addItemsToEnv vars
 
 
 
-addVarsToEnv :: [Item] -> IM ModEnv
-addVarsToEnv vars = do
+addItemsToEnv :: [Item] -> IM ModEnv
+addItemsToEnv vars = do
     items <- mapM resolveItem vars
-    store <- get
-    -- first we reserve memory for all variables
-    let (locs, store') = foldl (\ (ls, s) _ -> let (nl, s') = newlock s in (nl:ls, s')) ([], store) items
-    put store'
+    addVarsToEnv items
+
+
+
+addVarsToEnv :: [(Ident, Value)] -> IM ModEnv
+addVarsToEnv items = do
+    locs <- reserveN $ length items
     -- then we insert values into memory
-    mapM_ (\ ((i, v), l) -> modify $ insert l v) $ zip items locs
+    mapM_ (\ ((_, v), l) -> modify $ insert l v) $ zip items locs
     let ids = map fst items
     -- we need to tell how to modify environment
     let envMod (Env m) = Env $ foldl (\ m' (i, l) -> Map.insert i l m') m $ zip ids locs
@@ -304,9 +332,47 @@ evalE (ETer _ eb e1 e2) = do
     if b
         then evalE e1
         else evalE e2
+evalE (ERun pos e argsE) = do
+    (VTFun args b env) <- evalE e
+    argsVMl <- mapM evalERef argsE
+    let (argsV, argsMl) = unzip argsVMl
+    let (argsI, argsR) = unzip args
+    argsL <- mapM insertArg $ zip3 argsR argsV argsMl
+    let envInserter = insertEnvMany $ zip argsI argsL
+    (ret, Nothing) <- local envInserter $ evalB b
+    case ret of 
+        Nothing -> pure VTUnit
+        Just v  -> pure v
+    where
+        insertArg :: (VarRef, Value, Maybe Loc) -> IM Loc
+        insertArg (r, v, ml) = do
+            loc <- case r of
+              VRRef -> do
+                let Just l = ml
+                pure l
+              VRCopy -> do
+                [l] <- reserveN 1
+                pure l
+            modify $ insert loc v
+            pure loc
+
 
 
 evalE _ = undefined -- TODO: implement
+
+
+
+
+evalERef :: Expr -> IM (Value, Maybe Loc)
+evalERef (EVarName pos v) = do
+    loc <- envGet v =<< ask
+    store <- get
+    v <- storeGet loc store
+    pure (v, Just loc)
+evalERef e = do
+    v <- evalE e
+    pure (v, Nothing)
+
 
 
 doRelOp :: RelOp -> Value -> Value -> IM Bool
