@@ -105,10 +105,12 @@ fun inc_to_10(var x: Integer) : Integer {
     return inc_to_10(x);
 }
 
-var x: Integer = inc_to_10(0);
+var arg: Integer = 0;
+var x: Integer = inc_to_10(arg);
 writeInt(x);
 // wypisze "10"
 
-var x: Integer = inc_to_10(20);
+arg = 20;
+var x: Integer = inc_to_10(arg);
 writeInt(x);
 // wypisze "20"

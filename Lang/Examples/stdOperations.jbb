@@ -10,7 +10,7 @@ var a: Integer = 42;
 var b: Integer = 11;
 
 a == x;  // prawda
-a != y;  // fałsz
+a != x;  // fałsz
 a == b;  // fałsz
 a != b;  // prawda
 
@@ -22,8 +22,8 @@ a >= b;  // prawda
 a <= x;  // prawda
 a >= x;  // prawda
 
-var b0: Boolean = False;
-var b1: Boolean = True;
+var b0: Boolean = false;
+var b1: Boolean = true;
 
 // logiczny `and`
 b0 && b1;   // fałsz

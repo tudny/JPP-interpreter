@@ -7,18 +7,18 @@ var z: Integer = a - b; // z = 4
 z = a * b;              // z = 437
 z = a / b;              // z = 1
 
-var b: Boolean = True;
-b = a < b;  // b = False
-b = a > b;  // b = True
-b = a <= b; // b = False
-b = a >= b; // b = True
-b = a == b; // b = False
-b = a != b; // b = True
+var B: Boolean = true;
+B = a < b;  // b = false
+B = a > b;  // b = true
+B = a <= b; // b = false
+B = a >= b; // b = true
+B = a == b; // b = false
+B = a != b; // b = true
 
-var b1: Boolean = True;
-var b2: Boolean = False;
-var b3: Boolean = b1 && b2;  // b3 = False
-b3              = b1 || b2;  // b3 = True
+var b1: Boolean = true;
+var b2: Boolean = false;
+var b3: Boolean = b1 && b2;  // b3 = false
+b3              = b1 || b2;  // b3 = true
 
 var s: String = "Hello";
 // Pozwalamy na konkatenację stringów.

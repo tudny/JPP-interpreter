@@ -3,3 +3,5 @@
 fun foo(val g: Gen[Integer]) : Unit {
     return;
 }
+
+x;

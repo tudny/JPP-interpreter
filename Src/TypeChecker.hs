@@ -45,6 +45,26 @@ newtype Env = Env (TypeEnv, FnEnv)
 type IM a = ExceptT ErrHolder (State Env) a
 
 
+emptyEnv :: Env
+emptyEnv = Env (Map.empty, Map.empty)
+
+
+stdLib :: Env
+stdLib = Env (
+        Map.empty,
+        Map.fromList [
+            (Ident "writeStr", (Fn [(VTString, VMConst, VRRef)] VTVoid, emptyEnv)),
+            (Ident "writeInt", (Fn [(VTInt, VMConst, VRRef)] VTVoid, emptyEnv)),
+            (Ident "toString", (Fn [(VTInt, VMConst, VRRef)] VTString, emptyEnv)),
+            (Ident "toInt", (Fn [(VTString, VMConst, VRRef)] VTInt, emptyEnv))
+        ]
+    )
+
+
+envUnion :: Env -> Env -> Env
+envUnion (Env (te1, fe1)) (Env (te2, fe2)) = Env (Map.union te1 te2, Map.union fe1 fe2)
+
+
 localState :: (Env -> Env) -> IM a -> IM a
 localState f m = do
     s <- get
@@ -59,7 +79,7 @@ typeCheck = typeCheckWithEnv $ Env (Map.empty, Map.empty)
 
 
 typeCheckWithEnv :: Env -> Program -> Either ErrHolder ()
-typeCheckWithEnv env p = evalState (runExceptT (checkTypeP p)) env
+typeCheckWithEnv env p = evalState (runExceptT (checkTypeP p)) $ envUnion env stdLib
 
 
 checkTypeP :: Program -> IM ()
@@ -233,11 +253,12 @@ checkTypeE (ERun pos fn es) = do
 checkTypeE (ENeg pos (ONeg _) e) = checkExprSingleOp "negation" pos e VTInt
 checkTypeE (ENot pos (ONot _) e) = checkExprSingleOp "negation" pos e VTBool
 checkTypeE (EMul pos e1 (ODiv _) (EIntLit _ 0)) = throwError $ TypeChecker pos ZeroLiternalDiv
-checkTypeE (EMul pos e1 op e2) = checkExprBiOp (getMulOpName op) pos e1 e2 VTInt
-checkTypeE (ESum pos e1 op e2) = checkExprBiOp (getSumOpName op) pos e1 e2 VTInt
-checkTypeE (ERel pos e1 op e2) = checkExprBiOp (getRelOpName op) pos e1 e2 VTInt >> pure VTBool
-checkTypeE (EBAnd pos e1 (OAnd _) e2) = checkExprBiOp "and" pos e1 e2 VTBool
-checkTypeE (EBOr pos e1 (OOr _) e2) = checkExprBiOp "or" pos e1 e2 VTBool
+checkTypeE (EMul pos e1 op e2) = checkExprBiOp (getMulOpName op) pos e1 e2 [VTInt]
+checkTypeE (ESum pos e1 op@(OPlus _) e2) = checkExprBiOp (getSumOpName op) pos e1 e2 [VTInt, VTString]
+checkTypeE (ESum pos e1 op e2) = checkExprBiOp (getSumOpName op) pos e1 e2 [VTInt]
+checkTypeE (ERel pos e1 op e2) = checkExprBiOp (getRelOpName op) pos e1 e2 [VTInt] >> pure VTBool
+checkTypeE (EBAnd pos e1 (OAnd _) e2) = checkExprBiOp "and" pos e1 e2 [VTBool]
+checkTypeE (EBOr pos e1 (OOr _) e2) = checkExprBiOp "or" pos e1 e2 [VTBool]
 checkTypeE (ETer pos eb e1 e2) = do
     t1 <- checkTypeE e1
     t2 <- checkTypeE e2
@@ -305,9 +326,9 @@ checkCallArgumentType pos t t' id = do
         else throwError $ TypeChecker pos $ WrongTypeArg id t t'
 
 
--- There are 12 cases to check, but only 2 are problematic.
+-- There are 12 cases to check, but only 3 are problematic.
 checkCallArgumentMutability :: BNFC'Position -> Maybe VarMutability -> (VarMutability, VarRef) -> Int -> IM ()
-checkCallArgumentMutability pos Nothing (_, VRRef) id = throwError $ TypeChecker pos $ ExprMutPass id
+checkCallArgumentMutability pos Nothing (VMMut, VRRef) id = throwError $ TypeChecker pos $ ExprMutPass id
 checkCallArgumentMutability pos (Just VMConst) (VMMut, VRRef) id = throwError $ TypeChecker pos $ ImmutMutPass id
 checkCallArgumentMutability _ _ _ _ = pure ()
 
@@ -353,10 +374,10 @@ checkExprSingleOp opN pos e t = do
         else throwError $ TypeChecker pos $ WrongTypeOp opN t'
 
 
-checkExprBiOp :: String -> BNFC'Position -> Expr' BNFC'Position -> Expr' BNFC'Position -> VarType -> IM VarType
-checkExprBiOp opN pos e1 e2 t = do
+checkExprBiOp :: String -> BNFC'Position -> Expr' BNFC'Position -> Expr' BNFC'Position -> [VarType] -> IM VarType
+checkExprBiOp opN pos e1 e2 ts = do
     t1 <- checkTypeE e1
     t2 <- checkTypeE e2
-    if t1 == t && t2 == t
-        then pure t
+    if t1 == t2 && t1 `elem` ts
+        then pure t1
         else throwError $ TypeChecker pos $ WrongTypeBiOp opN t1 t2
