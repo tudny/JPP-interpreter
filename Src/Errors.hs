@@ -40,6 +40,7 @@ data ErrType
 
 data RuntimeType
     = ZeroDiv
+    | TypeCheckerDidntCatch
     deriving (Eq)
 
 
