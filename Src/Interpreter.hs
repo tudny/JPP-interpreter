@@ -8,7 +8,7 @@ import Prelude
   , Show, show
   , IO, (>>), (>>=), mapM_, putStrLn
   , FilePath
-  , getContents, readFile, print
+  , getContents, readFile, print, Applicative (pure)
   )
 import System.Environment ( getArgs )
 import System.Exit        ( exitFailure )
@@ -33,16 +33,23 @@ runFile p f = putStrLn f >> readFile f >>= run p
 run :: ParseFun Program -> String -> IO ()
 run p s = case go of
   Left err -> do
-    putStrLn "\nError!\n"
+    putStrLn "\nPrerun Error!\n"
     print err
     exitFailure
-  Right io -> io
+  Right p -> do
+    e <- evaluate p
+    case e of
+      Left eh -> do
+        putStrLn "\nRuntime Error!\n"
+        print eh
+        exitFailure
+      Right () -> pure ()
   where
     ts = myLexer s
     go = do
       tree <- left ParserErr $ p ts
       typeCheck tree
-      evaluate tree
+      pure tree
 
 usage :: IO ()
 usage = do

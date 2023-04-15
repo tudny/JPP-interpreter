@@ -8,6 +8,7 @@ type Err = Either ErrHolder
 data ErrHolder 
     = ParserErr String
     | TypeChecker BNFC'Position ErrType
+    | RuntimeError BNFC'Position RuntimeType
 
 data ErrType
     = ImmutVar Ident
@@ -37,6 +38,11 @@ data ErrType
     deriving (Eq)
 
 
+data RuntimeType
+    = ZeroDiv
+    deriving (Eq)
+
+
 showPos :: BNFC'Position -> String
 showPos BNFC'NoPosition = "unknown position"
 showPos (BNFC'Position l c) = "line " ++ show l ++ ", column " ++ show c
@@ -54,6 +60,9 @@ instance Show ErrHolder where
     show (ParserErr err) = 
         "There was a parsing problem " ++ 
         show err
+    show (RuntimeError pos errT) = 
+        "There was a runtime problem at " ++ showPos pos ++
+        ": " ++ show errT
 
 
 instance Show ErrType where
@@ -81,3 +90,7 @@ instance Show ErrType where
     show (FunctionReturnMismatch i t1 t2) = "function " ++ show i ++ " returns type " ++ show t1 ++ " but evaluated " ++ show t2 ++ "."
     show (FunctionMaybeReturn i t) = "not all paths in function " ++ show i ++ " return a value and return type is " ++ show t ++ "."
     show (NotFnType t) = "type " ++ show t ++ " is not a function type."
+
+
+instance Show RuntimeType where
+    show ZeroDiv = "division by zero."
