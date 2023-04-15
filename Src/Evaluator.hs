@@ -24,9 +24,10 @@ import Src.Types ( VarRef (..) )
 import Src.Errors ( ErrHolder, Err (..), ErrHolder (RuntimeError), RuntimeType (..) )
 import Control.Monad.Except (ExceptT, runExceptT, throwError, void)
 import Control.Monad.Reader (ReaderT, runReaderT, ask, local)
-import Control.Monad.State (StateT, evalStateT, get, put, modify)
+import Control.Monad.State (StateT, evalStateT, get, put, modify, gets)
 import qualified Data.Map as Map (Map, empty, insert, lookup, fromList)
 import Debug.Trace (trace) -- TODO: remove
+import Data.Maybe (isJust)
 
 -- =============================================================================
 
@@ -40,6 +41,9 @@ envGet i (Env m) = case Map.lookup i m of
     Nothing -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
     Just l -> pure l
 
+insertEnv :: Ident -> Loc -> Env -> Env
+insertEnv i l (Env m) = Env $ Map.insert i l m
+
 type ModEnv = Env -> Env
 
 -- =============================================================================
@@ -51,6 +55,13 @@ data Value
     | VTString String
     | VTUnit
     | VTFun [FnArg] Block Env
+
+instance Show Value where
+    show (VTInt i) = show i
+    show (VTBool b) = show b
+    show (VTString s) = show s
+    show VTUnit = "()"
+    show VTFun {} = "<function>"
 
 data LoopControlFlow = Break | Continue
 
@@ -65,6 +76,13 @@ emptyStore = Store 0 Map.empty
 
 newlock :: Store -> (Loc, Store)
 newlock (Store n m) = (n, Store (n + 1) m)
+
+newlockM :: IM Loc
+newlockM = do
+    s <- get
+    let (l, s') = newlock s
+    put s'
+    pure l
 
 insert :: Loc -> Value -> Store -> Store
 insert l v (Store n m) = Store n (Map.insert l v m)
@@ -99,12 +117,91 @@ evalIs :: [Instr] -> IM RetType
 
 evalIs [] = pure (Nothing, Nothing)
 
-evalIs ((IExpr _ e):is) = evalE e >> evalIs is
+evalIs ((IExpr _ e):is) = do
+    n <- evalE e
+    trace ("Expr: " ++ show n) $ evalIs is
 evalIs ((IDecl _ d):is) = do
     mod <- evalD d
     local mod $ evalIs is
+evalIs ((IUnit _):is) = evalIs is
+evalIs ((IIncr _ v):is) = modIntVar v (+1) >> evalIs is
+evalIs ((IDecr _ v):is) = modIntVar v (subtract 1) >> evalIs is
+evalIs ((IAss _ v e):is) = do 
+    n <- evalE e
+    loc <- envGet v =<< ask
+    modify $ insert loc n
+    evalIs is
+evalIs ((IRet _ e):_) = do
+    v <- evalE e
+    pure (Just v, Nothing)
+evalIs ((IRetUnit _):_) = pure (Just VTUnit, Nothing)
+evalIs ((IBreak _):_) = pure (Nothing, Just Break)
+evalIs ((ICont _):_) = pure (Nothing, Just Continue)
+evalIs ((IIf pos eb b):is) = evalIs (IIfElse pos eb b (IBlock pos []):is)
+evalIs ((IIfElse _ eb b1 b2):is) = do
+    (VTBool b) <- evalE eb
+    if b then evalB b1 >>= handleRetType is
+         else evalB b2 >>= handleRetType is
+evalIs all@((IWhile pos e b):is) = do
+    (VTBool cond) <- evalE e
+    if cond then do
+        (ret, flow) <- evalB b
+        if isJust ret then pure (ret, Nothing)
+        else case flow of
+            Nothing -> evalIs all
+            Just Break -> pure (Nothing, Nothing)
+            Just Continue -> evalIs all
+    else evalIs is
+evalIs all@((IWhileFin pos e b bFin):is) = do
+    (VTBool cond) <- evalE e
+    if cond then do
+        (ret, flow) <- evalB b
+        if isJust ret then pure (ret, Nothing)
+        else case flow of
+            Nothing -> evalIs all
+            Just Break -> pure (Nothing, Nothing)
+            Just Continue -> evalIs all
+    else evalB bFin >> evalIs is
+evalIs ((IFor _ v e1 e2 b):is) = do
+    (VTInt n1) <- evalE e1
+    (VTInt n2) <- evalE e2
+    let range = [n1..n2]
+    loc <- newlockM
+    local (insertEnv v loc) (runFor loc range b) >>= handleRetType is
+evalIs ((IBBlock _ b):is) = evalB b >>= handleRetType is
+
 
 evalIs _ = undefined -- TODO: implement
+
+
+
+runFor :: Loc -> [Integer] -> Block -> IM RetType
+runFor loc [] _ = pure (Nothing, Nothing)
+runFor loc (n:ns) b = do
+    modify $ insert loc (VTInt n)
+    (ret, flow) <- evalB b
+    if isJust ret then pure (ret, Nothing)
+    else case flow of
+        Nothing -> runFor loc ns b
+        Just Break -> pure (Nothing, Nothing)
+        Just Continue -> runFor loc ns b
+
+
+
+handleRetType :: [Instr] -> RetType -> IM RetType
+handleRetType is (Nothing, Nothing) = evalIs is
+handleRetType is (Just _, Just _) = undefined -- There should never be a return and a break/continue
+handleRetType is (ret, Nothing) = pure (ret, Nothing)
+handleRetType is (Nothing, controlFlow) = pure (Nothing, controlFlow)
+
+
+
+modIntVar :: Ident -> (Integer -> Integer) -> IM ()
+modIntVar v f = do
+    loc <- envGet v =<< ask
+    store <- get
+    (VTInt n) <- storeGet loc store
+    modify $ insert loc (VTInt $ f n)
 
 
 
@@ -151,7 +248,7 @@ defaultValueForType TFun {} = undefined -- type checker should catch this
 
 
 evalB :: Block -> IM RetType
-evalB _ = undefined -- TODO: implement
+evalB (IBlock _ is) = evalIs is
 
 
 
