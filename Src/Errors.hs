@@ -29,6 +29,10 @@ data ErrType
     | TopLevelProgramMaybeReturn VarType
     | ForRangeTypeMismatch VarType VarType
     | TopLevelProgramLoopFlow
+    | FunctionLoopFlow Ident
+    | FunctionNoReturn Ident VarType
+    | FunctionReturnMismatch Ident VarType VarType
+    | FunctionMaybeReturn Ident VarType
     deriving (Eq)
 
 
@@ -54,7 +58,7 @@ instance Show ErrHolder where
 instance Show ErrType where
     show (ImmutVar i) = "variable " ++ showI i ++ " is immutable."
     show (NotDeclVar i) = "variable " ++ showI i ++ " was not declared in current scope."
-    show (NotDeclFun i) = "function" ++ showI i ++ " was not declared in current scope."
+    show (NotDeclFun i) = "function " ++ showI i ++ " was not declared in current scope."
     show (WrongType i t ex) = "variable " ++ showI i ++ " is of type " ++ show t ++ " but expected " ++ show ex ++ "."
     show (WrongTypeArg i t ex) = "argument " ++ show (i + 1) ++ " is of type " ++ show t ++ " but expected " ++ show ex ++ "."
     show (VarAlreadyDecl i) = "variable " ++ showI i ++ " was already declared in declaration block."
@@ -66,8 +70,12 @@ instance Show ErrType where
     show (TernaryMismatch t1 t2) = "ternary operator has type " ++ show t1 ++ " and " ++ show t2 ++ " as branches."
     show ZeroLiternalDiv = "division by zero literal."
     show (ConstantAssign i) = "variable " ++ showI i ++ " is immutable and cannot be assigned to."
-    show (MismatchedReturnTypes t1 t2) = "function returns type " ++ show t1 ++ " but expected " ++ show t2 ++ "."
+    show (MismatchedReturnTypes t1 t2) = "multiple return statements with types " ++ show t1 ++ " and " ++ show t2 ++ "."
     show (TopLevelProgramReturn t) = "top level program returns type " ++ show t ++ " but expected nothing."
     show (TopLevelProgramMaybeReturn t) = "top level program may return type " ++ show t ++ " but expected nothing."
     show (ForRangeTypeMismatch t1 t2) = "for range has type " ++ show t1 ++ " and " ++ show t2 ++ " as bounds."
     show TopLevelProgramLoopFlow = "top level program contains loop flow statement."
+    show (FunctionLoopFlow i) = "function " ++ show i ++ " contains loop flow statement that is not in a loop."
+    show (FunctionNoReturn i t) = "function " ++ show i ++ " doens't have a return statement and returns type " ++ show t ++ "."
+    show (FunctionReturnMismatch i t1 t2) = "function " ++ show i ++ " returns type " ++ show t1 ++ " but evaluated " ++ show t2 ++ "."
+    show (FunctionMaybeReturn i t) = "not all paths in function " ++ show i ++ " return a value and return type is " ++ show t ++ "."

@@ -20,7 +20,7 @@ import Src.Jabba.Abs ( Ident,
                        )
 import qualified Data.Map as Map
 import qualified Data.Set as Set
-import Control.Monad.Except (ExceptT, MonadError (throwError), runExceptT)
+import Control.Monad.Except (ExceptT, MonadError (throwError), runExceptT, when)
 import Control.Monad.State (StateT (runStateT), State, runState, evalState, MonadState (get, put), modify)
 import Data.List ( nub )
 import qualified Data.Maybe
@@ -40,8 +40,8 @@ data RetType'
 type RetType = (RetType', Bool)
 
 type TypeEnv = Map.Map Ident (VarType, VarMutability)
-type FnEnv = Map.Map Ident (FnType, TypeEnv)
-type Env = (TypeEnv, FnEnv)
+type FnEnv = Map.Map Ident (FnType, Env)
+newtype Env = Env (TypeEnv, FnEnv)
 type IM a = ExceptT ErrHolder (State Env) a
 
 
@@ -55,7 +55,7 @@ localState f m = do
 
 
 typeCheck :: Program -> Err ()
-typeCheck = typeCheckWithEnv (Map.empty, Map.empty)
+typeCheck = typeCheckWithEnv $ Env (Map.empty, Map.empty)
 
 
 typeCheckWithEnv :: Env -> Program -> Either ErrHolder ()
@@ -128,22 +128,43 @@ checkTypeI (IFor pos v e1 e2 bl) = do
     n2 <- checkTypeE e2
     if n1 /= VTInt || n2 /= VTInt
         then throwError $ TypeChecker pos $ ForRangeTypeMismatch n1 n2
-        else localState (onFirst $ Map.insert v (VTInt, VMConst)) $ checkTypeI (IWhile pos (EBoolLitTrue pos) bl)
+        else localState (onVarEnv $ Map.insert v (VTInt, VMConst)) $ checkTypeI (IWhile pos (EBoolLitTrue pos) bl)
         >>= \(x, _) -> pure (x, False)
 checkTypeI IForGen {} = undefined
 checkTypeI (IBBlock _ b) = checkTypeB b
-checkTypeI (DFun pos f args t b) = do
+checkTypeI (DFun pos fName args t b) = do
     args' <- mapM resolveFnArg args
+    checkAllNamesAreUnique Set.empty $ map (\(i, t, _, _, p) -> (i, t, p)) args'
+    let fnArgs = map (\(_, t, m, r, _) -> (t, m, r)) args' 
+    let fnRet = absTypeToVarType t
     saveEnv <- get
-
+    let f = Fn fnArgs fnRet
+    modify $ modifyEnvForFunction (fName, (f, saveEnv)) args'
+    (retType, loopFlow) <- checkTypeB b
+    if loopFlow then throwError $ TypeChecker pos $ FunctionLoopFlow fName
+    else case retType of
+        None -> when (fnRet /= VTVoid) $ throwError $ TypeChecker pos $ FunctionNoReturn fName fnRet
+        Definitive t -> when (t /= fnRet) $ throwError $ TypeChecker pos $ FunctionReturnMismatch fName t fnRet
+        Branching t -> if t /= fnRet
+            then throwError $ TypeChecker pos $ FunctionReturnMismatch fName t fnRet
+            else when (fnRet /= VTVoid) $ throwError $ TypeChecker pos $ FunctionMaybeReturn fName fnRet
+    put saveEnv
+    modify $ onFnEnv $ Map.union $ Map.fromList [(fName, (f, saveEnv))]
     pure (None, False)
 
 
-resolveFnArg :: Arg -> IM (Ident, VarType, VarMutability, VarRef)
-resolveFnArg (RefMutArg    _ v t) = pure (v, absTypeToVarType t, VMMut,   VRRef)
-resolveFnArg (RefConstArg  _ v t) = pure (v, absTypeToVarType t, VMConst, VRRef)
-resolveFnArg (CopyMutArg   _ v t) = pure (v, absTypeToVarType t, VMMut,   VRCopy)
-resolveFnArg (CopyConstArg _ v t) = pure (v, absTypeToVarType t, VMConst, VRCopy)
+modifyEnvForFunction :: (Ident, (FnType, Env)) -> [(Ident, VarType, VarMutability, VarRef, BNFC'Position)] -> Env -> Env
+modifyEnvForFunction f args (Env (vars, fns)) = Env (newVars, newFns)
+    where
+        newVars = Map.union vars $ Map.fromList $ map (\(i, t, m, r, _) -> (i, (t, m))) args
+        newFns = Map.union fns $ Map.fromList [f]
+
+
+resolveFnArg :: Arg -> IM (Ident, VarType, VarMutability, VarRef, BNFC'Position)
+resolveFnArg (RefMutArg    p v t) = pure (v, absTypeToVarType t, VMMut,   VRRef,  p)
+resolveFnArg (RefConstArg  p v t) = pure (v, absTypeToVarType t, VMConst, VRRef,  p)
+resolveFnArg (CopyMutArg   p v t) = pure (v, absTypeToVarType t, VMMut,   VRCopy, p)
+resolveFnArg (CopyConstArg p v t) = pure (v, absTypeToVarType t, VMConst, VRCopy, p)
 
 
 checkTypeB :: Block -> IM RetType
@@ -248,7 +269,7 @@ getRelOpName (RGeq _) = "greater or equal"
 
 getVarType :: BNFC'Position -> Ident -> IM (VarType, VarMutability)
 getVarType pos v = do
-    (envT, envF) <- get
+    Env (envT, envF) <- get
     case Map.lookup v envT of
         Just (t, m) -> pure (t, m)
         Nothing -> throwError $ TypeChecker pos $ NotDeclVar v
@@ -256,7 +277,7 @@ getVarType pos v = do
 
 getF :: BNFC'Position -> Ident -> IM ([(VarType, VarMutability, VarRef)], VarType)
 getF pos fn = do
-    (envT, envF) <- get
+    Env (envT, envF) <- get
     case Map.lookup fn envF of
         Just (Fn args ret, _) -> pure (args, ret)
         _ -> throwError $ TypeChecker pos $ NotDeclFun fn
@@ -309,15 +330,18 @@ checkAllNamesAreUnique s ((v, t, pos):xs) = do
         else checkAllNamesAreUnique (Set.insert v s) xs
 
 
-onFirst :: (a -> b) -> (a, c) -> (b, c)
-onFirst f (a, c) = (f a, c)
+onVarEnv :: (TypeEnv -> TypeEnv) -> Env -> Env
+onVarEnv m (Env (vars, fns)) = Env (m vars, fns)
+
+onFnEnv :: (FnEnv -> FnEnv) -> Env -> Env
+onFnEnv m (Env (vars, fns)) = Env (vars, m fns)
 
 
 declareNewVariables :: BNFC'Position -> [Item' BNFC'Position] -> VarMutability -> IM RetType
 declareNewVariables pos its m = do
     items <- mapM checkTypeItem its
     checkAllNamesAreUnique Set.empty items
-    mapM_ (\(v, t, _) -> modify (onFirst $ Map.insert v (t, m))) items
+    mapM_ (\(v, t, _) -> modify (onVarEnv $ Map.insert v (t, m))) items
     pure (None, False)
 
 
