@@ -240,6 +240,7 @@ checkTypeItem (DItemVal pos v t e) = do
     if t' == et'
         then pure (v, t', pos)
         else throwError $ TypeChecker pos $ WrongType v t' [et']
+checkTypeItem (DItem pos f TFun {}) = throwError $ TypeChecker pos $ FunctionWithoutInitializer f
 checkTypeItem (DItem pos v t) = pure (v, absTypeToVarType t, pos)
 checkTypeItem (DItemAuto pos v e) = do
     et' <- checkTypeE e

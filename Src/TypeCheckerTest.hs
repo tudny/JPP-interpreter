@@ -49,7 +49,9 @@ testFiles = [
     ("12-031-lambda-mismatch", WrongType (Ident "f") (Fn [(VTInt, VMConst, VRRef)] VTInt) [Fn [(VTInt, VMMut, VRRef)] VTInt]),
     ("12-032-function-hide", ConstantAssign (Ident "foo")),
     ("12-033-function-recursion", NotDeclVar (Ident "not_decl")),
-    ("12-034-lambda-passing", NotDeclVar (Ident "not_decl"))
+    ("12-034-lambda-passing", NotDeclVar (Ident "not_decl")),
+    ("12-035-const-in-fun", ConstantAssign (Ident "x")),
+    ("12-036-function-wo-body", FunctionWithoutInitializer (Ident "f"))
   ]
 
 inlineTests :: [InlineTestCase]

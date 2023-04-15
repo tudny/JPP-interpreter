@@ -35,6 +35,7 @@ data ErrType
     | FunctionReturnMismatch Ident VarType VarType
     | FunctionMaybeReturn Ident VarType
     | NotFnType VarType
+    | FunctionWithoutInitializer Ident
     deriving (Eq)
 
 
@@ -91,7 +92,9 @@ instance Show ErrType where
     show (FunctionReturnMismatch i t1 t2) = "function " ++ show i ++ " returns type " ++ show t1 ++ " but evaluated " ++ show t2 ++ "."
     show (FunctionMaybeReturn i t) = "not all paths in function " ++ show i ++ " return a value and return type is " ++ show t ++ "."
     show (NotFnType t) = "type " ++ show t ++ " is not a function type."
+    show (FunctionWithoutInitializer i) = "function " ++ show i ++ " is not initialized."
 
 
 instance Show RuntimeType where
     show ZeroDiv = "division by zero."
+    show TypeCheckerDidntCatch = "type checker didn't catch this error."

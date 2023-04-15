@@ -17,15 +17,16 @@ import Src.Jabba.Abs ( Ident,
                        OrOp' (..), OrOp (..),
                        Expr' (..), Expr (..),
                        Ident (..), HasPosition (hasPosition),
-                       BNFC'Position
+                       BNFC'Position, TArg' (..), TArg (..)
                        )
 
-import Src.Types ( VarRef )
+import Src.Types ( VarRef (..) )
 import Src.Errors ( ErrHolder, Err (..), ErrHolder (RuntimeError), RuntimeType (..) )
-import Control.Monad.Except (ExceptT, runExceptT, throwError)
+import Control.Monad.Except (ExceptT, runExceptT, throwError, void)
 import Control.Monad.Reader (ReaderT, runReaderT, ask, local)
 import Control.Monad.State (StateT, evalStateT, get, put, modify)
 import qualified Data.Map as Map (Map, empty, insert, lookup, fromList)
+import Debug.Trace (trace) -- TODO: remove
 
 -- =============================================================================
 
@@ -38,6 +39,8 @@ envGet :: Ident -> Env -> IM Loc
 envGet i (Env m) = case Map.lookup i m of
     Nothing -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
     Just l -> pure l
+
+type ModEnv = Env -> Env
 
 -- =============================================================================
 
@@ -71,6 +74,8 @@ storeGet l (Store _ m) = case Map.lookup l m of
     Nothing -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
     Just v -> pure v
 
+type ModStore = Store -> Store
+
 -- =============================================================================
 
 --                  errors     local   env  modify memory io
@@ -86,22 +91,62 @@ evaluate p = do
 
 
 evalP :: Program -> IM ()
-evalP (PProgram _ is) = do
-    pure () -- TODO: implement
-
-
-evalI :: Instr -> IM RetType
-
-evalI (IExpr pos e) = do
-    e' <- evalE e
-    pure (Just e', Nothing)
-
-evalI _ = undefined -- TODO: implement
+evalP (PProgram _ is) = void $ evalIs is
 
 
 
-evalD :: Decl -> IM ()
-evalD _ = undefined -- TODO: implement
+evalIs :: [Instr] -> IM RetType
+
+evalIs [] = pure (Nothing, Nothing)
+
+evalIs ((IExpr _ e):is) = evalE e >> evalIs is
+evalIs ((IDecl _ d):is) = do
+    mod <- evalD d
+    local mod $ evalIs is
+
+evalIs _ = undefined -- TODO: implement
+
+
+
+evalD :: Decl -> IM ModEnv
+evalD (DVar _ vars) = addVarsToEnv vars
+evalD (DVal _ vars) = addVarsToEnv vars
+
+
+
+addVarsToEnv :: [Item] -> IM ModEnv
+addVarsToEnv vars = do
+    items <- mapM resolveItem vars
+    store <- get
+    -- first we reserve memory for all variables
+    let (locs, store') = foldl (\ (ls, s) _ -> let (nl, s') = newlock s in (nl:ls, s')) ([], store) items
+    put store'
+    -- then we insert values into memory
+    mapM_ (\ ((i, v), l) -> modify $ insert l v) $ zip items locs
+    let ids = map fst items
+    -- we need to tell how to modify environment
+    let envMod (Env m) = Env $ foldl (\ m' (i, l) -> Map.insert i l m') m $ zip ids locs
+    pure envMod
+
+
+
+resolveItem :: Item -> IM (Ident, Value)
+resolveItem (DItemVal _ i _ e) = do
+    v <- evalE e
+    pure (i, v)
+resolveItem (DItemAuto _ i e) = do
+    v <- evalE e
+    pure (i, v)
+resolveItem (DItem _ i t) = pure (i, defaultValueForType t)
+
+
+
+defaultValueForType :: Type -> Value
+defaultValueForType (TInt _) = VTInt 0
+defaultValueForType (TBool _) = VTBool False
+defaultValueForType (TString _) = VTString ""
+defaultValueForType (TVoid _) = VTUnit
+defaultValueForType TFun {} = undefined -- type checker should catch this
 
 
 
