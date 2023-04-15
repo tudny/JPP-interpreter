@@ -68,13 +68,21 @@ fun filter(
     val m: (val Integer) -> Boolean
 ) : (val Integer) -> Integer {
     return |val x: Integer| {
-        if (m(t(x))) {
+        if m(t(x)) {
             return t(x);
         } else {
             return -1;
         }
     };
 }
+
+fun map(
+    val t: (val Integer) -> Integer, 
+    val m: (val Integer) -> Integer
+) : (val Integer) -> Integer {
+    return |val x: Integer| m(t(x));
+}
+
 
 val isOdd = |val x: Integer| x % 2 == 1;
 
@@ -95,5 +103,43 @@ var incrL = |var x: Integer| { x = x + 1; };
 
 var x = 10;
 incr(x);
+
+
+fun head(
+    val t: (val Integer) -> Integer
+) : Integer {
+    var i = 0;
+    while (t(i) == -1) {
+        i = i + 1;
+    }
+    return i;
+}
+
+fun tail(
+    val t: (val Integer) -> Integer
+) : (val Integer) -> Integer {
+    val i = head(t);
+    return |val x: Integer| t(x + i);
+}
+
+
+fun filterPrimes(
+    val t: (val Integer) -> Integer
+) : (val Integer) -> Integer {
+    val i = head(t);
+    val rest = tail(t);
+    // use filter
+    return filterPrimes(filter(rest, |val x: Integer| x % i != 0));
+}
+
+
+val primes = filterPrimes(natArray());
+
+// I don't know if it works, but TypeChecker parses it :)))))))
+for x = 0..100 {
+    if (primes(x) != -1) {
+        writeInt(primes(x));
+    }
+}
 
 

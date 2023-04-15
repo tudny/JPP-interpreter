@@ -13,7 +13,7 @@ done
 
 for file in good/*.jbb; do
     echo "Testing $file"
-    ./Interpreter $file > /dev/null 2>&1
+    ./Interpreter $file # > /dev/null 2>&1
     if [ $? -ne 0 ]; then
         echo "Failed to eval $file"
         exit 1
