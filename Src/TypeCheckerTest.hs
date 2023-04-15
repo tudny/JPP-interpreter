@@ -46,7 +46,10 @@ testFiles = [
     ("12-028-fun-return-match", MismatchedReturnTypes VTInt VTString),
     ("12-029-fun-return-match2", FunctionReturnMismatch (Ident "foo") VTInt VTString),
     ("12-030-fun-call-mut", ImmutMutPass 0),
-    ("12-031-lambda-mismatch", WrongType (Ident "f") (Fn [(VTInt, VMConst, VRRef)] VTInt) [Fn [(VTInt, VMMut, VRRef)] VTInt])
+    ("12-031-lambda-mismatch", WrongType (Ident "f") (Fn [(VTInt, VMConst, VRRef)] VTInt) [Fn [(VTInt, VMMut, VRRef)] VTInt]),
+    ("12-032-function-hide", ConstantAssign (Ident "foo")),
+    ("12-033-function-recursion", NotDeclVar (Ident "not_decl")),
+    ("12-034-lambda-passing", NotDeclVar (Ident "not_decl"))
   ]
 
 inlineTests :: [InlineTestCase]
@@ -357,6 +360,11 @@ inlineTests = [
       "var x: Integer = 1; x = true;",
       Env Map.empty,
       WrongType (Ident "x") VTInt [VTBool]
+    ),
+    (
+      "var b = || { return true; }; b = || { return 1; };",
+      Env Map.empty,
+      WrongType (Ident "b") (Fn [] VTBool) [Fn [] VTInt]
     )
   ]
 
@@ -374,7 +382,7 @@ testSingleInlineCase (name, content, env, expected) = do
   case go ts of
     Left err -> do
       if checkErrorMatch expected err
-        then putStrLn $ "Success " ++ "\"" ++ take 40 name ++ "\""
+        then putStrLn $ "Success " ++ "\"" ++ trim name ++ "\""
         else do
           putStrLn $ "Failure " ++ show name
           putStrLn $ "Expected: " ++ show expected
@@ -386,6 +394,8 @@ testSingleInlineCase (name, content, env, expected) = do
       putStrLn $ "Got: " ++ "No error"
       exitFailure
   where
+    trim x | length x > 40 = take 40 x ++ "..."
+           | otherwise = x
     go ts = do
       tree <- left ParserErr $ pProgram ts
       typeCheckWithEnv env tree

@@ -48,8 +48,12 @@ emptyEnv :: Env
 emptyEnv = Env Map.empty
 
 
+-- Functions defined using `fun` keyword cannot be replaced using lambda expressions
+-- e.g.
+-- fun f() { return 1; }
+-- f = || { return 2; } // Error. `fun` is equivalent to `val`
 fMut :: VarMutability
-fMut = VMMut
+fMut = VMConst
 
 
 envUnion :: Env -> Env -> Env
@@ -63,10 +67,10 @@ envInsert i v (Env e) = Env $ Map.insert i v e
 stdLib :: Env
 stdLib = Env (
         Map.fromList [
-            (Ident "writeStr", (Fn [(VTString, VMConst, VRRef)] VTVoid, fMut)),
-            (Ident "writeInt", (Fn [(VTInt, VMConst, VRRef)] VTVoid, fMut)),
-            (Ident "toString", (Fn [(VTInt, VMConst, VRRef)] VTString, fMut)),
-            (Ident "toInt", (Fn [(VTString, VMConst, VRRef)] VTInt, fMut))
+            (Ident "writeStr", (Fn [(VTString, VMConst, VRCopy)] VTVoid, fMut)),
+            (Ident "writeInt", (Fn [(VTInt, VMConst, VRCopy)] VTVoid, fMut)),
+            (Ident "toString", (Fn [(VTInt, VMConst, VRCopy)] VTString, fMut)),
+            (Ident "toInt", (Fn [(VTString, VMConst, VRCopy)] VTInt, fMut))
         ]
     )
 
