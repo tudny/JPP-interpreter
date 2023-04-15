@@ -374,7 +374,7 @@ checkCallArgumentType pos t t' id = do
 
 -- There are 12 cases to check, but only 3 are problematic.
 checkCallArgumentMutability :: BNFC'Position -> Maybe VarMutability -> (VarMutability, VarRef) -> Int -> IM ()
-checkCallArgumentMutability pos Nothing (VMMut, VRRef) id = throwError $ TypeChecker pos $ ExprMutPass id
+checkCallArgumentMutability pos Nothing (_, VRRef) id = throwError $ TypeChecker pos $ ExprRefPass id
 checkCallArgumentMutability pos (Just VMConst) (VMMut, VRRef) id = throwError $ TypeChecker pos $ ImmutMutPass id
 checkCallArgumentMutability _ _ _ _ = pure ()
 

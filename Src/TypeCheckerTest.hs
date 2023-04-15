@@ -45,7 +45,8 @@ testFiles = [
     ("12-027-fun-var-vis3", NotDeclVar (Ident "x")),
     ("12-028-fun-return-match", MismatchedReturnTypes VTInt VTString),
     ("12-029-fun-return-match2", FunctionReturnMismatch (Ident "foo") VTInt VTString),
-    ("12-030-fun-call-mut", ImmutMutPass 0)
+    ("12-030-fun-call-mut", ImmutMutPass 0),
+    ("12-031-lambda-mismatch", WrongType (Ident "f") (Fn [(VTInt, VMConst, VRRef)] VTInt) [Fn [(VTInt, VMMut, VRRef)] VTInt])
   ]
 
 inlineTests :: [InlineTestCase]
@@ -77,7 +78,7 @@ inlineTests = [
     ),
     (
       "f(1, \"abc\");",
-      Env (Map.fromList [(Ident "f", (Fn [(VTInt, VMConst, VRRef), (VTInt, VMConst, VRRef)] VTInt, fMut))]),
+      Env (Map.fromList [(Ident "f", (Fn [(VTInt, VMConst, VRCopy), (VTInt, VMConst, VRCopy)] VTInt, fMut))]),
       WrongTypeArg 1 VTString VTInt
     ),
     (
@@ -88,7 +89,7 @@ inlineTests = [
     (
       "f(10);",
       Env (Map.fromList [(Ident "f", (Fn [(VTInt, VMMut, VRRef)] VTInt, fMut))]),
-      ExprMutPass 0
+      ExprRefPass 0
     ),
     (
       "f(x);",
@@ -102,14 +103,14 @@ inlineTests = [
       Env (
         Map.fromList [(Ident "x", (VTInt, VMConst)), (Ident "f", (Fn [(VTInt, VMMut, VRRef)] VTInt, fMut))]
       ),
-      ExprMutPass 0
+      ExprRefPass 0
     ),
     (
       "f(x + 0);",
       Env (
         Map.fromList [(Ident "x", (VTInt, VMConst)), (Ident "f", (Fn [(VTInt, VMMut, VRRef)] VTInt, fMut))]
       ),
-      ExprMutPass 0
+      ExprRefPass 0
     ),
     (
       "-\"abc\";",

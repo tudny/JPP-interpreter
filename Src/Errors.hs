@@ -17,7 +17,7 @@ data ErrType
     | WrongTypeArg Int VarType VarType
     | VarAlreadyDecl Ident
     | WrongNumberOfArgs Int Int
-    | ExprMutPass Int
+    | ExprRefPass Int
     | ImmutMutPass Int
     | WrongTypeOp String VarType
     | WrongTypeBiOp String VarType VarType
@@ -64,7 +64,7 @@ instance Show ErrType where
     show (WrongTypeArg i t ex) = "argument " ++ show (i + 1) ++ " is of type " ++ show t ++ " but expected " ++ show ex ++ "."
     show (VarAlreadyDecl i) = "variable " ++ showI i ++ " was already declared in declaration block."
     show (WrongNumberOfArgs ex got) = "function was called with " ++ show got ++ " arguments but expected " ++ show ex ++ " arguments."
-    show (ExprMutPass i) = "expression " ++ show (i + 1) ++ " was passed to a mutable reference argument."
+    show (ExprRefPass i) = "expression " ++ show (i + 1) ++ " was passed to a mutable reference argument."
     show (ImmutMutPass i) = "immutable variable " ++ show (i + 1) ++ " was passed to a mutable reference argument."
     show (WrongTypeOp op t) = "operator " ++ op ++ " is not defined for type " ++ show t ++ "."
     show (WrongTypeBiOp op t1 t2) = "operator " ++ op ++ " is not defined for types " ++ show t1 ++ " and " ++ show t2 ++ "."
