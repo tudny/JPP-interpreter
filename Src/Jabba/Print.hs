@@ -154,8 +154,6 @@ instance Print (Src.Jabba.Abs.Instr' a) where
     Src.Jabba.Abs.IAss _ id_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString "="), prt 0 expr, doc (showString ";")])
     Src.Jabba.Abs.IRet _ expr -> prPrec i 0 (concatD [doc (showString "return"), prt 0 expr, doc (showString ";")])
     Src.Jabba.Abs.IRetUnit _ -> prPrec i 0 (concatD [doc (showString "return"), doc (showString ";")])
-    Src.Jabba.Abs.IYield _ expr -> prPrec i 0 (concatD [doc (showString "yield"), prt 0 expr, doc (showString ";")])
-    Src.Jabba.Abs.IYieldUnit _ -> prPrec i 0 (concatD [doc (showString "yield"), doc (showString ";")])
     Src.Jabba.Abs.IBreak _ -> prPrec i 0 (concatD [doc (showString "break"), doc (showString ";")])
     Src.Jabba.Abs.ICont _ -> prPrec i 0 (concatD [doc (showString "continue"), doc (showString ";")])
     Src.Jabba.Abs.IIf _ expr block -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block])
@@ -163,7 +161,6 @@ instance Print (Src.Jabba.Abs.Instr' a) where
     Src.Jabba.Abs.IWhile _ expr block -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block])
     Src.Jabba.Abs.IWhileFin _ expr block1 block2 -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block1, doc (showString "finally"), prt 0 block2])
     Src.Jabba.Abs.IFor _ id_ expr1 expr2 block -> prPrec i 0 (concatD [doc (showString "for"), prt 0 id_, doc (showString "="), prt 0 expr1, doc (showString ".."), prt 0 expr2, prt 0 block])
-    Src.Jabba.Abs.IForGen _ id_ expr block -> prPrec i 0 (concatD [doc (showString "for"), prt 0 id_, doc (showString "in"), prt 0 expr, prt 0 block])
     Src.Jabba.Abs.IExpr _ expr -> prPrec i 0 (concatD [prt 0 expr, doc (showString ";")])
     Src.Jabba.Abs.IDecl _ decl -> prPrec i 0 (concatD [prt 0 decl, doc (showString ";")])
     Src.Jabba.Abs.IBBlock _ block -> prPrec i 0 (concatD [prt 0 block])
@@ -209,8 +206,20 @@ instance Print (Src.Jabba.Abs.Type' a) where
     Src.Jabba.Abs.TInt _ -> prPrec i 0 (concatD [doc (showString "Integer")])
     Src.Jabba.Abs.TBool _ -> prPrec i 0 (concatD [doc (showString "Boolean")])
     Src.Jabba.Abs.TString _ -> prPrec i 0 (concatD [doc (showString "String")])
-    Src.Jabba.Abs.TGen _ type_ -> prPrec i 0 (concatD [doc (showString "Gen"), doc (showString "["), prt 0 type_, doc (showString "]")])
     Src.Jabba.Abs.TVoid _ -> prPrec i 0 (concatD [doc (showString "Unit")])
+    Src.Jabba.Abs.TFun _ targs type_ -> prPrec i 0 (concatD [doc (showString "("), prt 0 targs, doc (showString ")"), doc (showString "->"), prt 0 type_])
+
+instance Print (Src.Jabba.Abs.TArg' a) where
+  prt i = \case
+    Src.Jabba.Abs.TRefMutArg _ type_ -> prPrec i 0 (concatD [doc (showString "var"), prt 0 type_])
+    Src.Jabba.Abs.TRefConstArg _ type_ -> prPrec i 0 (concatD [doc (showString "val"), prt 0 type_])
+    Src.Jabba.Abs.TCopyMutArg _ type_ -> prPrec i 0 (concatD [doc (showString "var"), doc (showString "$"), prt 0 type_])
+    Src.Jabba.Abs.TCopyConstArg _ type_ -> prPrec i 0 (concatD [doc (showString "val"), doc (showString "$"), prt 0 type_])
+
+instance Print [Src.Jabba.Abs.TArg' a] where
+  prt _ [] = concatD []
+  prt _ [x] = concatD [prt 0 x]
+  prt _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
 
 instance Print (Src.Jabba.Abs.PlsOp' a) where
   prt i = \case
@@ -254,8 +263,10 @@ instance Print (Src.Jabba.Abs.Expr' a) where
     Src.Jabba.Abs.EIntLit _ n -> prPrec i 6 (concatD [prt 0 n])
     Src.Jabba.Abs.EBoolLitTrue _ -> prPrec i 6 (concatD [doc (showString "true")])
     Src.Jabba.Abs.EBoolLitFalse _ -> prPrec i 6 (concatD [doc (showString "false")])
-    Src.Jabba.Abs.ERun _ id_ exprs -> prPrec i 6 (concatD [prt 0 id_, doc (showString "("), prt 0 exprs, doc (showString ")")])
     Src.Jabba.Abs.EStringLit _ str -> prPrec i 6 (concatD [printString str])
+    Src.Jabba.Abs.ERun _ expr exprs -> prPrec i 5 (concatD [prt 5 expr, doc (showString "("), prt 0 exprs, doc (showString ")")])
+    Src.Jabba.Abs.ELambda _ args block -> prPrec i 5 (concatD [doc (showString "|"), prt 0 args, doc (showString "|"), prt 0 block])
+    Src.Jabba.Abs.ELambdaEmpty _ block -> prPrec i 5 (concatD [doc (showString "||"), prt 0 block])
     Src.Jabba.Abs.ENeg _ negop expr -> prPrec i 5 (concatD [prt 0 negop, prt 6 expr])
     Src.Jabba.Abs.ENot _ notop expr -> prPrec i 5 (concatD [prt 0 notop, prt 6 expr])
     Src.Jabba.Abs.EMul _ expr1 mulop expr2 -> prPrec i 4 (concatD [prt 4 expr1, prt 0 mulop, prt 5 expr2])
@@ -264,6 +275,8 @@ instance Print (Src.Jabba.Abs.Expr' a) where
     Src.Jabba.Abs.EBAnd _ expr1 andop expr2 -> prPrec i 1 (concatD [prt 2 expr1, prt 0 andop, prt 1 expr2])
     Src.Jabba.Abs.EBOr _ expr1 orop expr2 -> prPrec i 0 (concatD [prt 1 expr1, prt 0 orop, prt 0 expr2])
     Src.Jabba.Abs.ETer _ expr1 expr2 expr3 -> prPrec i 0 (concatD [prt 1 expr1, doc (showString "?"), prt 1 expr2, doc (showString ":"), prt 0 expr3])
+    Src.Jabba.Abs.ELambdaExpr _ args expr -> prPrec i 0 (concatD [doc (showString "|"), prt 0 args, doc (showString "|"), prt 1 expr])
+    Src.Jabba.Abs.ELambdaEmptEpr _ expr -> prPrec i 0 (concatD [doc (showString "||"), prt 1 expr])
 
 instance Print [Src.Jabba.Abs.Expr' a] where
   prt _ [] = concatD []

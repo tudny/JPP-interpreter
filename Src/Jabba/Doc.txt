@@ -30,21 +30,21 @@ except ``"`` unless preceded by ``\``.
 The set of reserved words is the set of terminals appearing in the grammar. Those reserved words that consist of non-letter characters are called symbols, and they are treated in a different way from those that are similar to identifiers. The lexer follows rules familiar from languages like Haskell, C, and Java, including longest match and spacing conventions.
 
 The reserved words used in jabba are the following:
-  | ``Boolean`` | ``Gen`` | ``Integer`` | ``String``
-  | ``Unit`` | ``break`` | ``continue`` | ``else``
-  | ``false`` | ``finally`` | ``for`` | ``fun``
-  | ``if`` | ``in`` | ``new`` | ``return``
-  | ``true`` | ``val`` | ``var`` | ``while``
-  | ``yield`` |  |  |
+  | ``Boolean`` | ``Integer`` | ``String`` | ``Unit``
+  | ``break`` | ``continue`` | ``else`` | ``false``
+  | ``finally`` | ``for`` | ``fun`` | ``if``
+  | ``new`` | ``return`` | ``true`` | ``val``
+  | ``var`` | ``while`` |  |
 
 The symbols used in jabba are the following:
   | ( | ) | : | ,
   | = | { | } | ;
-  | ++ | -- | .. | [
-  | ] | + | - | *
+  | ++ | -- | .. | ->
+  | $ | + | - | *
   | / | % | ! | &&
   | || | == | != | <
-  | > | <= | >= | ?
+  | > | <= | >= | |
+  | ? |  |  |
 
 ===Comments===
 Single-line comments begin with #, //.Multiple-line comments are  enclosed with /* and */.
@@ -64,8 +64,6 @@ All other symbols are terminals.
   |  |  **|**  | //Ident// ``=`` //Expr// ``;``
   |  |  **|**  | ``return`` //Expr// ``;``
   |  |  **|**  | ``return`` ``;``
-  |  |  **|**  | ``yield`` //Expr// ``;``
-  |  |  **|**  | ``yield`` ``;``
   |  |  **|**  | ``break`` ``;``
   |  |  **|**  | ``continue`` ``;``
   |  |  **|**  | ``if`` //Expr// //Block//
@@ -73,7 +71,6 @@ All other symbols are terminals.
   |  |  **|**  | ``while`` //Expr// //Block//
   |  |  **|**  | ``while`` //Expr// //Block// ``finally`` //Block//
   |  |  **|**  | ``for`` //Ident// ``=`` //Expr// ``..`` //Expr// //Block//
-  |  |  **|**  | ``for`` //Ident// ``in`` //Expr// //Block//
   |  |  **|**  | //Expr// ``;``
   |  |  **|**  | //Decl// ``;``
   |  |  **|**  | //Block//
@@ -98,8 +95,15 @@ All other symbols are terminals.
   | //Type// | -> | ``Integer``
   |  |  **|**  | ``Boolean``
   |  |  **|**  | ``String``
-  |  |  **|**  | ``Gen`` ``[`` //Type// ``]``
   |  |  **|**  | ``Unit``
+  |  |  **|**  | ``(`` //[TArg]// ``)`` ``->`` //Type//
+  | //TArg// | -> | ``var`` //Type//
+  |  |  **|**  | ``val`` //Type//
+  |  |  **|**  | ``var`` ``$`` //Type//
+  |  |  **|**  | ``val`` ``$`` //Type//
+  | //[TArg]// | -> | **eps**
+  |  |  **|**  | //TArg//
+  |  |  **|**  | //TArg// ``,`` //[TArg]//
   | //PlsOp// | -> | ``+``
   |  |  **|**  | ``-``
   | //MulOp// | -> | ``*``
@@ -119,10 +123,12 @@ All other symbols are terminals.
   |  |  **|**  | //Integer//
   |  |  **|**  | ``true``
   |  |  **|**  | ``false``
-  |  |  **|**  | //Ident// ``(`` //[Expr]// ``)``
   |  |  **|**  | //String//
   |  |  **|**  | ``(`` //Expr// ``)``
-  | //Expr5// | -> | //NegOp// //Expr6//
+  | //Expr5// | -> | //Expr5// ``(`` //[Expr]// ``)``
+  |  |  **|**  | ``|`` //[Arg]// ``|`` //Block//
+  |  |  **|**  | ``||`` //Block//
+  |  |  **|**  | //NegOp// //Expr6//
   |  |  **|**  | //NotOp// //Expr6//
   |  |  **|**  | //Expr6//
   | //Expr4// | -> | //Expr4// //MulOp// //Expr5//
@@ -135,6 +141,8 @@ All other symbols are terminals.
   |  |  **|**  | //Expr2//
   | //Expr// | -> | //Expr1// //OrOp// //Expr//
   |  |  **|**  | //Expr1// ``?`` //Expr1// ``:`` //Expr//
+  |  |  **|**  | ``|`` //[Arg]// ``|`` //Expr1//
+  |  |  **|**  | ``||`` //Expr1//
   |  |  **|**  | //Expr1//
   | //[Expr]// | -> | **eps**
   |  |  **|**  | //Expr//

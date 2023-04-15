@@ -1,16 +1,16 @@
 module Src.Types where
 
-import Src.Jabba.Abs ( Type' (..), Type (..) )
+import Src.Jabba.Abs ( Type' (..), Type (..), TArg' (..), TArg (..) )
 
-data VarType 
+data VarType
     = VTInt 
     | VTBool 
     | VTString 
     | VTVoid 
+    | Fn [FnArg] VarType
     deriving (Eq)
 
 type FnArg = (VarType, VarMutability, VarRef)
-data FnType = Fn [FnArg] VarType deriving (Eq)
 
 
 data VarMutability
@@ -30,7 +30,14 @@ absTypeToVarType (TInt _) = VTInt
 absTypeToVarType (TBool _) = VTBool
 absTypeToVarType (TString _) = VTString
 absTypeToVarType (TVoid _) = VTVoid
-absTypeToVarType TGen {} = undefined
+absTypeToVarType (TFun _ args ret) = Fn (map absTypeToFnArg args) (absTypeToVarType ret)
+
+
+absTypeToFnArg :: TArg -> FnArg
+absTypeToFnArg (TRefMutArg    _ t) = (absTypeToVarType t, VMMut,   VRRef)
+absTypeToFnArg (TRefConstArg  _ t) = (absTypeToVarType t, VMConst, VRRef)
+absTypeToFnArg (TCopyMutArg   _ t) = (absTypeToVarType t, VMMut,   VRCopy)
+absTypeToFnArg (TCopyConstArg _ t) = (absTypeToVarType t, VMConst, VRCopy)
 
 
 instance Show VarType where
@@ -38,9 +45,6 @@ instance Show VarType where
     show VTString = "String"
     show VTBool = "Boolean"
     show VTVoid = "Unit"
-
-
-instance Show FnType where
     show (Fn args ret) = "(" ++ show args ++ ") -> " ++ show ret
 
 

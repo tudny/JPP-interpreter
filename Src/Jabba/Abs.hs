@@ -32,8 +32,6 @@ data Instr' a
     | IAss a Ident (Expr' a)
     | IRet a (Expr' a)
     | IRetUnit a
-    | IYield a (Expr' a)
-    | IYieldUnit a
     | IBreak a
     | ICont a
     | IIf a (Expr' a) (Block' a)
@@ -41,7 +39,6 @@ data Instr' a
     | IWhile a (Expr' a) (Block' a)
     | IWhileFin a (Expr' a) (Block' a) (Block' a)
     | IFor a Ident (Expr' a) (Expr' a) (Block' a)
-    | IForGen a Ident (Expr' a) (Block' a)
     | IExpr a (Expr' a)
     | IDecl a (Decl' a)
     | IBBlock a (Block' a)
@@ -72,7 +69,19 @@ data Block' a = IBlock a [Instr' a]
 
 type Type = Type' BNFC'Position
 data Type' a
-    = TInt a | TBool a | TString a | TGen a (Type' a) | TVoid a
+    = TInt a
+    | TBool a
+    | TString a
+    | TVoid a
+    | TFun a [TArg' a] (Type' a)
+  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
+
+type TArg = TArg' BNFC'Position
+data TArg' a
+    = TRefMutArg a (Type' a)
+    | TRefConstArg a (Type' a)
+    | TCopyMutArg a (Type' a)
+    | TCopyConstArg a (Type' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type PlsOp = PlsOp' BNFC'Position
@@ -109,8 +118,10 @@ data Expr' a
     | EIntLit a Integer
     | EBoolLitTrue a
     | EBoolLitFalse a
-    | ERun a Ident [Expr' a]
     | EStringLit a String
+    | ERun a (Expr' a) [Expr' a]
+    | ELambda a [Arg' a] (Block' a)
+    | ELambdaEmpty a (Block' a)
     | ENeg a (NegOp' a) (Expr' a)
     | ENot a (NotOp' a) (Expr' a)
     | EMul a (Expr' a) (MulOp' a) (Expr' a)
@@ -119,6 +130,8 @@ data Expr' a
     | EBAnd a (Expr' a) (AndOp' a) (Expr' a)
     | EBOr a (Expr' a) (OrOp' a) (Expr' a)
     | ETer a (Expr' a) (Expr' a) (Expr' a)
+    | ELambdaExpr a [Arg' a] (Expr' a)
+    | ELambdaEmptEpr a (Expr' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 newtype Ident = Ident String
@@ -153,8 +166,6 @@ instance HasPosition Instr where
     IAss p _ _ -> p
     IRet p _ -> p
     IRetUnit p -> p
-    IYield p _ -> p
-    IYieldUnit p -> p
     IBreak p -> p
     ICont p -> p
     IIf p _ _ -> p
@@ -162,7 +173,6 @@ instance HasPosition Instr where
     IWhile p _ _ -> p
     IWhileFin p _ _ _ -> p
     IFor p _ _ _ _ -> p
-    IForGen p _ _ _ -> p
     IExpr p _ -> p
     IDecl p _ -> p
     IBBlock p _ -> p
@@ -194,8 +204,15 @@ instance HasPosition Type where
     TInt p -> p
     TBool p -> p
     TString p -> p
-    TGen p _ -> p
     TVoid p -> p
+    TFun p _ _ -> p
+
+instance HasPosition TArg where
+  hasPosition = \case
+    TRefMutArg p _ -> p
+    TRefConstArg p _ -> p
+    TCopyMutArg p _ -> p
+    TCopyConstArg p _ -> p
 
 instance HasPosition PlsOp where
   hasPosition = \case
@@ -239,8 +256,10 @@ instance HasPosition Expr where
     EIntLit p _ -> p
     EBoolLitTrue p -> p
     EBoolLitFalse p -> p
-    ERun p _ _ -> p
     EStringLit p _ -> p
+    ERun p _ _ -> p
+    ELambda p _ _ -> p
+    ELambdaEmpty p _ -> p
     ENeg p _ _ -> p
     ENot p _ _ -> p
     EMul p _ _ _ -> p
@@ -249,4 +268,6 @@ instance HasPosition Expr where
     EBAnd p _ _ _ -> p
     EBOr p _ _ _ -> p
     ETer p _ _ _ -> p
+    ELambdaExpr p _ _ -> p
+    ELambdaEmptEpr p _ -> p
 

@@ -33,8 +33,6 @@ transInstr x = case x of
   Src.Jabba.Abs.IAss _ ident expr -> failure x
   Src.Jabba.Abs.IRet _ expr -> failure x
   Src.Jabba.Abs.IRetUnit _ -> failure x
-  Src.Jabba.Abs.IYield _ expr -> failure x
-  Src.Jabba.Abs.IYieldUnit _ -> failure x
   Src.Jabba.Abs.IBreak _ -> failure x
   Src.Jabba.Abs.ICont _ -> failure x
   Src.Jabba.Abs.IIf _ expr block -> failure x
@@ -42,7 +40,6 @@ transInstr x = case x of
   Src.Jabba.Abs.IWhile _ expr block -> failure x
   Src.Jabba.Abs.IWhileFin _ expr block1 block2 -> failure x
   Src.Jabba.Abs.IFor _ ident expr1 expr2 block -> failure x
-  Src.Jabba.Abs.IForGen _ ident expr block -> failure x
   Src.Jabba.Abs.IExpr _ expr -> failure x
   Src.Jabba.Abs.IDecl _ decl -> failure x
   Src.Jabba.Abs.IBBlock _ block -> failure x
@@ -74,8 +71,15 @@ transType x = case x of
   Src.Jabba.Abs.TInt _ -> failure x
   Src.Jabba.Abs.TBool _ -> failure x
   Src.Jabba.Abs.TString _ -> failure x
-  Src.Jabba.Abs.TGen _ type_ -> failure x
   Src.Jabba.Abs.TVoid _ -> failure x
+  Src.Jabba.Abs.TFun _ targs type_ -> failure x
+
+transTArg :: Show a => Src.Jabba.Abs.TArg' a -> Result
+transTArg x = case x of
+  Src.Jabba.Abs.TRefMutArg _ type_ -> failure x
+  Src.Jabba.Abs.TRefConstArg _ type_ -> failure x
+  Src.Jabba.Abs.TCopyMutArg _ type_ -> failure x
+  Src.Jabba.Abs.TCopyConstArg _ type_ -> failure x
 
 transPlsOp :: Show a => Src.Jabba.Abs.PlsOp' a -> Result
 transPlsOp x = case x of
@@ -119,8 +123,10 @@ transExpr x = case x of
   Src.Jabba.Abs.EIntLit _ integer -> failure x
   Src.Jabba.Abs.EBoolLitTrue _ -> failure x
   Src.Jabba.Abs.EBoolLitFalse _ -> failure x
-  Src.Jabba.Abs.ERun _ ident exprs -> failure x
   Src.Jabba.Abs.EStringLit _ string -> failure x
+  Src.Jabba.Abs.ERun _ expr exprs -> failure x
+  Src.Jabba.Abs.ELambda _ args block -> failure x
+  Src.Jabba.Abs.ELambdaEmpty _ block -> failure x
   Src.Jabba.Abs.ENeg _ negop expr -> failure x
   Src.Jabba.Abs.ENot _ notop expr -> failure x
   Src.Jabba.Abs.EMul _ expr1 mulop expr2 -> failure x
@@ -129,3 +135,5 @@ transExpr x = case x of
   Src.Jabba.Abs.EBAnd _ expr1 andop expr2 -> failure x
   Src.Jabba.Abs.EBOr _ expr1 orop expr2 -> failure x
   Src.Jabba.Abs.ETer _ expr1 expr2 expr3 -> failure x
+  Src.Jabba.Abs.ELambdaExpr _ args expr -> failure x
+  Src.Jabba.Abs.ELambdaEmptEpr _ expr -> failure x

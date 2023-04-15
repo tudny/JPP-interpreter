@@ -16,7 +16,7 @@ data ErrType
     | WrongType Ident VarType [VarType]
     | WrongTypeArg Int VarType VarType
     | VarAlreadyDecl Ident
-    | WrongNumberOfArgs Ident Int Int
+    | WrongNumberOfArgs Int Int
     | ExprMutPass Int
     | ImmutMutPass Int
     | WrongTypeOp String VarType
@@ -33,6 +33,7 @@ data ErrType
     | FunctionNoReturn Ident VarType
     | FunctionReturnMismatch Ident VarType VarType
     | FunctionMaybeReturn Ident VarType
+    | NotFnType VarType
     deriving (Eq)
 
 
@@ -62,7 +63,7 @@ instance Show ErrType where
     show (WrongType i t ex) = "variable " ++ showI i ++ " is of type " ++ show t ++ " but expected " ++ show ex ++ "."
     show (WrongTypeArg i t ex) = "argument " ++ show (i + 1) ++ " is of type " ++ show t ++ " but expected " ++ show ex ++ "."
     show (VarAlreadyDecl i) = "variable " ++ showI i ++ " was already declared in declaration block."
-    show (WrongNumberOfArgs i ex got) = "function " ++ showI i ++ " was called with " ++ show got ++ " arguments but expected " ++ show ex ++ " arguments."
+    show (WrongNumberOfArgs ex got) = "function was called with " ++ show got ++ " arguments but expected " ++ show ex ++ " arguments."
     show (ExprMutPass i) = "expression " ++ show (i + 1) ++ " was passed to a mutable reference argument."
     show (ImmutMutPass i) = "immutable variable " ++ show (i + 1) ++ " was passed to a mutable reference argument."
     show (WrongTypeOp op t) = "operator " ++ op ++ " is not defined for type " ++ show t ++ "."
@@ -79,3 +80,4 @@ instance Show ErrType where
     show (FunctionNoReturn i t) = "function " ++ show i ++ " doens't have a return statement and returns type " ++ show t ++ "."
     show (FunctionReturnMismatch i t1 t2) = "function " ++ show i ++ " returns type " ++ show t1 ++ " but evaluated " ++ show t2 ++ "."
     show (FunctionMaybeReturn i t) = "not all paths in function " ++ show i ++ " return a value and return type is " ++ show t ++ "."
+    show (NotFnType t) = "type " ++ show t ++ " is not a function type."

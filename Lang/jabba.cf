@@ -53,10 +53,6 @@ IRet.           Instr ::= "return" Expr ";" ;
 
 IRetUnit.       Instr ::= "return" ";" ;
 
-IYield.         Instr ::= "yield" Expr ";" ;
-
-IYieldUnit.     Instr ::= "yield" ";" ;
-
 IBreak.         Instr ::= "break" ";" ;
 
 ICont.          Instr ::= "continue" ";" ;
@@ -70,8 +66,6 @@ IWhile.         Instr ::= "while" Expr Block ;
 IWhileFin.      Instr ::= "while" Expr Block "finally" Block ;
 
 IFor.           Instr ::= "for" Ident "=" Expr ".." Expr Block ;
-
-IForGen.        Instr ::= "for" Ident "in" Expr Block ;
 
 IExpr.          Instr ::= Expr ";" ;
 
@@ -87,9 +81,19 @@ TBool.          Type ::= "Boolean" ;
 
 TString.        Type ::= "String" ;
 
-TGen.           Type ::= "Gen" "[" Type "]" ;
-
 TVoid.          Type ::= "Unit" ;
+
+TFun.           Type ::= "(" [TArg] ")" "->" Type ;
+
+TRefMutArg.     TArg ::= "var" Type;
+
+TRefConstArg.   TArg ::= "val" Type;
+
+TCopyMutArg.    TArg ::= "var" "$" Type ;
+
+TCopyConstArg.  TArg ::= "val" "$" Type ;
+
+separator       TArg "," ;
 
 -- Operators ----------------------------------------------
 
@@ -137,9 +141,13 @@ EBoolLitTrue.   Expr6 ::= "true" ;
 
 EBoolLitFalse.  Expr6 ::= "false" ;
 
-ERun.           Expr6 ::= Ident "(" [Expr] ")" ;
-
 EStringLit.     Expr6 ::= String ;
+
+ERun.           Expr5 ::= Expr5 "(" [Expr] ")" ;
+
+ELambda.        Expr5 ::= "|" [Arg] "|" Block ;
+
+ELambdaEmpty.   Expr5 ::= "||" Block ;
 
 ENeg.           Expr5 ::= NegOp Expr6 ;
 
@@ -156,6 +164,10 @@ EBAnd.          Expr1 ::= Expr2 AndOp Expr1 ;
 EBOr.           Expr ::= Expr1 OrOp Expr ;
 
 ETer.           Expr ::= Expr1 "?" Expr1 ":" Expr ;
+
+ELambdaExpr.    Expr ::= "|" [Arg] "|" Expr1 ;
+
+ELambdaEmptEpr. Expr ::= "||" Expr1 ;
 
 coercions       Expr 6 ;
 
