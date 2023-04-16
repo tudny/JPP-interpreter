@@ -67,13 +67,7 @@ fun filter(
     val t: (val Integer) -> Integer, 
     val m: (val$Integer) -> Boolean
 ) : (val Integer) -> Integer {
-    t;
-    m;
     return |val x: Integer| {
-        "inside";
-        x;
-        m;
-        t;
         if m(t(x)) {
             return t(x);
         } else {
@@ -99,10 +93,9 @@ val odd = filter(t, isOdd);
 "poszlo";
 
 for x = 0..100 {
-    "x";
-    x;
     if odd(x) != -1 {
-        // writeInt(odd(x));
+        writeInt(odd(x));
+        writeStr("\n");
         odd(x);
     }
 }

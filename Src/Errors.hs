@@ -42,6 +42,7 @@ data ErrType
 data RuntimeType
     = ZeroDiv
     | TypeCheckerDidntCatch
+    | CannotCast String String
     deriving (Eq)
 
 
@@ -98,3 +99,4 @@ instance Show ErrType where
 instance Show RuntimeType where
     show ZeroDiv = "division by zero."
     show TypeCheckerDidntCatch = "type checker didn't catch this error."
+    show (CannotCast s t) = "cannot cast " ++ s ++ " to type " ++ show t ++ "."

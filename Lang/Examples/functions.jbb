@@ -62,9 +62,9 @@ fun succ(val n: Integer) : Integer {
     return n + 1;
 }
 
-fun jpp(val n: Integer) : Integer {
-    fun jbb(val m: Integer) : Integer {
-        fun jqq(val p: Integer) : Integer {
+fun jpp(val n: new Integer) : Integer {
+    fun jbb(val m: new Integer) : Integer {
+        fun jqq(val p: new Integer) : Integer {
             return p + m + n;
         }
         return jqq(m + n) + m + n;

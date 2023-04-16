@@ -22,11 +22,12 @@ import Src.Jabba.Abs ( Ident,
 
 import Src.Types ( VarRef (..) )
 import Src.Errors ( ErrHolder, Err (..), ErrHolder (RuntimeError), RuntimeType (..) )
-import Control.Monad.Except (ExceptT, runExceptT, throwError, void)
+import Control.Monad.Except (ExceptT, runExceptT, throwError, void, MonadIO (liftIO))
 import Control.Monad.Reader (ReaderT, runReaderT, ask, local, asks)
 import Control.Monad.State (StateT, evalStateT, get, put, modify, gets)
 import qualified Data.Map as Map (Map, empty, insert, lookup, fromList)
 import Data.Maybe (isJust, isNothing)
+import Text.Read (readMaybe)
 
 -- =============================================================================
 
@@ -51,13 +52,20 @@ type ModEnv = Env -> Env
 
 -- =============================================================================
 
+data FunBlock
+    = NormalBlock Block
+    | WriteStr
+    | WriteInt
+    | ToInt
+    | ToString
+
 type FnArg = (Ident, VarRef)
 data Value
     = VTInt Integer
     | VTBool Bool
     | VTString String
     | VTUnit
-    | VTFun [FnArg] Block Env
+    | VTFun [FnArg] FunBlock Env
 
 instance Show Value where
     show (VTInt i) = show i
@@ -87,19 +95,26 @@ newlockM = do
     put s'
     pure l
 
-insert :: Loc -> Value -> Store -> Store
-insert l v (Store n m) = Store n (Map.insert l v m)
+insertStore :: Loc -> Value -> Store -> Store
+insertStore l v (Store n m) = Store n (Map.insert l v m)
+
+insertStoreMany :: [(Loc, Value)] -> Store -> Store
+insertStoreMany [] s = s
+insertStoreMany ((l, v):xs) s = insertStoreMany xs $ insertStore l v s
 
 storeGet :: Loc -> Store -> IM Value
 storeGet l (Store _ m) = case Map.lookup l m of
     Nothing -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
     Just v -> pure v
 
+reserveNnonM :: Int -> Store -> ([Loc], Store)
+reserveNnonM n s = foldl (\ (ls, s') _ -> let (nl, s'') = newlock s' in (nl:ls, s'')) ([], s) [1..n]
+
 reserveN :: Int -> IM [Loc]
 reserveN n = do
     store <- get
     -- first we reserve memory for all variables
-    let (locs, store') = foldl (\ (ls, s) _ -> let (nl, s') = newlock s in (nl:ls, s')) ([], store) [1..n]
+    let (locs, store') = reserveNnonM n store
     put store'
     pure locs
 
@@ -113,9 +128,10 @@ type IM a = ExceptT ErrHolder (ReaderT Env (StateT Store IO)) a
 
 evaluate :: Program -> IO (Err ())
 evaluate p = do 
+    let (env, store) = makeStdLib emptyEnv emptyStore
     let errorsT = runExceptT (evalP p)
-    let envT = runReaderT errorsT emptyEnv
-    evalStateT envT emptyStore
+    let envT = runReaderT errorsT env
+    evalStateT envT store
 
 
 
@@ -136,7 +152,7 @@ evalIs ((IDecr _ v):is) = modIntVar v (subtract 1) >> evalIs is
 evalIs ((IAss _ v e):is) = do 
     n <- evalE e
     loc <- envGet v =<< ask
-    modify $ insert loc n
+    modify $ insertStore loc n
     evalIs is
 evalIs ((IRet _ e):_) = do
     v <- evalE e
@@ -183,8 +199,8 @@ evalIs ((DFun _ fN args t b):is) = do
     let args' = map resolveDeclArg args
     env <- ask
     loc <- newlockM
-    let f = VTFun args' b (insertEnv fN loc env)
-    modify $ insert loc f
+    let f = VTFun args' (NormalBlock b) (insertEnv fN loc env)
+    modify $ insertStore loc f
     local (insertEnv fN loc) (evalIs is)
 evalIs ((DFunUnit pos fN args b):is) = evalIs (DFun pos fN args (TVoid pos) b:is)
 
@@ -201,7 +217,7 @@ resolveDeclArg (CopyConstArg _ i _) = (i, VRCopy)
 runFor :: Loc -> [Integer] -> Block -> IM RetType
 runFor loc [] _ = pure (Nothing, Nothing)
 runFor loc (n:ns) b = do
-    modify $ insert loc (VTInt n)
+    modify $ insertStore loc (VTInt n)
     (ret, flow) <- evalB b
     if isJust ret then pure (ret, Nothing)
     else case flow of
@@ -224,7 +240,7 @@ modIntVar v f = do
     loc <- envGet v =<< ask
     store <- get
     (VTInt n) <- storeGet loc store
-    modify $ insert loc (VTInt $ f n)
+    modify $ insertStore loc (VTInt $ f n)
 
 
 
@@ -245,7 +261,7 @@ addVarsToEnv :: [(Ident, Value)] -> IM ModEnv
 addVarsToEnv items = do
     locs <- reserveN $ length items
     -- then we insert values into memory
-    mapM_ (\ ((_, v), l) -> modify $ insert l v) $ zip items locs
+    mapM_ (\ ((_, v), l) -> modify $ insertStore l v) $ zip items locs
     let ids = map fst items
     -- we need to tell how to modify environment
     let envMod (Env m) = Env $ foldl (\ m' (i, l) -> Map.insert i l m') m $ zip ids locs
@@ -337,7 +353,7 @@ evalE (ERun _ e argsE) = do
     let (argsI, argsR) = unzip args
     argsL <- mapM insertArg $ zip3 argsR argsV argsMl
     let envInserter = insertEnvMany $ zip argsI argsL
-    (ret, Nothing) <- local (\_ -> envInserter env) $ evalB b
+    (ret, Nothing) <- local (\_ -> envInserter env) $ evalFunB b
     case ret of 
         Nothing -> pure VTUnit
         Just v  -> pure v
@@ -351,11 +367,11 @@ evalE (ERun _ e argsE) = do
               VRCopy -> do
                 [l] <- reserveN 1
                 pure l
-            modify $ insert loc v
+            modify $ insertStore loc v
             pure loc
 evalE (ELambda _ args b) = do
     let args' = map resolveDeclArg args
-    asks $ VTFun args' b
+    asks $ VTFun args' (NormalBlock b)
 evalE (ELambdaEmpty pos b) = evalE (ELambda pos [] b)
 evalE (ELambdaExpr pos args e) = evalE (ELambda pos args (IBlock pos [IRet pos e]))
 evalE (ELambdaEmptEpr pos e) = evalE (ELambda pos [] (IBlock pos [IRet pos e]))
@@ -406,3 +422,51 @@ getVarValue pos v = do
     storeGet loc store
 
 
+
+-- =============================================================================
+
+
+evalFunB :: FunBlock -> IM RetType
+evalFunB (NormalBlock b) = evalB b
+evalFunB WriteStr = do
+    (VTString s) <- evalE (EVarName Nothing (Ident "s"))
+    liftIO $ putStr s
+    pure (Nothing, Nothing)
+evalFunB WriteInt = do
+    (VTInt n) <- evalE (EVarName Nothing (Ident "n"))
+    liftIO $ putStr $ show n
+    pure (Nothing, Nothing)
+evalFunB ToString = do
+    (VTInt n) <- evalE (EVarName Nothing (Ident "n"))
+    pure (Just $ VTString $ show n, Nothing)
+evalFunB ToInt = do
+    (VTString s) <- evalE (EVarName Nothing (Ident "s"))
+    case readMaybe s of
+        Just n -> pure (Just $ VTInt n, Nothing)
+        Nothing -> throwError $ RuntimeError Nothing $ CannotCast s "Integer"
+
+
+writeStrDecl :: (Ident, Value)
+writeStrDecl = (Ident "writeStr", VTFun [(Ident "s", VRCopy)] WriteStr emptyEnv)
+
+writeIntDecl :: (Ident, Value)
+writeIntDecl = (Ident "writeInt", VTFun [(Ident "n", VRCopy)] WriteInt emptyEnv)
+
+toStringDecl :: (Ident, Value)
+toStringDecl = (Ident "toString", VTFun [(Ident "n", VRCopy)] ToString emptyEnv)
+
+toIntDecl :: (Ident, Value)
+toIntDecl = (Ident "toInt", VTFun [(Ident "s", VRCopy)] ToInt emptyEnv)
+
+stdLib :: [(Ident, Value)]
+stdLib = [writeStrDecl, writeIntDecl, toStringDecl, toIntDecl]
+
+
+makeStdLib :: Env -> Store -> (Env, Store)
+makeStdLib env store = 
+    let stdLibCount = length stdLib in
+    let (locs, store') = reserveNnonM stdLibCount store in
+    let (names, values) = unzip stdLib in
+    let env' = insertEnvMany (zip names locs) env in
+    let store'' = insertStoreMany (zip locs values) store' in
+    (env', store'')
