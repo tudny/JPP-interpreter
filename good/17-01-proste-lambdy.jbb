@@ -1,11 +1,11 @@
 
-val f = |val x: Integer| x;
+val f = |val x: new Integer| x;
 
-val g = |val x: Integer| x + 1;
+val g = |val x: new Integer| x + 1;
 
-var h = |val x: Integer| x + 1;
+var h = |val x: new Integer| x + 1;
 
-var i = |val x: Integer| {
+var i = |val x: new Integer| {
     return x + 1;
 };
 
@@ -30,13 +30,13 @@ var g: (var String) -> String = |var x: String| "World";
 
 var h: (var$String) -> String = |var x: new String| "World";
 
-fun foo(val x: Integer): Integer {
+fun foo(val x: new Integer): Integer {
     return x;
 }
 
 var xyz = foo;
 
-var xyzT: (val Integer) -> Integer = foo;
+var xyzT: (val$Integer) -> Integer = foo;
 
 var foo = |var x: new String| "Fooooo";
 
@@ -44,8 +44,8 @@ foo("Hello");
 xyzT(10);
 
 
-fun abc(val x: Integer): (val Integer) -> Integer {
-    return |val y: Integer| x + y;
+fun abc(val x: new Integer): (val$Integer) -> Integer {
+    return |val y: new Integer| x + y;
 }
 
 val abc_res = abc(10);
@@ -65,9 +65,15 @@ val t = natArray();
 
 fun filter(
     val t: (val Integer) -> Integer, 
-    val m: (val Integer) -> Boolean
+    val m: (val$Integer) -> Boolean
 ) : (val Integer) -> Integer {
+    t;
+    m;
     return |val x: Integer| {
+        "inside";
+        x;
+        m;
+        t;
         if m(t(x)) {
             return t(x);
         } else {
@@ -78,19 +84,26 @@ fun filter(
 
 fun map(
     val t: (val Integer) -> Integer, 
-    val m: (val Integer) -> Integer
+    val m: (val$Integer) -> Integer
 ) : (val Integer) -> Integer {
     return |val x: Integer| m(t(x));
 }
 
 
-val isOdd = |val x: Integer| x % 2 == 1;
+val isOdd = |val x: new Integer| x % 2 == 1;
+
+isOdd;
 
 val odd = filter(t, isOdd);
 
+"poszlo";
+
 for x = 0..100 {
-    if (odd(x) != -1) {
-        writeInt(odd(x));
+    "x";
+    x;
+    if odd(x) != -1 {
+        // writeInt(odd(x));
+        odd(x);
     }
 }
 
@@ -103,43 +116,5 @@ var incrL = |var x: Integer| { x = x + 1; };
 
 var x = 10;
 incr(x);
-
-
-fun head(
-    val t: (val Integer) -> Integer
-) : Integer {
-    var i = 0;
-    while (t(i) == -1) {
-        i = i + 1;
-    }
-    return i;
-}
-
-fun tail(
-    val t: (val Integer) -> Integer
-) : (val Integer) -> Integer {
-    val i = head(t);
-    return |val x: Integer| t(x + i);
-}
-
-
-fun filterPrimes(
-    val t: (val Integer) -> Integer
-) : (val Integer) -> Integer {
-    val i = head(t);
-    val rest = tail(t);
-    // use filter
-    return filterPrimes(filter(rest, |val x: Integer| x % i != 0));
-}
-
-
-val primes = filterPrimes(natArray());
-
-// I don't know if it works, but TypeChecker parses it :)))))))
-for x = 0..100 {
-    if (primes(x) != -1) {
-        writeInt(primes(x));
-    }
-}
 
 

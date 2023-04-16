@@ -23,17 +23,14 @@ import Src.Jabba.Abs ( Ident,
 import Src.Types ( VarRef (..) )
 import Src.Errors ( ErrHolder, Err (..), ErrHolder (RuntimeError), RuntimeType (..) )
 import Control.Monad.Except (ExceptT, runExceptT, throwError, void)
-import Control.Monad.Reader (ReaderT, runReaderT, ask, local)
+import Control.Monad.Reader (ReaderT, runReaderT, ask, local, asks)
 import Control.Monad.State (StateT, evalStateT, get, put, modify, gets)
 import qualified Data.Map as Map (Map, empty, insert, lookup, fromList)
-import Debug.Trace (trace) -- TODO: remove
--- TODO: remove
 import Data.Maybe (isJust, isNothing)
-import Data.List (zip4)
 
 -- =============================================================================
 
-newtype Env = Env { env :: Map.Map Ident Loc }
+newtype Env = Env { env :: Map.Map Ident Loc } deriving (Show)
 
 emptyEnv :: Env
 emptyEnv = Env Map.empty
@@ -67,7 +64,7 @@ instance Show Value where
     show (VTBool b) = show b
     show (VTString s) = show s
     show VTUnit = "()"
-    show VTFun {} = "<function>"
+    show (VTFun args _ _) = "Fn(" ++ show args ++ ")"
 
 data LoopControlFlow = Break | Continue
 
@@ -129,9 +126,7 @@ evalP (PProgram _ is) = void $ evalIs is
 
 evalIs :: [Instr] -> IM RetType
 evalIs [] = pure (Nothing, Nothing)
-evalIs ((IExpr _ e):is) = do
-    n <- evalE e
-    trace ("Expr: " ++ show n) $ evalIs is
+evalIs ((IExpr pos e):is) = evalE e >> evalIs is
 evalIs ((IDecl _ d):is) = do
     mod <- evalD d
     local mod $ evalIs is
@@ -151,9 +146,12 @@ evalIs ((IBreak _):_) = pure (Nothing, Just Break)
 evalIs ((ICont _):_) = pure (Nothing, Just Continue)
 evalIs ((IIf pos eb b):is) = evalIs (IIfElse pos eb b (IBlock pos []):is)
 evalIs ((IIfElse _ eb b1 b2):is) = do
-    (VTBool b) <- evalE eb
-    if b then evalB b1 >>= handleRetType is
-         else evalB b2 >>= handleRetType is
+    retTypeB <- evalE eb
+    case retTypeB of
+        VTBool b -> 
+            if b then evalB b1 >>= handleRetType is
+                else evalB b2 >>= handleRetType is
+        t -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
 evalIs all@((IWhile pos e b):is) = do
     (VTBool cond) <- evalE e
     if cond then do
@@ -332,14 +330,14 @@ evalE (ETer _ eb e1 e2) = do
     if b
         then evalE e1
         else evalE e2
-evalE (ERun pos e argsE) = do
+evalE (ERun _ e argsE) = do
     (VTFun args b env) <- evalE e
     argsVMl <- mapM evalERef argsE
     let (argsV, argsMl) = unzip argsVMl
     let (argsI, argsR) = unzip args
     argsL <- mapM insertArg $ zip3 argsR argsV argsMl
     let envInserter = insertEnvMany $ zip argsI argsL
-    (ret, Nothing) <- local envInserter $ evalB b
+    (ret, Nothing) <- local (\_ -> envInserter env) $ evalB b
     case ret of 
         Nothing -> pure VTUnit
         Just v  -> pure v
@@ -355,11 +353,12 @@ evalE (ERun pos e argsE) = do
                 pure l
             modify $ insert loc v
             pure loc
-
-
-
-evalE _ = undefined -- TODO: implement
-
+evalE (ELambda _ args b) = do
+    let args' = map resolveDeclArg args
+    asks $ VTFun args' b
+evalE (ELambdaEmpty pos b) = evalE (ELambda pos [] b)
+evalE (ELambdaExpr pos args e) = evalE (ELambda pos args (IBlock pos [IRet pos e]))
+evalE (ELambdaEmptEpr pos e) = evalE (ELambda pos [] (IBlock pos [IRet pos e]))
 
 
 
