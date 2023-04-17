@@ -27,3 +27,6 @@ while n != 1 {
     writeStr("\n");
     n = col(n);
 }
+writeInt(n);
+writeStr("\n");
+

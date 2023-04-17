@@ -35,7 +35,8 @@ data Instr' a
     | IBreak a
     | ICont a
     | IIf a (Expr' a) (Block' a)
-    | IIfElif a (Expr' a) (Block' a) [Elif' a] (Block' a)
+    | IIfElif a (Expr' a) (Block' a) [Elif' a]
+    | IIfElifElse a (Expr' a) (Block' a) [Elif' a] (Block' a)
     | IWhile a (Expr' a) (Block' a)
     | IWhileFin a (Expr' a) (Block' a) (Block' a)
     | IFor a Ident (Expr' a) (Expr' a) (Block' a)
@@ -174,7 +175,8 @@ instance HasPosition Instr where
     IBreak p -> p
     ICont p -> p
     IIf p _ _ -> p
-    IIfElif p _ _ _ _ -> p
+    IIfElif p _ _ _ -> p
+    IIfElifElse p _ _ _ _ -> p
     IWhile p _ _ -> p
     IWhileFin p _ _ _ -> p
     IFor p _ _ _ _ -> p

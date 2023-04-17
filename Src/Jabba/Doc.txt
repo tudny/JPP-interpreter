@@ -67,6 +67,7 @@ All other symbols are terminals.
   |  |  **|**  | ``break`` ``;``
   |  |  **|**  | ``continue`` ``;``
   |  |  **|**  | ``if`` //Expr// //Block//
+  |  |  **|**  | ``if`` //Expr// //Block// //[Elif]//
   |  |  **|**  | ``if`` //Expr// //Block// //[Elif]// ``else`` //Block//
   |  |  **|**  | ``while`` //Expr// //Block//
   |  |  **|**  | ``while`` //Expr// //Block// ``finally`` //Block//

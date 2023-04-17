@@ -122,6 +122,7 @@ data Expr' a
     | EIntLit a Integer
     | EBoolLitTrue a
     | EBoolLitFalse a
+    | EUnitLiteral a
     | EStringLit a String
     | ERun a (Expr' a) [Expr' a]
     | ELambda a [Arg' a] (Block' a)
@@ -264,6 +265,7 @@ instance HasPosition Expr where
     EIntLit p _ -> p
     EBoolLitTrue p -> p
     EBoolLitFalse p -> p
+    EUnitLiteral p -> p
     EStringLit p _ -> p
     ERun p _ _ -> p
     ELambda p _ _ -> p

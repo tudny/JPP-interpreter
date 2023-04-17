@@ -271,6 +271,7 @@ instance Print (Src.Jabba.Abs.Expr' a) where
     Src.Jabba.Abs.EIntLit _ n -> prPrec i 6 (concatD [prt 0 n])
     Src.Jabba.Abs.EBoolLitTrue _ -> prPrec i 6 (concatD [doc (showString "true")])
     Src.Jabba.Abs.EBoolLitFalse _ -> prPrec i 6 (concatD [doc (showString "false")])
+    Src.Jabba.Abs.EUnitLiteral _ -> prPrec i 6 (concatD [doc (showString "unit")])
     Src.Jabba.Abs.EStringLit _ str -> prPrec i 6 (concatD [printString str])
     Src.Jabba.Abs.ERun _ expr exprs -> prPrec i 5 (concatD [prt 5 expr, doc (showString "("), prt 0 exprs, doc (showString ")")])
     Src.Jabba.Abs.ELambda _ args block -> prPrec i 5 (concatD [doc (showString "|"), prt 0 args, doc (showString "|"), prt 0 block])
