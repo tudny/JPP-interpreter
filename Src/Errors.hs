@@ -104,4 +104,4 @@ instance Show RuntimeType where
     show ZeroDiv = "division by zero."
     show TypeCheckerDidntCatch = "type checker didn't catch this error."
     show (CannotCast s t) = "cannot cast " ++ s ++ " to type " ++ show t ++ "."
-    show (AssertionFailed s) = "assertion failed: " ++ s ++ "."
+    show (AssertionFailed s) = "assertion failed:\n" ++ s ++ "."

@@ -26,7 +26,7 @@ import Control.Monad.Except (ExceptT, runExceptT, throwError, void, MonadIO (lif
 import Control.Monad.Reader (ReaderT, runReaderT, ask, local, asks)
 import Control.Monad.State (StateT, evalStateT, get, put, modify, gets)
 import qualified Data.Map as Map (Map, empty, insert, lookup, fromList)
-import Data.Maybe (isJust, isNothing)
+import Data.Maybe (isJust, isNothing, fromMaybe)
 import Text.Read (readMaybe)
 
 -- =============================================================================
@@ -82,13 +82,16 @@ type RetType = (Maybe Value, Maybe LoopControlFlow)
 
 type Loc = Int
 
-data Store = Store { nextFree :: Loc, memory :: Map.Map Loc Value }
+data Store = Store { nextFree :: Loc, memory :: Map.Map Loc Value, programStr :: String }
 
 emptyStore :: Store
-emptyStore = Store 0 Map.empty
+emptyStore = storeWithProgram ""
+
+storeWithProgram :: String -> Store
+storeWithProgram = Store 0 Map.empty
 
 newlock :: Store -> (Loc, Store)
-newlock (Store n m) = (n, Store (n + 1) m)
+newlock (Store n m s) = (n, Store (n + 1) m s)
 
 newlockM :: IM Loc
 newlockM = do
@@ -98,14 +101,14 @@ newlockM = do
     pure l
 
 insertStore :: Loc -> Value -> Store -> Store
-insertStore l v (Store n m) = Store n (Map.insert l v m)
+insertStore l v (Store n m s) = Store n (Map.insert l v m) s
 
 insertStoreMany :: [(Loc, Value)] -> Store -> Store
 insertStoreMany [] s = s
 insertStoreMany ((l, v):xs) s = insertStoreMany xs $ insertStore l v s
 
 storeGet :: Loc -> Store -> IM Value
-storeGet l (Store _ m) = case Map.lookup l m of
+storeGet l (Store _ m s) = case Map.lookup l m of
     Nothing -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
     Just v -> pure v
 
@@ -128,9 +131,9 @@ type ModStore = Store -> Store
 type IM a = ExceptT ErrHolder (ReaderT Env (StateT Store IO)) a
 
 
-evaluate :: Program -> IO (Err ())
-evaluate p = do 
-    let (env, store) = makeStdLib emptyEnv emptyStore
+evaluate :: Program -> String -> IO (Err ())
+evaluate p s = do 
+    let (env, store) = makeStdLib emptyEnv $ storeWithProgram s
     let errorsT = runExceptT (evalP p)
     let envT = runReaderT errorsT env
     evalStateT envT store
@@ -459,8 +462,50 @@ evalFunB pos AssertExpr = do
     (VTBool b) <- evalE (EVarName pos (Ident "e"))
     if b
         then pure (Nothing, Nothing)
-        else throwError $ RuntimeError pos $ AssertionFailed "assertion failed"
+        else do
+            codeFragment <- getCodeFragmentFromPos pos
+            throwError $ RuntimeError pos $ AssertionFailed codeFragment
 
+
+getCodeFragmentFromPos :: BNFC'Position -> IM String
+getCodeFragmentFromPos (Just (line, col)) = do
+    code' <- gets programStr
+    let code = lines code'
+    let line' = line - 1
+    let col' = col - 1 + length "assert("
+    let lineStr = code !! line'
+    let lineBefore = fromMaybe "" $ code `getElem` (line' - 1)
+    let lineAfter = fromMaybe "" $ code `getElem` (line' + 1)
+    getAssertMessage line col' lineStr lineBefore lineAfter
+getCodeFragmentFromPos Nothing = pure "no position info"
+
+
+getElem :: [a] -> Int -> Maybe a
+getElem [] _ = Nothing
+getElem _ n | n < 0 = Nothing
+getElem (x:_) 0 = Just x
+getElem (_:xs) n = getElem xs (n - 1)
+
+-- for string `assert(false)` and numer 6 generates message like
+-- ```
+-- assert(false);
+--       ^
+-- ```
+getAssertMessage :: Int -> Int -> String -> String -> String -> IM String
+getAssertMessage line col code codeBefore codeAfter = do
+    let beforeCode = show line ++ ": "
+    let beforeCodLen = length beforeCode
+    let beforeBeforeCode = show (line - 1) ++ ": "
+    let beforeBeforeCodLen = length beforeBeforeCode
+    let beforeAfterCode = show (line + 1) ++ ": "
+    let beforeAfterCodLen = length beforeAfterCode
+    let codeBeforeMore = if line > 1 then beforeBeforeCode ++ codeBefore ++ "\n" else ""
+    let codeAfterMore = beforeAfterCode ++ codeAfter
+    let maxLen = maximum [beforeCodLen, beforeBeforeCodLen, beforeAfterCodLen]
+    pure $ codeBeforeMore ++ beforeCode ++ code ++ "\n" ++ duplicate " " (col + maxLen) ++ "^\n" ++ codeAfterMore
+
+duplicate :: String -> Int -> String
+duplicate string n = concat $ replicate n string
 
 writeStrDecl :: (Ident, Value)
 writeStrDecl = (Ident "writeStr", VTFun [(Ident "s", VRCopy)] WriteStr emptyEnv)

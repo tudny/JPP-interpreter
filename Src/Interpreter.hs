@@ -37,7 +37,7 @@ run p s = case go of
     print err
     exitFailure
   Right p -> do
-    e <- evaluate p
+    e <- evaluate p s
     case e of
       Left eh -> do
         putStrLn "\nRuntime Error!\n"

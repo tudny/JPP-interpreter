@@ -74,4 +74,5 @@ fun fastFibIteration(var a: new Integer, var b: new Integer, var n: new Integer)
 
 assert(1 == 1);
 assert(1 != 2);
+assert(false);
 assert(true);
