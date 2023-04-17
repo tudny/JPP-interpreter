@@ -127,6 +127,7 @@ transExpr x = case x of
   Src.Jabba.Abs.EIntLit _ integer -> failure x
   Src.Jabba.Abs.EBoolLitTrue _ -> failure x
   Src.Jabba.Abs.EBoolLitFalse _ -> failure x
+  Src.Jabba.Abs.EUnitLiteral _ -> failure x
   Src.Jabba.Abs.EStringLit _ string -> failure x
   Src.Jabba.Abs.ERun _ expr exprs -> failure x
   Src.Jabba.Abs.ELambda _ args block -> failure x

@@ -31,10 +31,10 @@ The set of reserved words is the set of terminals appearing in the grammar. Thos
 
 The reserved words used in jabba are the following:
   | ``Boolean`` | ``Integer`` | ``String`` | ``Unit``
-  | ``break`` | ``continue`` | ``else`` | ``false``
-  | ``finally`` | ``for`` | ``fun`` | ``if``
-  | ``new`` | ``return`` | ``true`` | ``val``
-  | ``var`` | ``while`` |  |
+  | ``break`` | ``continue`` | ``elif`` | ``else``
+  | ``false`` | ``finally`` | ``for`` | ``fun``
+  | ``if`` | ``new`` | ``return`` | ``true``
+  | ``val`` | ``var`` | ``while`` |
 
 The symbols used in jabba are the following:
   | ( | ) | : | ,
@@ -92,7 +92,7 @@ All other symbols are terminals.
   | //Block// | -> | ``{`` //[Instr]// ``}``
   | //[Instr]// | -> | **eps**
   |  |  **|**  | //Instr// //[Instr]//
-  | //Elif// | -> | ``else`` ``if`` //Expr// //Block//
+  | //Elif// | -> | ``elif`` //Expr// //Block//
   | //[Elif]// | -> | **eps**
   |  |  **|**  | //Elif// //[Elif]//
   | //Type// | -> | ``Integer``

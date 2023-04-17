@@ -36,7 +36,6 @@ transInstr x = case x of
   Src.Jabba.Abs.IBreak _ -> failure x
   Src.Jabba.Abs.ICont _ -> failure x
   Src.Jabba.Abs.IIf _ expr block -> failure x
-  Src.Jabba.Abs.IIfElse _ expr block1 block2 -> failure x
   Src.Jabba.Abs.IIfElif _ expr block1 elifs block2 -> failure x
   Src.Jabba.Abs.IWhile _ expr block -> failure x
   Src.Jabba.Abs.IWhileFin _ expr block1 block2 -> failure x

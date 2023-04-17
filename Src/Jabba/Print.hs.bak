@@ -203,7 +203,7 @@ instance Print [Src.Jabba.Abs.Instr' a] where
 
 instance Print (Src.Jabba.Abs.Elif' a) where
   prt i = \case
-    Src.Jabba.Abs.ElseIf _ expr block -> prPrec i 0 (concatD [doc (showString "else"), doc (showString "if"), prt 0 expr, prt 0 block])
+    Src.Jabba.Abs.ElseIf _ expr block -> prPrec i 0 (concatD [doc (showString "elif"), prt 0 expr, prt 0 block])
 
 instance Print [Src.Jabba.Abs.Elif' a] where
   prt _ [] = concatD []

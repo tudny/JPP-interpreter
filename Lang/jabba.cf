@@ -145,6 +145,8 @@ EBoolLitTrue.   Expr6 ::= "true" ;
 
 EBoolLitFalse.  Expr6 ::= "false" ;
 
+EUnitLiteral.   Expr6 ::= "unit" ;
+
 EStringLit.     Expr6 ::= String ;
 
 ERun.           Expr5 ::= Expr5 "(" [Expr] ")" ;

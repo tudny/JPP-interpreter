@@ -64,13 +64,14 @@ import Src.Jabba.Lex
   'new'      { PT _ (TS _ 39) }
   'return'   { PT _ (TS _ 40) }
   'true'     { PT _ (TS _ 41) }
-  'val'      { PT _ (TS _ 42) }
-  'var'      { PT _ (TS _ 43) }
-  'while'    { PT _ (TS _ 44) }
-  '{'        { PT _ (TS _ 45) }
-  '|'        { PT _ (TS _ 46) }
-  '||'       { PT _ (TS _ 47) }
-  '}'        { PT _ (TS _ 48) }
+  'unit'     { PT _ (TS _ 42) }
+  'val'      { PT _ (TS _ 43) }
+  'var'      { PT _ (TS _ 44) }
+  'while'    { PT _ (TS _ 45) }
+  '{'        { PT _ (TS _ 46) }
+  '|'        { PT _ (TS _ 47) }
+  '||'       { PT _ (TS _ 48) }
+  '}'        { PT _ (TS _ 49) }
   L_Ident    { PT _ (TV _)    }
   L_integ    { PT _ (TI _)    }
   L_quoted   { PT _ (TL _)    }
@@ -222,6 +223,7 @@ Expr6
   | Integer { (fst $1, Src.Jabba.Abs.EIntLit (fst $1) (snd $1)) }
   | 'true' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.EBoolLitTrue (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | 'false' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.EBoolLitFalse (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
+  | 'unit' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.EUnitLiteral (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | String { (fst $1, Src.Jabba.Abs.EStringLit (fst $1) (snd $1)) }
   | '(' Expr ')' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), (snd $2)) }
 

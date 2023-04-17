@@ -9,7 +9,7 @@ data ErrHolder
     = ParserErr String
     | TypeChecker BNFC'Position ErrType
     | RuntimeError BNFC'Position RuntimeType
-    | ControlledExit Integer
+    | ControlledExit Int
 
 data ErrType
     = ImmutVar Ident

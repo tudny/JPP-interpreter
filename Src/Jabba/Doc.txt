@@ -34,7 +34,7 @@ The reserved words used in jabba are the following:
   | ``break`` | ``continue`` | ``elif`` | ``else``
   | ``false`` | ``finally`` | ``for`` | ``fun``
   | ``if`` | ``new`` | ``return`` | ``true``
-  | ``val`` | ``var`` | ``while`` |
+  | ``unit`` | ``val`` | ``var`` | ``while``
 
 The symbols used in jabba are the following:
   | ( | ) | : | ,
@@ -126,6 +126,7 @@ All other symbols are terminals.
   |  |  **|**  | //Integer//
   |  |  **|**  | ``true``
   |  |  **|**  | ``false``
+  |  |  **|**  | ``unit``
   |  |  **|**  | //String//
   |  |  **|**  | ``(`` //Expr// ``)``
   | //Expr5// | -> | //Expr5// ``(`` //[Expr]// ``)``

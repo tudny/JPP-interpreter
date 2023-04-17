@@ -1,12 +1,28 @@
 
-fun fib(val n: new Integer): Integer {
-    if n < 2 {
-        return n;
-    }
-    if n == 8 {
-        exit(2137);
-    }
-    return fib(n - 1) + fib(n - 2);
-}
+fun xd() {}
 
-fib(10);
+var x: Unit;
+x = xd();
+
+x = unit;
+
+
+
+fun foo(val x: Unit) {}
+
+val f: (var$Integer) -> Unit = |var n: new Integer| { n = 2; };
+val g = || 5;
+
+var y = 10;
+writeInt(y);
+writeStr("\n");
+
+f(y);
+writeInt(y);
+writeStr("\n");
+
+writeInt(g());
+writeStr("\n");
+
+foo(x);
+

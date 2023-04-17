@@ -81,30 +81,31 @@ Grammar
 	Expr6 -> Integer                                   (72)
 	Expr6 -> 'true'                                    (73)
 	Expr6 -> 'false'                                   (74)
-	Expr6 -> String                                    (75)
-	Expr6 -> '(' Expr ')'                              (76)
-	Expr5 -> Expr5 '(' ListExpr ')'                    (77)
-	Expr5 -> '|' ListArg '|' Block                     (78)
-	Expr5 -> '||' Block                                (79)
-	Expr5 -> NegOp Expr6                               (80)
-	Expr5 -> NotOp Expr6                               (81)
-	Expr5 -> Expr6                                     (82)
-	Expr4 -> Expr4 MulOp Expr5                         (83)
-	Expr4 -> Expr5                                     (84)
-	Expr3 -> Expr3 PlsOp Expr4                         (85)
-	Expr3 -> Expr4                                     (86)
-	Expr2 -> Expr2 RelOp Expr3                         (87)
-	Expr2 -> Expr3                                     (88)
-	Expr1 -> Expr2 AndOp Expr1                         (89)
-	Expr1 -> Expr2                                     (90)
-	Expr -> Expr1 OrOp Expr                            (91)
-	Expr -> Expr1 '?' Expr1 ':' Expr                   (92)
-	Expr -> '|' ListArg '|' Expr1                      (93)
-	Expr -> '||' Expr1                                 (94)
-	Expr -> Expr1                                      (95)
-	ListExpr ->                                        (96)
-	ListExpr -> Expr                                   (97)
-	ListExpr -> Expr ',' ListExpr                      (98)
+	Expr6 -> 'unit'                                    (75)
+	Expr6 -> String                                    (76)
+	Expr6 -> '(' Expr ')'                              (77)
+	Expr5 -> Expr5 '(' ListExpr ')'                    (78)
+	Expr5 -> '|' ListArg '|' Block                     (79)
+	Expr5 -> '||' Block                                (80)
+	Expr5 -> NegOp Expr6                               (81)
+	Expr5 -> NotOp Expr6                               (82)
+	Expr5 -> Expr6                                     (83)
+	Expr4 -> Expr4 MulOp Expr5                         (84)
+	Expr4 -> Expr5                                     (85)
+	Expr3 -> Expr3 PlsOp Expr4                         (86)
+	Expr3 -> Expr4                                     (87)
+	Expr2 -> Expr2 RelOp Expr3                         (88)
+	Expr2 -> Expr3                                     (89)
+	Expr1 -> Expr2 AndOp Expr1                         (90)
+	Expr1 -> Expr2                                     (91)
+	Expr -> Expr1 OrOp Expr                            (92)
+	Expr -> Expr1 '?' Expr1 ':' Expr                   (93)
+	Expr -> '|' ListArg '|' Expr1                      (94)
+	Expr -> '||' Expr1                                 (95)
+	Expr -> Expr1                                      (96)
+	ListExpr ->                                        (97)
+	ListExpr -> Expr                                   (98)
+	ListExpr -> Expr ',' ListExpr                      (99)
 
 -----------------------------------------------------------------------------
 Terminals
@@ -150,13 +151,14 @@ Terminals
 	'new'          { PT _ (TS _ 39) }
 	'return'       { PT _ (TS _ 40) }
 	'true'         { PT _ (TS _ 41) }
-	'val'          { PT _ (TS _ 42) }
-	'var'          { PT _ (TS _ 43) }
-	'while'        { PT _ (TS _ 44) }
-	'{'            { PT _ (TS _ 45) }
-	'|'            { PT _ (TS _ 46) }
-	'||'           { PT _ (TS _ 47) }
-	'}'            { PT _ (TS _ 48) }
+	'unit'         { PT _ (TS _ 42) }
+	'val'          { PT _ (TS _ 43) }
+	'var'          { PT _ (TS _ 44) }
+	'while'        { PT _ (TS _ 45) }
+	'{'            { PT _ (TS _ 46) }
+	'|'            { PT _ (TS _ 47) }
+	'||'           { PT _ (TS _ 48) }
+	'}'            { PT _ (TS _ 49) }
 	L_Ident        { PT _ (TV _) }
 	L_integ        { PT _ (TI _) }
 	L_quoted       { PT _ (TL _) }
@@ -189,14 +191,14 @@ Non-terminals
 	AndOp           rule  63
 	OrOp            rule  64
 	RelOp           rules 65, 66, 67, 68, 69, 70
-	Expr6           rules 71, 72, 73, 74, 75, 76
-	Expr5           rules 77, 78, 79, 80, 81, 82
-	Expr4           rules 83, 84
-	Expr3           rules 85, 86
-	Expr2           rules 87, 88
-	Expr1           rules 89, 90
-	Expr            rules 91, 92, 93, 94, 95
-	ListExpr        rules 96, 97, 98
+	Expr6           rules 71, 72, 73, 74, 75, 76, 77
+	Expr5           rules 78, 79, 80, 81, 82, 83
+	Expr4           rules 84, 85
+	Expr3           rules 86, 87
+	Expr2           rules 88, 89
+	Expr1           rules 90, 91
+	Expr            rules 92, 93, 94, 95, 96
+	ListExpr        rules 97, 98, 99
 
 -----------------------------------------------------------------------------
 States
@@ -217,15 +219,16 @@ State 0
 	'if'           shift, and enter state 29
 	'return'       shift, and enter state 30
 	'true'         shift, and enter state 31
-	'val'          shift, and enter state 32
-	'var'          shift, and enter state 33
-	'while'        shift, and enter state 34
-	'{'            shift, and enter state 35
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'val'          shift, and enter state 33
+	'var'          shift, and enter state 34
+	'while'        shift, and enter state 35
+	'{'            shift, and enter state 36
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 	%eof           reduce using rule 39
 
 	Ident          goto state 3
@@ -296,14 +299,14 @@ State 3
 	'('            reduce using rule 71
 	'*'            reduce using rule 71
 	'+'            reduce using rule 71
-	'++'           shift, and enter state 88
+	'++'           shift, and enter state 89
 	'-'            reduce using rule 71
-	'--'           shift, and enter state 89
+	'--'           shift, and enter state 90
 	'/'            reduce using rule 71
 	';'            reduce using rule 71
 	'<'            reduce using rule 71
 	'<='           reduce using rule 71
-	'='            shift, and enter state 90
+	'='            shift, and enter state 91
 	'=='           reduce using rule 71
 	'>'            reduce using rule 71
 	'>='           reduce using rule 71
@@ -340,29 +343,29 @@ State 4
 
 State 5
 
-	Expr6 -> String .                                   (rule 75)
+	Expr6 -> String .                                   (rule 76)
 
-	'!='           reduce using rule 75
-	'%'            reduce using rule 75
-	'&&'           reduce using rule 75
-	'('            reduce using rule 75
-	')'            reduce using rule 75
-	'*'            reduce using rule 75
-	'+'            reduce using rule 75
-	','            reduce using rule 75
-	'-'            reduce using rule 75
-	'..'           reduce using rule 75
-	'/'            reduce using rule 75
-	':'            reduce using rule 75
-	';'            reduce using rule 75
-	'<'            reduce using rule 75
-	'<='           reduce using rule 75
-	'=='           reduce using rule 75
-	'>'            reduce using rule 75
-	'>='           reduce using rule 75
-	'?'            reduce using rule 75
-	'{'            reduce using rule 75
-	'||'           reduce using rule 75
+	'!='           reduce using rule 76
+	'%'            reduce using rule 76
+	'&&'           reduce using rule 76
+	'('            reduce using rule 76
+	')'            reduce using rule 76
+	'*'            reduce using rule 76
+	'+'            reduce using rule 76
+	','            reduce using rule 76
+	'-'            reduce using rule 76
+	'..'           reduce using rule 76
+	'/'            reduce using rule 76
+	':'            reduce using rule 76
+	';'            reduce using rule 76
+	'<'            reduce using rule 76
+	'<='           reduce using rule 76
+	'=='           reduce using rule 76
+	'>'            reduce using rule 76
+	'>='           reduce using rule 76
+	'?'            reduce using rule 76
+	'{'            reduce using rule 76
+	'||'           reduce using rule 76
 
 
 State 6
@@ -388,16 +391,17 @@ State 7
 	'if'           shift, and enter state 29
 	'return'       shift, and enter state 30
 	'true'         shift, and enter state 31
-	'val'          shift, and enter state 32
-	'var'          shift, and enter state 33
-	'while'        shift, and enter state 34
-	'{'            shift, and enter state 35
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'val'          shift, and enter state 33
+	'var'          shift, and enter state 34
+	'while'        shift, and enter state 35
+	'{'            shift, and enter state 36
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	'}'            reduce using rule 39
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 	%eof           reduce using rule 39
 
 	Ident          goto state 3
@@ -406,7 +410,7 @@ State 7
 	Instr          goto state 7
 	Decl           goto state 8
 	Block          goto state 9
-	ListInstr      goto state 87
+	ListInstr      goto state 88
 	NotOp          goto state 11
 	NegOp          goto state 12
 	Expr6          goto state 13
@@ -421,7 +425,7 @@ State 8
 
 	Instr -> Decl . ';'                                 (rule 21)
 
-	';'            shift, and enter state 86
+	';'            shift, and enter state 87
 
 
 State 9
@@ -440,6 +444,7 @@ State 9
 	'if'           reduce using rule 22
 	'return'       reduce using rule 22
 	'true'         reduce using rule 22
+	'unit'         reduce using rule 22
 	'val'          reduce using rule 22
 	'var'          reduce using rule 22
 	'while'        reduce using rule 22
@@ -462,190 +467,192 @@ State 10
 
 State 11
 
-	Expr5 -> NotOp . Expr6                              (rule 81)
+	Expr5 -> NotOp . Expr6                              (rule 82)
 
 	'('            shift, and enter state 21
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	Expr6          goto state 86
+
+State 12
+
+	Expr5 -> NegOp . Expr6                              (rule 81)
+
+	'('            shift, and enter state 21
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	Expr6          goto state 85
 
-State 12
-
-	Expr5 -> NegOp . Expr6                              (rule 80)
-
-	'('            shift, and enter state 21
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	Expr6          goto state 84
-
 State 13
 
-	Expr5 -> Expr6 .                                    (rule 82)
+	Expr5 -> Expr6 .                                    (rule 83)
 
-	'!='           reduce using rule 82
-	'%'            reduce using rule 82
-	'&&'           reduce using rule 82
-	'('            reduce using rule 82
-	')'            reduce using rule 82
-	'*'            reduce using rule 82
-	'+'            reduce using rule 82
-	','            reduce using rule 82
-	'-'            reduce using rule 82
-	'..'           reduce using rule 82
-	'/'            reduce using rule 82
-	':'            reduce using rule 82
-	';'            reduce using rule 82
-	'<'            reduce using rule 82
-	'<='           reduce using rule 82
-	'=='           reduce using rule 82
-	'>'            reduce using rule 82
-	'>='           reduce using rule 82
-	'?'            reduce using rule 82
-	'{'            reduce using rule 82
-	'||'           reduce using rule 82
+	'!='           reduce using rule 83
+	'%'            reduce using rule 83
+	'&&'           reduce using rule 83
+	'('            reduce using rule 83
+	')'            reduce using rule 83
+	'*'            reduce using rule 83
+	'+'            reduce using rule 83
+	','            reduce using rule 83
+	'-'            reduce using rule 83
+	'..'           reduce using rule 83
+	'/'            reduce using rule 83
+	':'            reduce using rule 83
+	';'            reduce using rule 83
+	'<'            reduce using rule 83
+	'<='           reduce using rule 83
+	'=='           reduce using rule 83
+	'>'            reduce using rule 83
+	'>='           reduce using rule 83
+	'?'            reduce using rule 83
+	'{'            reduce using rule 83
+	'||'           reduce using rule 83
 
 
 State 14
 
-	Expr5 -> Expr5 . '(' ListExpr ')'                   (rule 77)
-	Expr4 -> Expr5 .                                    (rule 84)
+	Expr5 -> Expr5 . '(' ListExpr ')'                   (rule 78)
+	Expr4 -> Expr5 .                                    (rule 85)
 
-	'!='           reduce using rule 84
-	'%'            reduce using rule 84
-	'&&'           reduce using rule 84
-	'('            shift, and enter state 83
-	')'            reduce using rule 84
-	'*'            reduce using rule 84
-	'+'            reduce using rule 84
-	','            reduce using rule 84
-	'-'            reduce using rule 84
-	'..'           reduce using rule 84
-	'/'            reduce using rule 84
-	':'            reduce using rule 84
-	';'            reduce using rule 84
-	'<'            reduce using rule 84
-	'<='           reduce using rule 84
-	'=='           reduce using rule 84
-	'>'            reduce using rule 84
-	'>='           reduce using rule 84
-	'?'            reduce using rule 84
-	'{'            reduce using rule 84
-	'||'           reduce using rule 84
+	'!='           reduce using rule 85
+	'%'            reduce using rule 85
+	'&&'           reduce using rule 85
+	'('            shift, and enter state 84
+	')'            reduce using rule 85
+	'*'            reduce using rule 85
+	'+'            reduce using rule 85
+	','            reduce using rule 85
+	'-'            reduce using rule 85
+	'..'           reduce using rule 85
+	'/'            reduce using rule 85
+	':'            reduce using rule 85
+	';'            reduce using rule 85
+	'<'            reduce using rule 85
+	'<='           reduce using rule 85
+	'=='           reduce using rule 85
+	'>'            reduce using rule 85
+	'>='           reduce using rule 85
+	'?'            reduce using rule 85
+	'{'            reduce using rule 85
+	'||'           reduce using rule 85
 
 
 State 15
 
-	Expr4 -> Expr4 . MulOp Expr5                        (rule 83)
-	Expr3 -> Expr4 .                                    (rule 86)
+	Expr4 -> Expr4 . MulOp Expr5                        (rule 84)
+	Expr3 -> Expr4 .                                    (rule 87)
 
-	'!='           reduce using rule 86
-	'%'            shift, and enter state 80
-	'&&'           reduce using rule 86
-	')'            reduce using rule 86
-	'*'            shift, and enter state 81
-	'+'            reduce using rule 86
-	','            reduce using rule 86
-	'-'            reduce using rule 86
-	'..'           reduce using rule 86
-	'/'            shift, and enter state 82
-	':'            reduce using rule 86
-	';'            reduce using rule 86
-	'<'            reduce using rule 86
-	'<='           reduce using rule 86
-	'=='           reduce using rule 86
-	'>'            reduce using rule 86
-	'>='           reduce using rule 86
-	'?'            reduce using rule 86
-	'{'            reduce using rule 86
-	'||'           reduce using rule 86
+	'!='           reduce using rule 87
+	'%'            shift, and enter state 81
+	'&&'           reduce using rule 87
+	')'            reduce using rule 87
+	'*'            shift, and enter state 82
+	'+'            reduce using rule 87
+	','            reduce using rule 87
+	'-'            reduce using rule 87
+	'..'           reduce using rule 87
+	'/'            shift, and enter state 83
+	':'            reduce using rule 87
+	';'            reduce using rule 87
+	'<'            reduce using rule 87
+	'<='           reduce using rule 87
+	'=='           reduce using rule 87
+	'>'            reduce using rule 87
+	'>='           reduce using rule 87
+	'?'            reduce using rule 87
+	'{'            reduce using rule 87
+	'||'           reduce using rule 87
 
-	MulOp          goto state 79
+	MulOp          goto state 80
 
 State 16
 
-	Expr3 -> Expr3 . PlsOp Expr4                        (rule 85)
-	Expr2 -> Expr3 .                                    (rule 88)
+	Expr3 -> Expr3 . PlsOp Expr4                        (rule 86)
+	Expr2 -> Expr3 .                                    (rule 89)
 
-	'!='           reduce using rule 88
-	'&&'           reduce using rule 88
-	')'            reduce using rule 88
-	'+'            shift, and enter state 77
-	','            reduce using rule 88
-	'-'            shift, and enter state 78
-	'..'           reduce using rule 88
-	':'            reduce using rule 88
-	';'            reduce using rule 88
-	'<'            reduce using rule 88
-	'<='           reduce using rule 88
-	'=='           reduce using rule 88
-	'>'            reduce using rule 88
-	'>='           reduce using rule 88
-	'?'            reduce using rule 88
-	'{'            reduce using rule 88
-	'||'           reduce using rule 88
+	'!='           reduce using rule 89
+	'&&'           reduce using rule 89
+	')'            reduce using rule 89
+	'+'            shift, and enter state 78
+	','            reduce using rule 89
+	'-'            shift, and enter state 79
+	'..'           reduce using rule 89
+	':'            reduce using rule 89
+	';'            reduce using rule 89
+	'<'            reduce using rule 89
+	'<='           reduce using rule 89
+	'=='           reduce using rule 89
+	'>'            reduce using rule 89
+	'>='           reduce using rule 89
+	'?'            reduce using rule 89
+	'{'            reduce using rule 89
+	'||'           reduce using rule 89
 
-	PlsOp          goto state 76
+	PlsOp          goto state 77
 
 State 17
 
-	Expr2 -> Expr2 . RelOp Expr3                        (rule 87)
-	Expr1 -> Expr2 . AndOp Expr1                        (rule 89)
-	Expr1 -> Expr2 .                                    (rule 90)
+	Expr2 -> Expr2 . RelOp Expr3                        (rule 88)
+	Expr1 -> Expr2 . AndOp Expr1                        (rule 90)
+	Expr1 -> Expr2 .                                    (rule 91)
 
-	'!='           shift, and enter state 69
-	'&&'           shift, and enter state 70
-	')'            reduce using rule 90
-	','            reduce using rule 90
-	'..'           reduce using rule 90
-	':'            reduce using rule 90
-	';'            reduce using rule 90
-	'<'            shift, and enter state 71
-	'<='           shift, and enter state 72
-	'=='           shift, and enter state 73
-	'>'            shift, and enter state 74
-	'>='           shift, and enter state 75
-	'?'            reduce using rule 90
-	'{'            reduce using rule 90
-	'||'           reduce using rule 90
+	'!='           shift, and enter state 70
+	'&&'           shift, and enter state 71
+	')'            reduce using rule 91
+	','            reduce using rule 91
+	'..'           reduce using rule 91
+	':'            reduce using rule 91
+	';'            reduce using rule 91
+	'<'            shift, and enter state 72
+	'<='           shift, and enter state 73
+	'=='           shift, and enter state 74
+	'>'            shift, and enter state 75
+	'>='           shift, and enter state 76
+	'?'            reduce using rule 91
+	'{'            reduce using rule 91
+	'||'           reduce using rule 91
 
-	AndOp          goto state 67
-	RelOp          goto state 68
+	AndOp          goto state 68
+	RelOp          goto state 69
 
 State 18
 
-	Expr -> Expr1 . OrOp Expr                           (rule 91)
-	Expr -> Expr1 . '?' Expr1 ':' Expr                  (rule 92)
-	Expr -> Expr1 .                                     (rule 95)
+	Expr -> Expr1 . OrOp Expr                           (rule 92)
+	Expr -> Expr1 . '?' Expr1 ':' Expr                  (rule 93)
+	Expr -> Expr1 .                                     (rule 96)
 
-	')'            reduce using rule 95
-	','            reduce using rule 95
-	'..'           reduce using rule 95
-	';'            reduce using rule 95
-	'?'            shift, and enter state 65
-	'{'            reduce using rule 95
-	'||'           shift, and enter state 66
+	')'            reduce using rule 96
+	','            reduce using rule 96
+	'..'           reduce using rule 96
+	';'            reduce using rule 96
+	'?'            shift, and enter state 66
+	'{'            reduce using rule 96
+	'||'           shift, and enter state 67
 
-	OrOp           goto state 64
+	OrOp           goto state 65
 
 State 19
 
 	Instr -> Expr . ';'                                 (rule 20)
 
-	';'            shift, and enter state 63
+	';'            shift, and enter state 64
 
 
 State 20
@@ -655,6 +662,7 @@ State 20
 	'('            reduce using rule 61
 	'false'        reduce using rule 61
 	'true'         reduce using rule 61
+	'unit'         reduce using rule 61
 	L_Ident        reduce using rule 61
 	L_integ        reduce using rule 61
 	L_quoted       reduce using rule 61
@@ -662,20 +670,21 @@ State 20
 
 State 21
 
-	Expr6 -> '(' . Expr ')'                             (rule 76)
+	Expr6 -> '(' . Expr ')'                             (rule 77)
 
 	'!'            shift, and enter state 20
 	'('            shift, and enter state 21
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -686,7 +695,7 @@ State 21
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 62
+	Expr           goto state 63
 
 State 22
 
@@ -695,6 +704,7 @@ State 22
 	'('            reduce using rule 62
 	'false'        reduce using rule 62
 	'true'         reduce using rule 62
+	'unit'         reduce using rule 62
 	L_Ident        reduce using rule 62
 	L_integ        reduce using rule 62
 	L_quoted       reduce using rule 62
@@ -716,6 +726,7 @@ State 23
 	'if'           reduce using rule 7
 	'return'       reduce using rule 7
 	'true'         reduce using rule 7
+	'unit'         reduce using rule 7
 	'val'          reduce using rule 7
 	'var'          reduce using rule 7
 	'while'        reduce using rule 7
@@ -733,14 +744,14 @@ State 24
 
 	Instr -> 'break' . ';'                              (rule 13)
 
-	';'            shift, and enter state 61
+	';'            shift, and enter state 62
 
 
 State 25
 
 	Instr -> 'continue' . ';'                           (rule 14)
 
-	';'            shift, and enter state 60
+	';'            shift, and enter state 61
 
 
 State 26
@@ -776,7 +787,7 @@ State 27
 
 	L_Ident        shift, and enter state 2
 
-	Ident          goto state 59
+	Ident          goto state 60
 
 State 28
 
@@ -785,7 +796,7 @@ State 28
 
 	L_Ident        shift, and enter state 2
 
-	Ident          goto state 58
+	Ident          goto state 59
 
 State 29
 
@@ -797,13 +808,14 @@ State 29
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -814,7 +826,7 @@ State 29
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 57
+	Expr           goto state 58
 
 State 30
 
@@ -824,16 +836,17 @@ State 30
 	'!'            shift, and enter state 20
 	'('            shift, and enter state 21
 	'-'            shift, and enter state 22
-	';'            shift, and enter state 56
+	';'            shift, and enter state 57
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -844,7 +857,7 @@ State 30
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 55
+	Expr           goto state 56
 
 State 31
 
@@ -875,27 +888,54 @@ State 31
 
 State 32
 
+	Expr6 -> 'unit' .                                   (rule 75)
+
+	'!='           reduce using rule 75
+	'%'            reduce using rule 75
+	'&&'           reduce using rule 75
+	'('            reduce using rule 75
+	')'            reduce using rule 75
+	'*'            reduce using rule 75
+	'+'            reduce using rule 75
+	','            reduce using rule 75
+	'-'            reduce using rule 75
+	'..'           reduce using rule 75
+	'/'            reduce using rule 75
+	':'            reduce using rule 75
+	';'            reduce using rule 75
+	'<'            reduce using rule 75
+	'<='           reduce using rule 75
+	'=='           reduce using rule 75
+	'>'            reduce using rule 75
+	'>='           reduce using rule 75
+	'?'            reduce using rule 75
+	'{'            reduce using rule 75
+	'||'           reduce using rule 75
+
+
+State 33
+
 	Decl -> 'val' . ListItem                            (rule 37)
 
 	';'            reduce using rule 33
 	L_Ident        shift, and enter state 2
 
-	Ident          goto state 51
-	Item           goto state 52
-	ListItem       goto state 54
+	Ident          goto state 52
+	Item           goto state 53
+	ListItem       goto state 55
 
-State 33
+State 34
 
 	Decl -> 'var' . ListItem                            (rule 36)
 
 	';'            reduce using rule 33
 	L_Ident        shift, and enter state 2
 
-	Ident          goto state 51
-	Item           goto state 52
-	ListItem       goto state 53
+	Ident          goto state 52
+	Item           goto state 53
+	ListItem       goto state 54
 
-State 34
+State 35
 
 	Instr -> 'while' . Expr Block                       (rule 17)
 	Instr -> 'while' . Expr Block 'finally' Block       (rule 18)
@@ -905,13 +945,14 @@ State 34
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -922,9 +963,9 @@ State 34
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 50
+	Expr           goto state 51
 
-State 35
+State 36
 
 	Block -> '{' . ListInstr '}'                        (rule 38)
 
@@ -940,16 +981,17 @@ State 35
 	'if'           shift, and enter state 29
 	'return'       shift, and enter state 30
 	'true'         shift, and enter state 31
-	'val'          shift, and enter state 32
-	'var'          shift, and enter state 33
-	'while'        shift, and enter state 34
-	'{'            shift, and enter state 35
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'val'          shift, and enter state 33
+	'var'          shift, and enter state 34
+	'while'        shift, and enter state 35
+	'{'            shift, and enter state 36
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	'}'            reduce using rule 39
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
 	Ident          goto state 3
 	Integer        goto state 4
@@ -957,7 +999,7 @@ State 35
 	Instr          goto state 7
 	Decl           goto state 8
 	Block          goto state 9
-	ListInstr      goto state 49
+	ListInstr      goto state 50
 	NotOp          goto state 11
 	NegOp          goto state 12
 	Expr6          goto state 13
@@ -968,39 +1010,40 @@ State 35
 	Expr1          goto state 18
 	Expr           goto state 19
 
-State 36
-
-	Expr5 -> '|' . ListArg '|' Block                    (rule 78)
-	Expr -> '|' . ListArg '|' Expr1                     (rule 93)
-
-	'val'          shift, and enter state 47
-	'var'          shift, and enter state 48
-	'|'            reduce using rule 27
-
-	Arg            goto state 45
-	ListArg        goto state 46
-
 State 37
 
-	Expr5 -> '||' . Block                               (rule 79)
-	Expr -> '||' . Expr1                                (rule 94)
+	Expr5 -> '|' . ListArg '|' Block                    (rule 79)
+	Expr -> '|' . ListArg '|' Expr1                     (rule 94)
+
+	'val'          shift, and enter state 48
+	'var'          shift, and enter state 49
+	'|'            reduce using rule 27
+
+	Arg            goto state 46
+	ListArg        goto state 47
+
+State 38
+
+	Expr5 -> '||' . Block                               (rule 80)
+	Expr -> '||' . Expr1                                (rule 95)
 
 	'!'            shift, and enter state 20
 	'('            shift, and enter state 21
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'{'            shift, and enter state 35
-	'|'            shift, and enter state 43
-	'||'           shift, and enter state 44
+	'unit'         shift, and enter state 32
+	'{'            shift, and enter state 36
+	'|'            shift, and enter state 44
+	'||'           shift, and enter state 45
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
-	Block          goto state 41
+	Block          goto state 42
 	NotOp          goto state 11
 	NegOp          goto state 12
 	Expr6          goto state 13
@@ -1008,9 +1051,9 @@ State 37
 	Expr4          goto state 15
 	Expr3          goto state 16
 	Expr2          goto state 17
-	Expr1          goto state 42
+	Expr1          goto state 43
 
-State 38
+State 39
 
 	Integer -> L_integ .                                (rule 2)
 
@@ -1037,7 +1080,7 @@ State 38
 	'||'           reduce using rule 2
 
 
-State 39
+State 40
 
 	String -> L_quoted .                                (rule 3)
 
@@ -1064,7 +1107,7 @@ State 39
 	'||'           reduce using rule 3
 
 
-State 40
+State 41
 
 	Expr6 -> Ident .                                    (rule 71)
 
@@ -1091,697 +1134,9 @@ State 40
 	'||'           reduce using rule 71
 
 
-State 41
-
-	Expr5 -> '||' Block .                               (rule 79)
-
-	'!='           reduce using rule 79
-	'%'            reduce using rule 79
-	'&&'           reduce using rule 79
-	'('            reduce using rule 79
-	')'            reduce using rule 79
-	'*'            reduce using rule 79
-	'+'            reduce using rule 79
-	','            reduce using rule 79
-	'-'            reduce using rule 79
-	'..'           reduce using rule 79
-	'/'            reduce using rule 79
-	':'            reduce using rule 79
-	';'            reduce using rule 79
-	'<'            reduce using rule 79
-	'<='           reduce using rule 79
-	'=='           reduce using rule 79
-	'>'            reduce using rule 79
-	'>='           reduce using rule 79
-	'?'            reduce using rule 79
-	'{'            reduce using rule 79
-	'||'           reduce using rule 79
-
-
 State 42
 
-	Expr -> '||' Expr1 .                                (rule 94)
-
-	')'            reduce using rule 94
-	','            reduce using rule 94
-	'..'           reduce using rule 94
-	';'            reduce using rule 94
-	'{'            reduce using rule 94
-
-
-State 43
-
-	Expr5 -> '|' . ListArg '|' Block                    (rule 78)
-
-	'val'          shift, and enter state 47
-	'var'          shift, and enter state 48
-	'|'            reduce using rule 27
-
-	Arg            goto state 45
-	ListArg        goto state 116
-
-State 44
-
-	Expr5 -> '||' . Block                               (rule 79)
-
-	'{'            shift, and enter state 35
-
-	Block          goto state 41
-
-State 45
-
-	ListArg -> Arg .                                    (rule 28)
-	ListArg -> Arg . ',' ListArg                        (rule 29)
-
-	')'            reduce using rule 28
-	','            shift, and enter state 115
-	'|'            reduce using rule 28
-
-
-State 46
-
-	Expr5 -> '|' ListArg . '|' Block                    (rule 78)
-	Expr -> '|' ListArg . '|' Expr1                     (rule 93)
-
-	'|'            shift, and enter state 114
-
-
-State 47
-
-	Arg -> 'val' . Ident ':' Type                       (rule 24)
-	Arg -> 'val' . Ident ':' 'new' Type                 (rule 26)
-
-	L_Ident        shift, and enter state 2
-
-	Ident          goto state 113
-
-State 48
-
-	Arg -> 'var' . Ident ':' Type                       (rule 23)
-	Arg -> 'var' . Ident ':' 'new' Type                 (rule 25)
-
-	L_Ident        shift, and enter state 2
-
-	Ident          goto state 112
-
-State 49
-
-	Block -> '{' ListInstr . '}'                        (rule 38)
-
-	'}'            shift, and enter state 111
-
-
-State 50
-
-	Instr -> 'while' Expr . Block                       (rule 17)
-	Instr -> 'while' Expr . Block 'finally' Block       (rule 18)
-
-	'{'            shift, and enter state 35
-
-	Block          goto state 110
-
-State 51
-
-	Item -> Ident . ':' Type '=' Expr                   (rule 30)
-	Item -> Ident . '=' Expr                            (rule 31)
-	Item -> Ident . ':' Type                            (rule 32)
-
-	':'            shift, and enter state 108
-	'='            shift, and enter state 109
-
-
-State 52
-
-	ListItem -> Item .                                  (rule 34)
-	ListItem -> Item . ',' ListItem                     (rule 35)
-
-	','            shift, and enter state 107
-	';'            reduce using rule 34
-
-
-State 53
-
-	Decl -> 'var' ListItem .                            (rule 36)
-
-	';'            reduce using rule 36
-
-
-State 54
-
-	Decl -> 'val' ListItem .                            (rule 37)
-
-	';'            reduce using rule 37
-
-
-State 55
-
-	Instr -> 'return' Expr . ';'                        (rule 11)
-
-	';'            shift, and enter state 106
-
-
-State 56
-
-	Instr -> 'return' ';' .                             (rule 12)
-
-	'!'            reduce using rule 12
-	'('            reduce using rule 12
-	'-'            reduce using rule 12
-	';'            reduce using rule 12
-	'break'        reduce using rule 12
-	'continue'     reduce using rule 12
-	'false'        reduce using rule 12
-	'for'          reduce using rule 12
-	'fun'          reduce using rule 12
-	'if'           reduce using rule 12
-	'return'       reduce using rule 12
-	'true'         reduce using rule 12
-	'val'          reduce using rule 12
-	'var'          reduce using rule 12
-	'while'        reduce using rule 12
-	'{'            reduce using rule 12
-	'|'            reduce using rule 12
-	'||'           reduce using rule 12
-	'}'            reduce using rule 12
-	L_Ident        reduce using rule 12
-	L_integ        reduce using rule 12
-	L_quoted       reduce using rule 12
-	%eof           reduce using rule 12
-
-
-State 57
-
-	Instr -> 'if' Expr . Block                          (rule 15)
-	Instr -> 'if' Expr . Block ListElif 'else' Block    (rule 16)
-
-	'{'            shift, and enter state 35
-
-	Block          goto state 105
-
-State 58
-
-	Instr -> 'fun' Ident . '(' ListArg ')' ':' Type Block    (rule 5)
-	Instr -> 'fun' Ident . '(' ListArg ')' Block        (rule 6)
-
-	'('            shift, and enter state 104
-
-
-State 59
-
-	Instr -> 'for' Ident . '=' Expr '..' Expr Block     (rule 19)
-
-	'='            shift, and enter state 103
-
-
-State 60
-
-	Instr -> 'continue' ';' .                           (rule 14)
-
-	'!'            reduce using rule 14
-	'('            reduce using rule 14
-	'-'            reduce using rule 14
-	';'            reduce using rule 14
-	'break'        reduce using rule 14
-	'continue'     reduce using rule 14
-	'false'        reduce using rule 14
-	'for'          reduce using rule 14
-	'fun'          reduce using rule 14
-	'if'           reduce using rule 14
-	'return'       reduce using rule 14
-	'true'         reduce using rule 14
-	'val'          reduce using rule 14
-	'var'          reduce using rule 14
-	'while'        reduce using rule 14
-	'{'            reduce using rule 14
-	'|'            reduce using rule 14
-	'||'           reduce using rule 14
-	'}'            reduce using rule 14
-	L_Ident        reduce using rule 14
-	L_integ        reduce using rule 14
-	L_quoted       reduce using rule 14
-	%eof           reduce using rule 14
-
-
-State 61
-
-	Instr -> 'break' ';' .                              (rule 13)
-
-	'!'            reduce using rule 13
-	'('            reduce using rule 13
-	'-'            reduce using rule 13
-	';'            reduce using rule 13
-	'break'        reduce using rule 13
-	'continue'     reduce using rule 13
-	'false'        reduce using rule 13
-	'for'          reduce using rule 13
-	'fun'          reduce using rule 13
-	'if'           reduce using rule 13
-	'return'       reduce using rule 13
-	'true'         reduce using rule 13
-	'val'          reduce using rule 13
-	'var'          reduce using rule 13
-	'while'        reduce using rule 13
-	'{'            reduce using rule 13
-	'|'            reduce using rule 13
-	'||'           reduce using rule 13
-	'}'            reduce using rule 13
-	L_Ident        reduce using rule 13
-	L_integ        reduce using rule 13
-	L_quoted       reduce using rule 13
-	%eof           reduce using rule 13
-
-
-State 62
-
-	Expr6 -> '(' Expr . ')'                             (rule 76)
-
-	')'            shift, and enter state 102
-
-
-State 63
-
-	Instr -> Expr ';' .                                 (rule 20)
-
-	'!'            reduce using rule 20
-	'('            reduce using rule 20
-	'-'            reduce using rule 20
-	';'            reduce using rule 20
-	'break'        reduce using rule 20
-	'continue'     reduce using rule 20
-	'false'        reduce using rule 20
-	'for'          reduce using rule 20
-	'fun'          reduce using rule 20
-	'if'           reduce using rule 20
-	'return'       reduce using rule 20
-	'true'         reduce using rule 20
-	'val'          reduce using rule 20
-	'var'          reduce using rule 20
-	'while'        reduce using rule 20
-	'{'            reduce using rule 20
-	'|'            reduce using rule 20
-	'||'           reduce using rule 20
-	'}'            reduce using rule 20
-	L_Ident        reduce using rule 20
-	L_integ        reduce using rule 20
-	L_quoted       reduce using rule 20
-	%eof           reduce using rule 20
-
-
-State 64
-
-	Expr -> Expr1 OrOp . Expr                           (rule 91)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 15
-	Expr3          goto state 16
-	Expr2          goto state 17
-	Expr1          goto state 18
-	Expr           goto state 101
-
-State 65
-
-	Expr -> Expr1 '?' . Expr1 ':' Expr                  (rule 92)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 43
-	'||'           shift, and enter state 44
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 15
-	Expr3          goto state 16
-	Expr2          goto state 17
-	Expr1          goto state 100
-
-State 66
-
-	OrOp -> '||' .                                      (rule 64)
-
-	'!'            reduce using rule 64
-	'('            reduce using rule 64
-	'-'            reduce using rule 64
-	'false'        reduce using rule 64
-	'true'         reduce using rule 64
-	'|'            reduce using rule 64
-	'||'           reduce using rule 64
-	L_Ident        reduce using rule 64
-	L_integ        reduce using rule 64
-	L_quoted       reduce using rule 64
-
-
-State 67
-
-	Expr1 -> Expr2 AndOp . Expr1                        (rule 89)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 43
-	'||'           shift, and enter state 44
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 15
-	Expr3          goto state 16
-	Expr2          goto state 17
-	Expr1          goto state 99
-
-State 68
-
-	Expr2 -> Expr2 RelOp . Expr3                        (rule 87)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 43
-	'||'           shift, and enter state 44
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 15
-	Expr3          goto state 98
-
-State 69
-
-	RelOp -> '!=' .                                     (rule 66)
-
-	'!'            reduce using rule 66
-	'('            reduce using rule 66
-	'-'            reduce using rule 66
-	'false'        reduce using rule 66
-	'true'         reduce using rule 66
-	'|'            reduce using rule 66
-	'||'           reduce using rule 66
-	L_Ident        reduce using rule 66
-	L_integ        reduce using rule 66
-	L_quoted       reduce using rule 66
-
-
-State 70
-
-	AndOp -> '&&' .                                     (rule 63)
-
-	'!'            reduce using rule 63
-	'('            reduce using rule 63
-	'-'            reduce using rule 63
-	'false'        reduce using rule 63
-	'true'         reduce using rule 63
-	'|'            reduce using rule 63
-	'||'           reduce using rule 63
-	L_Ident        reduce using rule 63
-	L_integ        reduce using rule 63
-	L_quoted       reduce using rule 63
-
-
-State 71
-
-	RelOp -> '<' .                                      (rule 67)
-
-	'!'            reduce using rule 67
-	'('            reduce using rule 67
-	'-'            reduce using rule 67
-	'false'        reduce using rule 67
-	'true'         reduce using rule 67
-	'|'            reduce using rule 67
-	'||'           reduce using rule 67
-	L_Ident        reduce using rule 67
-	L_integ        reduce using rule 67
-	L_quoted       reduce using rule 67
-
-
-State 72
-
-	RelOp -> '<=' .                                     (rule 69)
-
-	'!'            reduce using rule 69
-	'('            reduce using rule 69
-	'-'            reduce using rule 69
-	'false'        reduce using rule 69
-	'true'         reduce using rule 69
-	'|'            reduce using rule 69
-	'||'           reduce using rule 69
-	L_Ident        reduce using rule 69
-	L_integ        reduce using rule 69
-	L_quoted       reduce using rule 69
-
-
-State 73
-
-	RelOp -> '==' .                                     (rule 65)
-
-	'!'            reduce using rule 65
-	'('            reduce using rule 65
-	'-'            reduce using rule 65
-	'false'        reduce using rule 65
-	'true'         reduce using rule 65
-	'|'            reduce using rule 65
-	'||'           reduce using rule 65
-	L_Ident        reduce using rule 65
-	L_integ        reduce using rule 65
-	L_quoted       reduce using rule 65
-
-
-State 74
-
-	RelOp -> '>' .                                      (rule 68)
-
-	'!'            reduce using rule 68
-	'('            reduce using rule 68
-	'-'            reduce using rule 68
-	'false'        reduce using rule 68
-	'true'         reduce using rule 68
-	'|'            reduce using rule 68
-	'||'           reduce using rule 68
-	L_Ident        reduce using rule 68
-	L_integ        reduce using rule 68
-	L_quoted       reduce using rule 68
-
-
-State 75
-
-	RelOp -> '>=' .                                     (rule 70)
-
-	'!'            reduce using rule 70
-	'('            reduce using rule 70
-	'-'            reduce using rule 70
-	'false'        reduce using rule 70
-	'true'         reduce using rule 70
-	'|'            reduce using rule 70
-	'||'           reduce using rule 70
-	L_Ident        reduce using rule 70
-	L_integ        reduce using rule 70
-	L_quoted       reduce using rule 70
-
-
-State 76
-
-	Expr3 -> Expr3 PlsOp . Expr4                        (rule 85)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 43
-	'||'           shift, and enter state 44
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 97
-
-State 77
-
-	PlsOp -> '+' .                                      (rule 56)
-
-	'!'            reduce using rule 56
-	'('            reduce using rule 56
-	'-'            reduce using rule 56
-	'false'        reduce using rule 56
-	'true'         reduce using rule 56
-	'|'            reduce using rule 56
-	'||'           reduce using rule 56
-	L_Ident        reduce using rule 56
-	L_integ        reduce using rule 56
-	L_quoted       reduce using rule 56
-
-
-State 78
-
-	PlsOp -> '-' .                                      (rule 57)
-
-	'!'            reduce using rule 57
-	'('            reduce using rule 57
-	'-'            reduce using rule 57
-	'false'        reduce using rule 57
-	'true'         reduce using rule 57
-	'|'            reduce using rule 57
-	'||'           reduce using rule 57
-	L_Ident        reduce using rule 57
-	L_integ        reduce using rule 57
-	L_quoted       reduce using rule 57
-
-
-State 79
-
-	Expr4 -> Expr4 MulOp . Expr5                        (rule 83)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 43
-	'||'           shift, and enter state 44
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 96
-
-State 80
-
-	MulOp -> '%' .                                      (rule 60)
-
-	'!'            reduce using rule 60
-	'('            reduce using rule 60
-	'-'            reduce using rule 60
-	'false'        reduce using rule 60
-	'true'         reduce using rule 60
-	'|'            reduce using rule 60
-	'||'           reduce using rule 60
-	L_Ident        reduce using rule 60
-	L_integ        reduce using rule 60
-	L_quoted       reduce using rule 60
-
-
-State 81
-
-	MulOp -> '*' .                                      (rule 58)
-
-	'!'            reduce using rule 58
-	'('            reduce using rule 58
-	'-'            reduce using rule 58
-	'false'        reduce using rule 58
-	'true'         reduce using rule 58
-	'|'            reduce using rule 58
-	'||'           reduce using rule 58
-	L_Ident        reduce using rule 58
-	L_integ        reduce using rule 58
-	L_quoted       reduce using rule 58
-
-
-State 82
-
-	MulOp -> '/' .                                      (rule 59)
-
-	'!'            reduce using rule 59
-	'('            reduce using rule 59
-	'-'            reduce using rule 59
-	'false'        reduce using rule 59
-	'true'         reduce using rule 59
-	'|'            reduce using rule 59
-	'||'           reduce using rule 59
-	L_Ident        reduce using rule 59
-	L_integ        reduce using rule 59
-	L_quoted       reduce using rule 59
-
-
-State 83
-
-	Expr5 -> Expr5 '(' . ListExpr ')'                   (rule 77)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	')'            reduce using rule 96
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 15
-	Expr3          goto state 16
-	Expr2          goto state 17
-	Expr1          goto state 18
-	Expr           goto state 94
-	ListExpr       goto state 95
-
-State 84
-
-	Expr5 -> NegOp Expr6 .                              (rule 80)
+	Expr5 -> '||' Block .                               (rule 80)
 
 	'!='           reduce using rule 80
 	'%'            reduce using rule 80
@@ -1806,9 +1161,694 @@ State 84
 	'||'           reduce using rule 80
 
 
+State 43
+
+	Expr -> '||' Expr1 .                                (rule 95)
+
+	')'            reduce using rule 95
+	','            reduce using rule 95
+	'..'           reduce using rule 95
+	';'            reduce using rule 95
+	'{'            reduce using rule 95
+
+
+State 44
+
+	Expr5 -> '|' . ListArg '|' Block                    (rule 79)
+
+	'val'          shift, and enter state 48
+	'var'          shift, and enter state 49
+	'|'            reduce using rule 27
+
+	Arg            goto state 46
+	ListArg        goto state 117
+
+State 45
+
+	Expr5 -> '||' . Block                               (rule 80)
+
+	'{'            shift, and enter state 36
+
+	Block          goto state 42
+
+State 46
+
+	ListArg -> Arg .                                    (rule 28)
+	ListArg -> Arg . ',' ListArg                        (rule 29)
+
+	')'            reduce using rule 28
+	','            shift, and enter state 116
+	'|'            reduce using rule 28
+
+
+State 47
+
+	Expr5 -> '|' ListArg . '|' Block                    (rule 79)
+	Expr -> '|' ListArg . '|' Expr1                     (rule 94)
+
+	'|'            shift, and enter state 115
+
+
+State 48
+
+	Arg -> 'val' . Ident ':' Type                       (rule 24)
+	Arg -> 'val' . Ident ':' 'new' Type                 (rule 26)
+
+	L_Ident        shift, and enter state 2
+
+	Ident          goto state 114
+
+State 49
+
+	Arg -> 'var' . Ident ':' Type                       (rule 23)
+	Arg -> 'var' . Ident ':' 'new' Type                 (rule 25)
+
+	L_Ident        shift, and enter state 2
+
+	Ident          goto state 113
+
+State 50
+
+	Block -> '{' ListInstr . '}'                        (rule 38)
+
+	'}'            shift, and enter state 112
+
+
+State 51
+
+	Instr -> 'while' Expr . Block                       (rule 17)
+	Instr -> 'while' Expr . Block 'finally' Block       (rule 18)
+
+	'{'            shift, and enter state 36
+
+	Block          goto state 111
+
+State 52
+
+	Item -> Ident . ':' Type '=' Expr                   (rule 30)
+	Item -> Ident . '=' Expr                            (rule 31)
+	Item -> Ident . ':' Type                            (rule 32)
+
+	':'            shift, and enter state 109
+	'='            shift, and enter state 110
+
+
+State 53
+
+	ListItem -> Item .                                  (rule 34)
+	ListItem -> Item . ',' ListItem                     (rule 35)
+
+	','            shift, and enter state 108
+	';'            reduce using rule 34
+
+
+State 54
+
+	Decl -> 'var' ListItem .                            (rule 36)
+
+	';'            reduce using rule 36
+
+
+State 55
+
+	Decl -> 'val' ListItem .                            (rule 37)
+
+	';'            reduce using rule 37
+
+
+State 56
+
+	Instr -> 'return' Expr . ';'                        (rule 11)
+
+	';'            shift, and enter state 107
+
+
+State 57
+
+	Instr -> 'return' ';' .                             (rule 12)
+
+	'!'            reduce using rule 12
+	'('            reduce using rule 12
+	'-'            reduce using rule 12
+	';'            reduce using rule 12
+	'break'        reduce using rule 12
+	'continue'     reduce using rule 12
+	'false'        reduce using rule 12
+	'for'          reduce using rule 12
+	'fun'          reduce using rule 12
+	'if'           reduce using rule 12
+	'return'       reduce using rule 12
+	'true'         reduce using rule 12
+	'unit'         reduce using rule 12
+	'val'          reduce using rule 12
+	'var'          reduce using rule 12
+	'while'        reduce using rule 12
+	'{'            reduce using rule 12
+	'|'            reduce using rule 12
+	'||'           reduce using rule 12
+	'}'            reduce using rule 12
+	L_Ident        reduce using rule 12
+	L_integ        reduce using rule 12
+	L_quoted       reduce using rule 12
+	%eof           reduce using rule 12
+
+
+State 58
+
+	Instr -> 'if' Expr . Block                          (rule 15)
+	Instr -> 'if' Expr . Block ListElif 'else' Block    (rule 16)
+
+	'{'            shift, and enter state 36
+
+	Block          goto state 106
+
+State 59
+
+	Instr -> 'fun' Ident . '(' ListArg ')' ':' Type Block    (rule 5)
+	Instr -> 'fun' Ident . '(' ListArg ')' Block        (rule 6)
+
+	'('            shift, and enter state 105
+
+
+State 60
+
+	Instr -> 'for' Ident . '=' Expr '..' Expr Block     (rule 19)
+
+	'='            shift, and enter state 104
+
+
+State 61
+
+	Instr -> 'continue' ';' .                           (rule 14)
+
+	'!'            reduce using rule 14
+	'('            reduce using rule 14
+	'-'            reduce using rule 14
+	';'            reduce using rule 14
+	'break'        reduce using rule 14
+	'continue'     reduce using rule 14
+	'false'        reduce using rule 14
+	'for'          reduce using rule 14
+	'fun'          reduce using rule 14
+	'if'           reduce using rule 14
+	'return'       reduce using rule 14
+	'true'         reduce using rule 14
+	'unit'         reduce using rule 14
+	'val'          reduce using rule 14
+	'var'          reduce using rule 14
+	'while'        reduce using rule 14
+	'{'            reduce using rule 14
+	'|'            reduce using rule 14
+	'||'           reduce using rule 14
+	'}'            reduce using rule 14
+	L_Ident        reduce using rule 14
+	L_integ        reduce using rule 14
+	L_quoted       reduce using rule 14
+	%eof           reduce using rule 14
+
+
+State 62
+
+	Instr -> 'break' ';' .                              (rule 13)
+
+	'!'            reduce using rule 13
+	'('            reduce using rule 13
+	'-'            reduce using rule 13
+	';'            reduce using rule 13
+	'break'        reduce using rule 13
+	'continue'     reduce using rule 13
+	'false'        reduce using rule 13
+	'for'          reduce using rule 13
+	'fun'          reduce using rule 13
+	'if'           reduce using rule 13
+	'return'       reduce using rule 13
+	'true'         reduce using rule 13
+	'unit'         reduce using rule 13
+	'val'          reduce using rule 13
+	'var'          reduce using rule 13
+	'while'        reduce using rule 13
+	'{'            reduce using rule 13
+	'|'            reduce using rule 13
+	'||'           reduce using rule 13
+	'}'            reduce using rule 13
+	L_Ident        reduce using rule 13
+	L_integ        reduce using rule 13
+	L_quoted       reduce using rule 13
+	%eof           reduce using rule 13
+
+
+State 63
+
+	Expr6 -> '(' Expr . ')'                             (rule 77)
+
+	')'            shift, and enter state 103
+
+
+State 64
+
+	Instr -> Expr ';' .                                 (rule 20)
+
+	'!'            reduce using rule 20
+	'('            reduce using rule 20
+	'-'            reduce using rule 20
+	';'            reduce using rule 20
+	'break'        reduce using rule 20
+	'continue'     reduce using rule 20
+	'false'        reduce using rule 20
+	'for'          reduce using rule 20
+	'fun'          reduce using rule 20
+	'if'           reduce using rule 20
+	'return'       reduce using rule 20
+	'true'         reduce using rule 20
+	'unit'         reduce using rule 20
+	'val'          reduce using rule 20
+	'var'          reduce using rule 20
+	'while'        reduce using rule 20
+	'{'            reduce using rule 20
+	'|'            reduce using rule 20
+	'||'           reduce using rule 20
+	'}'            reduce using rule 20
+	L_Ident        reduce using rule 20
+	L_integ        reduce using rule 20
+	L_quoted       reduce using rule 20
+	%eof           reduce using rule 20
+
+
+State 65
+
+	Expr -> Expr1 OrOp . Expr                           (rule 92)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 15
+	Expr3          goto state 16
+	Expr2          goto state 17
+	Expr1          goto state 18
+	Expr           goto state 102
+
+State 66
+
+	Expr -> Expr1 '?' . Expr1 ':' Expr                  (rule 93)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 44
+	'||'           shift, and enter state 45
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 15
+	Expr3          goto state 16
+	Expr2          goto state 17
+	Expr1          goto state 101
+
+State 67
+
+	OrOp -> '||' .                                      (rule 64)
+
+	'!'            reduce using rule 64
+	'('            reduce using rule 64
+	'-'            reduce using rule 64
+	'false'        reduce using rule 64
+	'true'         reduce using rule 64
+	'unit'         reduce using rule 64
+	'|'            reduce using rule 64
+	'||'           reduce using rule 64
+	L_Ident        reduce using rule 64
+	L_integ        reduce using rule 64
+	L_quoted       reduce using rule 64
+
+
+State 68
+
+	Expr1 -> Expr2 AndOp . Expr1                        (rule 90)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 44
+	'||'           shift, and enter state 45
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 15
+	Expr3          goto state 16
+	Expr2          goto state 17
+	Expr1          goto state 100
+
+State 69
+
+	Expr2 -> Expr2 RelOp . Expr3                        (rule 88)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 44
+	'||'           shift, and enter state 45
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 15
+	Expr3          goto state 99
+
+State 70
+
+	RelOp -> '!=' .                                     (rule 66)
+
+	'!'            reduce using rule 66
+	'('            reduce using rule 66
+	'-'            reduce using rule 66
+	'false'        reduce using rule 66
+	'true'         reduce using rule 66
+	'unit'         reduce using rule 66
+	'|'            reduce using rule 66
+	'||'           reduce using rule 66
+	L_Ident        reduce using rule 66
+	L_integ        reduce using rule 66
+	L_quoted       reduce using rule 66
+
+
+State 71
+
+	AndOp -> '&&' .                                     (rule 63)
+
+	'!'            reduce using rule 63
+	'('            reduce using rule 63
+	'-'            reduce using rule 63
+	'false'        reduce using rule 63
+	'true'         reduce using rule 63
+	'unit'         reduce using rule 63
+	'|'            reduce using rule 63
+	'||'           reduce using rule 63
+	L_Ident        reduce using rule 63
+	L_integ        reduce using rule 63
+	L_quoted       reduce using rule 63
+
+
+State 72
+
+	RelOp -> '<' .                                      (rule 67)
+
+	'!'            reduce using rule 67
+	'('            reduce using rule 67
+	'-'            reduce using rule 67
+	'false'        reduce using rule 67
+	'true'         reduce using rule 67
+	'unit'         reduce using rule 67
+	'|'            reduce using rule 67
+	'||'           reduce using rule 67
+	L_Ident        reduce using rule 67
+	L_integ        reduce using rule 67
+	L_quoted       reduce using rule 67
+
+
+State 73
+
+	RelOp -> '<=' .                                     (rule 69)
+
+	'!'            reduce using rule 69
+	'('            reduce using rule 69
+	'-'            reduce using rule 69
+	'false'        reduce using rule 69
+	'true'         reduce using rule 69
+	'unit'         reduce using rule 69
+	'|'            reduce using rule 69
+	'||'           reduce using rule 69
+	L_Ident        reduce using rule 69
+	L_integ        reduce using rule 69
+	L_quoted       reduce using rule 69
+
+
+State 74
+
+	RelOp -> '==' .                                     (rule 65)
+
+	'!'            reduce using rule 65
+	'('            reduce using rule 65
+	'-'            reduce using rule 65
+	'false'        reduce using rule 65
+	'true'         reduce using rule 65
+	'unit'         reduce using rule 65
+	'|'            reduce using rule 65
+	'||'           reduce using rule 65
+	L_Ident        reduce using rule 65
+	L_integ        reduce using rule 65
+	L_quoted       reduce using rule 65
+
+
+State 75
+
+	RelOp -> '>' .                                      (rule 68)
+
+	'!'            reduce using rule 68
+	'('            reduce using rule 68
+	'-'            reduce using rule 68
+	'false'        reduce using rule 68
+	'true'         reduce using rule 68
+	'unit'         reduce using rule 68
+	'|'            reduce using rule 68
+	'||'           reduce using rule 68
+	L_Ident        reduce using rule 68
+	L_integ        reduce using rule 68
+	L_quoted       reduce using rule 68
+
+
+State 76
+
+	RelOp -> '>=' .                                     (rule 70)
+
+	'!'            reduce using rule 70
+	'('            reduce using rule 70
+	'-'            reduce using rule 70
+	'false'        reduce using rule 70
+	'true'         reduce using rule 70
+	'unit'         reduce using rule 70
+	'|'            reduce using rule 70
+	'||'           reduce using rule 70
+	L_Ident        reduce using rule 70
+	L_integ        reduce using rule 70
+	L_quoted       reduce using rule 70
+
+
+State 77
+
+	Expr3 -> Expr3 PlsOp . Expr4                        (rule 86)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 44
+	'||'           shift, and enter state 45
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 98
+
+State 78
+
+	PlsOp -> '+' .                                      (rule 56)
+
+	'!'            reduce using rule 56
+	'('            reduce using rule 56
+	'-'            reduce using rule 56
+	'false'        reduce using rule 56
+	'true'         reduce using rule 56
+	'unit'         reduce using rule 56
+	'|'            reduce using rule 56
+	'||'           reduce using rule 56
+	L_Ident        reduce using rule 56
+	L_integ        reduce using rule 56
+	L_quoted       reduce using rule 56
+
+
+State 79
+
+	PlsOp -> '-' .                                      (rule 57)
+
+	'!'            reduce using rule 57
+	'('            reduce using rule 57
+	'-'            reduce using rule 57
+	'false'        reduce using rule 57
+	'true'         reduce using rule 57
+	'unit'         reduce using rule 57
+	'|'            reduce using rule 57
+	'||'           reduce using rule 57
+	L_Ident        reduce using rule 57
+	L_integ        reduce using rule 57
+	L_quoted       reduce using rule 57
+
+
+State 80
+
+	Expr4 -> Expr4 MulOp . Expr5                        (rule 84)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 44
+	'||'           shift, and enter state 45
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 97
+
+State 81
+
+	MulOp -> '%' .                                      (rule 60)
+
+	'!'            reduce using rule 60
+	'('            reduce using rule 60
+	'-'            reduce using rule 60
+	'false'        reduce using rule 60
+	'true'         reduce using rule 60
+	'unit'         reduce using rule 60
+	'|'            reduce using rule 60
+	'||'           reduce using rule 60
+	L_Ident        reduce using rule 60
+	L_integ        reduce using rule 60
+	L_quoted       reduce using rule 60
+
+
+State 82
+
+	MulOp -> '*' .                                      (rule 58)
+
+	'!'            reduce using rule 58
+	'('            reduce using rule 58
+	'-'            reduce using rule 58
+	'false'        reduce using rule 58
+	'true'         reduce using rule 58
+	'unit'         reduce using rule 58
+	'|'            reduce using rule 58
+	'||'           reduce using rule 58
+	L_Ident        reduce using rule 58
+	L_integ        reduce using rule 58
+	L_quoted       reduce using rule 58
+
+
+State 83
+
+	MulOp -> '/' .                                      (rule 59)
+
+	'!'            reduce using rule 59
+	'('            reduce using rule 59
+	'-'            reduce using rule 59
+	'false'        reduce using rule 59
+	'true'         reduce using rule 59
+	'unit'         reduce using rule 59
+	'|'            reduce using rule 59
+	'||'           reduce using rule 59
+	L_Ident        reduce using rule 59
+	L_integ        reduce using rule 59
+	L_quoted       reduce using rule 59
+
+
+State 84
+
+	Expr5 -> Expr5 '(' . ListExpr ')'                   (rule 78)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	')'            reduce using rule 97
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 15
+	Expr3          goto state 16
+	Expr2          goto state 17
+	Expr1          goto state 18
+	Expr           goto state 95
+	ListExpr       goto state 96
+
 State 85
 
-	Expr5 -> NotOp Expr6 .                              (rule 81)
+	Expr5 -> NegOp Expr6 .                              (rule 81)
 
 	'!='           reduce using rule 81
 	'%'            reduce using rule 81
@@ -1835,6 +1875,33 @@ State 85
 
 State 86
 
+	Expr5 -> NotOp Expr6 .                              (rule 82)
+
+	'!='           reduce using rule 82
+	'%'            reduce using rule 82
+	'&&'           reduce using rule 82
+	'('            reduce using rule 82
+	')'            reduce using rule 82
+	'*'            reduce using rule 82
+	'+'            reduce using rule 82
+	','            reduce using rule 82
+	'-'            reduce using rule 82
+	'..'           reduce using rule 82
+	'/'            reduce using rule 82
+	':'            reduce using rule 82
+	';'            reduce using rule 82
+	'<'            reduce using rule 82
+	'<='           reduce using rule 82
+	'=='           reduce using rule 82
+	'>'            reduce using rule 82
+	'>='           reduce using rule 82
+	'?'            reduce using rule 82
+	'{'            reduce using rule 82
+	'||'           reduce using rule 82
+
+
+State 87
+
 	Instr -> Decl ';' .                                 (rule 21)
 
 	'!'            reduce using rule 21
@@ -1849,6 +1916,7 @@ State 86
 	'if'           reduce using rule 21
 	'return'       reduce using rule 21
 	'true'         reduce using rule 21
+	'unit'         reduce using rule 21
 	'val'          reduce using rule 21
 	'var'          reduce using rule 21
 	'while'        reduce using rule 21
@@ -1862,7 +1930,7 @@ State 86
 	%eof           reduce using rule 21
 
 
-State 87
+State 88
 
 	ListInstr -> Instr ListInstr .                      (rule 40)
 
@@ -1870,21 +1938,21 @@ State 87
 	%eof           reduce using rule 40
 
 
-State 88
+State 89
 
 	Instr -> Ident '++' . ';'                           (rule 8)
+
+	';'            shift, and enter state 94
+
+
+State 90
+
+	Instr -> Ident '--' . ';'                           (rule 9)
 
 	';'            shift, and enter state 93
 
 
-State 89
-
-	Instr -> Ident '--' . ';'                           (rule 9)
-
-	';'            shift, and enter state 92
-
-
-State 90
+State 91
 
 	Instr -> Ident '=' . Expr ';'                       (rule 10)
 
@@ -1893,13 +1961,14 @@ State 90
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -1910,16 +1979,16 @@ State 90
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 91
+	Expr           goto state 92
 
-State 91
+State 92
 
 	Instr -> Ident '=' Expr . ';'                       (rule 10)
 
-	';'            shift, and enter state 140
+	';'            shift, and enter state 141
 
 
-State 92
+State 93
 
 	Instr -> Ident '--' ';' .                           (rule 9)
 
@@ -1935,6 +2004,7 @@ State 92
 	'if'           reduce using rule 9
 	'return'       reduce using rule 9
 	'true'         reduce using rule 9
+	'unit'         reduce using rule 9
 	'val'          reduce using rule 9
 	'var'          reduce using rule 9
 	'while'        reduce using rule 9
@@ -1948,7 +2018,7 @@ State 92
 	%eof           reduce using rule 9
 
 
-State 93
+State 94
 
 	Instr -> Ident '++' ';' .                           (rule 8)
 
@@ -1964,6 +2034,7 @@ State 93
 	'if'           reduce using rule 8
 	'return'       reduce using rule 8
 	'true'         reduce using rule 8
+	'unit'         reduce using rule 8
 	'val'          reduce using rule 8
 	'var'          reduce using rule 8
 	'while'        reduce using rule 8
@@ -1977,163 +2048,163 @@ State 93
 	%eof           reduce using rule 8
 
 
-State 94
-
-	ListExpr -> Expr .                                  (rule 97)
-	ListExpr -> Expr . ',' ListExpr                     (rule 98)
-
-	')'            reduce using rule 97
-	','            shift, and enter state 139
-
-
 State 95
 
-	Expr5 -> Expr5 '(' ListExpr . ')'                   (rule 77)
+	ListExpr -> Expr .                                  (rule 98)
+	ListExpr -> Expr . ',' ListExpr                     (rule 99)
 
-	')'            shift, and enter state 138
+	')'            reduce using rule 98
+	','            shift, and enter state 140
 
 
 State 96
 
-	Expr5 -> Expr5 . '(' ListExpr ')'                   (rule 77)
-	Expr4 -> Expr4 MulOp Expr5 .                        (rule 83)
+	Expr5 -> Expr5 '(' ListExpr . ')'                   (rule 78)
 
-	'!='           reduce using rule 83
-	'%'            reduce using rule 83
-	'&&'           reduce using rule 83
-	'('            shift, and enter state 83
-	')'            reduce using rule 83
-	'*'            reduce using rule 83
-	'+'            reduce using rule 83
-	','            reduce using rule 83
-	'-'            reduce using rule 83
-	'..'           reduce using rule 83
-	'/'            reduce using rule 83
-	':'            reduce using rule 83
-	';'            reduce using rule 83
-	'<'            reduce using rule 83
-	'<='           reduce using rule 83
-	'=='           reduce using rule 83
-	'>'            reduce using rule 83
-	'>='           reduce using rule 83
-	'?'            reduce using rule 83
-	'{'            reduce using rule 83
-	'||'           reduce using rule 83
+	')'            shift, and enter state 139
 
 
 State 97
 
-	Expr4 -> Expr4 . MulOp Expr5                        (rule 83)
-	Expr3 -> Expr3 PlsOp Expr4 .                        (rule 85)
+	Expr5 -> Expr5 . '(' ListExpr ')'                   (rule 78)
+	Expr4 -> Expr4 MulOp Expr5 .                        (rule 84)
 
-	'!='           reduce using rule 85
-	'%'            shift, and enter state 80
-	'&&'           reduce using rule 85
-	')'            reduce using rule 85
-	'*'            shift, and enter state 81
-	'+'            reduce using rule 85
-	','            reduce using rule 85
-	'-'            reduce using rule 85
-	'..'           reduce using rule 85
-	'/'            shift, and enter state 82
-	':'            reduce using rule 85
-	';'            reduce using rule 85
-	'<'            reduce using rule 85
-	'<='           reduce using rule 85
-	'=='           reduce using rule 85
-	'>'            reduce using rule 85
-	'>='           reduce using rule 85
-	'?'            reduce using rule 85
-	'{'            reduce using rule 85
-	'||'           reduce using rule 85
+	'!='           reduce using rule 84
+	'%'            reduce using rule 84
+	'&&'           reduce using rule 84
+	'('            shift, and enter state 84
+	')'            reduce using rule 84
+	'*'            reduce using rule 84
+	'+'            reduce using rule 84
+	','            reduce using rule 84
+	'-'            reduce using rule 84
+	'..'           reduce using rule 84
+	'/'            reduce using rule 84
+	':'            reduce using rule 84
+	';'            reduce using rule 84
+	'<'            reduce using rule 84
+	'<='           reduce using rule 84
+	'=='           reduce using rule 84
+	'>'            reduce using rule 84
+	'>='           reduce using rule 84
+	'?'            reduce using rule 84
+	'{'            reduce using rule 84
+	'||'           reduce using rule 84
 
-	MulOp          goto state 79
 
 State 98
 
-	Expr3 -> Expr3 . PlsOp Expr4                        (rule 85)
-	Expr2 -> Expr2 RelOp Expr3 .                        (rule 87)
+	Expr4 -> Expr4 . MulOp Expr5                        (rule 84)
+	Expr3 -> Expr3 PlsOp Expr4 .                        (rule 86)
 
-	'!='           reduce using rule 87
-	'&&'           reduce using rule 87
-	')'            reduce using rule 87
-	'+'            shift, and enter state 77
-	','            reduce using rule 87
-	'-'            shift, and enter state 78
-	'..'           reduce using rule 87
-	':'            reduce using rule 87
-	';'            reduce using rule 87
-	'<'            reduce using rule 87
-	'<='           reduce using rule 87
-	'=='           reduce using rule 87
-	'>'            reduce using rule 87
-	'>='           reduce using rule 87
-	'?'            reduce using rule 87
-	'{'            reduce using rule 87
-	'||'           reduce using rule 87
+	'!='           reduce using rule 86
+	'%'            shift, and enter state 81
+	'&&'           reduce using rule 86
+	')'            reduce using rule 86
+	'*'            shift, and enter state 82
+	'+'            reduce using rule 86
+	','            reduce using rule 86
+	'-'            reduce using rule 86
+	'..'           reduce using rule 86
+	'/'            shift, and enter state 83
+	':'            reduce using rule 86
+	';'            reduce using rule 86
+	'<'            reduce using rule 86
+	'<='           reduce using rule 86
+	'=='           reduce using rule 86
+	'>'            reduce using rule 86
+	'>='           reduce using rule 86
+	'?'            reduce using rule 86
+	'{'            reduce using rule 86
+	'||'           reduce using rule 86
 
-	PlsOp          goto state 76
+	MulOp          goto state 80
 
 State 99
 
-	Expr1 -> Expr2 AndOp Expr1 .                        (rule 89)
+	Expr3 -> Expr3 . PlsOp Expr4                        (rule 86)
+	Expr2 -> Expr2 RelOp Expr3 .                        (rule 88)
 
-	')'            reduce using rule 89
-	','            reduce using rule 89
-	'..'           reduce using rule 89
-	':'            reduce using rule 89
-	';'            reduce using rule 89
-	'?'            reduce using rule 89
-	'{'            reduce using rule 89
-	'||'           reduce using rule 89
+	'!='           reduce using rule 88
+	'&&'           reduce using rule 88
+	')'            reduce using rule 88
+	'+'            shift, and enter state 78
+	','            reduce using rule 88
+	'-'            shift, and enter state 79
+	'..'           reduce using rule 88
+	':'            reduce using rule 88
+	';'            reduce using rule 88
+	'<'            reduce using rule 88
+	'<='           reduce using rule 88
+	'=='           reduce using rule 88
+	'>'            reduce using rule 88
+	'>='           reduce using rule 88
+	'?'            reduce using rule 88
+	'{'            reduce using rule 88
+	'||'           reduce using rule 88
 
+	PlsOp          goto state 77
 
 State 100
 
-	Expr -> Expr1 '?' Expr1 . ':' Expr                  (rule 92)
+	Expr1 -> Expr2 AndOp Expr1 .                        (rule 90)
 
-	':'            shift, and enter state 137
+	')'            reduce using rule 90
+	','            reduce using rule 90
+	'..'           reduce using rule 90
+	':'            reduce using rule 90
+	';'            reduce using rule 90
+	'?'            reduce using rule 90
+	'{'            reduce using rule 90
+	'||'           reduce using rule 90
 
 
 State 101
 
-	Expr -> Expr1 OrOp Expr .                           (rule 91)
+	Expr -> Expr1 '?' Expr1 . ':' Expr                  (rule 93)
 
-	')'            reduce using rule 91
-	','            reduce using rule 91
-	'..'           reduce using rule 91
-	';'            reduce using rule 91
-	'{'            reduce using rule 91
+	':'            shift, and enter state 138
 
 
 State 102
 
-	Expr6 -> '(' Expr ')' .                             (rule 76)
+	Expr -> Expr1 OrOp Expr .                           (rule 92)
 
-	'!='           reduce using rule 76
-	'%'            reduce using rule 76
-	'&&'           reduce using rule 76
-	'('            reduce using rule 76
-	')'            reduce using rule 76
-	'*'            reduce using rule 76
-	'+'            reduce using rule 76
-	','            reduce using rule 76
-	'-'            reduce using rule 76
-	'..'           reduce using rule 76
-	'/'            reduce using rule 76
-	':'            reduce using rule 76
-	';'            reduce using rule 76
-	'<'            reduce using rule 76
-	'<='           reduce using rule 76
-	'=='           reduce using rule 76
-	'>'            reduce using rule 76
-	'>='           reduce using rule 76
-	'?'            reduce using rule 76
-	'{'            reduce using rule 76
-	'||'           reduce using rule 76
+	')'            reduce using rule 92
+	','            reduce using rule 92
+	'..'           reduce using rule 92
+	';'            reduce using rule 92
+	'{'            reduce using rule 92
 
 
 State 103
+
+	Expr6 -> '(' Expr ')' .                             (rule 77)
+
+	'!='           reduce using rule 77
+	'%'            reduce using rule 77
+	'&&'           reduce using rule 77
+	'('            reduce using rule 77
+	')'            reduce using rule 77
+	'*'            reduce using rule 77
+	'+'            reduce using rule 77
+	','            reduce using rule 77
+	'-'            reduce using rule 77
+	'..'           reduce using rule 77
+	'/'            reduce using rule 77
+	':'            reduce using rule 77
+	';'            reduce using rule 77
+	'<'            reduce using rule 77
+	'<='           reduce using rule 77
+	'=='           reduce using rule 77
+	'>'            reduce using rule 77
+	'>='           reduce using rule 77
+	'?'            reduce using rule 77
+	'{'            reduce using rule 77
+	'||'           reduce using rule 77
+
+
+State 104
 
 	Instr -> 'for' Ident '=' . Expr '..' Expr Block     (rule 19)
 
@@ -2142,13 +2213,14 @@ State 103
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -2159,21 +2231,21 @@ State 103
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 136
+	Expr           goto state 137
 
-State 104
+State 105
 
 	Instr -> 'fun' Ident '(' . ListArg ')' ':' Type Block    (rule 5)
 	Instr -> 'fun' Ident '(' . ListArg ')' Block        (rule 6)
 
 	')'            reduce using rule 27
-	'val'          shift, and enter state 47
-	'var'          shift, and enter state 48
+	'val'          shift, and enter state 48
+	'var'          shift, and enter state 49
 
-	Arg            goto state 45
-	ListArg        goto state 135
+	Arg            goto state 46
+	ListArg        goto state 136
 
-State 105
+State 106
 
 	Instr -> 'if' Expr Block .                          (rule 15)
 	Instr -> 'if' Expr Block . ListElif 'else' Block    (rule 16)
@@ -2184,7 +2256,7 @@ State 105
 	';'            reduce using rule 15
 	'break'        reduce using rule 15
 	'continue'     reduce using rule 15
-	'elif'         shift, and enter state 134
+	'elif'         shift, and enter state 135
 	'else'         reduce using rule 42
 	'false'        reduce using rule 15
 	'for'          reduce using rule 15
@@ -2192,6 +2264,7 @@ State 105
 	'if'           reduce using rule 15
 	'return'       reduce using rule 15
 	'true'         reduce using rule 15
+	'unit'         reduce using rule 15
 	'val'          reduce using rule 15
 	'var'          reduce using rule 15
 	'while'        reduce using rule 15
@@ -2204,10 +2277,10 @@ State 105
 	L_quoted       reduce using rule 15
 	%eof           reduce using rule 15
 
-	Elif           goto state 132
-	ListElif       goto state 133
+	Elif           goto state 133
+	ListElif       goto state 134
 
-State 106
+State 107
 
 	Instr -> 'return' Expr ';' .                        (rule 11)
 
@@ -2223,6 +2296,7 @@ State 106
 	'if'           reduce using rule 11
 	'return'       reduce using rule 11
 	'true'         reduce using rule 11
+	'unit'         reduce using rule 11
 	'val'          reduce using rule 11
 	'var'          reduce using rule 11
 	'while'        reduce using rule 11
@@ -2236,31 +2310,31 @@ State 106
 	%eof           reduce using rule 11
 
 
-State 107
+State 108
 
 	ListItem -> Item ',' . ListItem                     (rule 35)
 
 	';'            reduce using rule 33
 	L_Ident        shift, and enter state 2
 
-	Ident          goto state 51
-	Item           goto state 52
-	ListItem       goto state 131
+	Ident          goto state 52
+	Item           goto state 53
+	ListItem       goto state 132
 
-State 108
+State 109
 
 	Item -> Ident ':' . Type '=' Expr                   (rule 30)
 	Item -> Ident ':' . Type                            (rule 32)
 
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 125
+	Type           goto state 126
 
-State 109
+State 110
 
 	Item -> Ident '=' . Expr                            (rule 31)
 
@@ -2269,13 +2343,14 @@ State 109
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -2286,9 +2361,9 @@ State 109
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 124
+	Expr           goto state 125
 
-State 110
+State 111
 
 	Instr -> 'while' Expr Block .                       (rule 17)
 	Instr -> 'while' Expr Block . 'finally' Block       (rule 18)
@@ -2300,12 +2375,13 @@ State 110
 	'break'        reduce using rule 17
 	'continue'     reduce using rule 17
 	'false'        reduce using rule 17
-	'finally'      shift, and enter state 123
+	'finally'      shift, and enter state 124
 	'for'          reduce using rule 17
 	'fun'          reduce using rule 17
 	'if'           reduce using rule 17
 	'return'       reduce using rule 17
 	'true'         reduce using rule 17
+	'unit'         reduce using rule 17
 	'val'          reduce using rule 17
 	'var'          reduce using rule 17
 	'while'        reduce using rule 17
@@ -2319,7 +2395,7 @@ State 110
 	%eof           reduce using rule 17
 
 
-State 111
+State 112
 
 	Block -> '{' ListInstr '}' .                        (rule 38)
 
@@ -2354,6 +2430,7 @@ State 111
 	'if'           reduce using rule 38
 	'return'       reduce using rule 38
 	'true'         reduce using rule 38
+	'unit'         reduce using rule 38
 	'val'          reduce using rule 38
 	'var'          reduce using rule 38
 	'while'        reduce using rule 38
@@ -2367,43 +2444,44 @@ State 111
 	%eof           reduce using rule 38
 
 
-State 112
+State 113
 
 	Arg -> 'var' Ident . ':' Type                       (rule 23)
 	Arg -> 'var' Ident . ':' 'new' Type                 (rule 25)
 
-	':'            shift, and enter state 122
-
-
-State 113
-
-	Arg -> 'val' Ident . ':' Type                       (rule 24)
-	Arg -> 'val' Ident . ':' 'new' Type                 (rule 26)
-
-	':'            shift, and enter state 121
+	':'            shift, and enter state 123
 
 
 State 114
 
-	Expr5 -> '|' ListArg '|' . Block                    (rule 78)
-	Expr -> '|' ListArg '|' . Expr1                     (rule 93)
+	Arg -> 'val' Ident . ':' Type                       (rule 24)
+	Arg -> 'val' Ident . ':' 'new' Type                 (rule 26)
+
+	':'            shift, and enter state 122
+
+
+State 115
+
+	Expr5 -> '|' ListArg '|' . Block                    (rule 79)
+	Expr -> '|' ListArg '|' . Expr1                     (rule 94)
 
 	'!'            shift, and enter state 20
 	'('            shift, and enter state 21
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'{'            shift, and enter state 35
-	'|'            shift, and enter state 43
-	'||'           shift, and enter state 44
+	'unit'         shift, and enter state 32
+	'{'            shift, and enter state 36
+	'|'            shift, and enter state 44
+	'||'           shift, and enter state 45
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
-	Block          goto state 119
+	Block          goto state 120
 	NotOp          goto state 11
 	NegOp          goto state 12
 	Expr6          goto state 13
@@ -2411,36 +2489,36 @@ State 114
 	Expr4          goto state 15
 	Expr3          goto state 16
 	Expr2          goto state 17
-	Expr1          goto state 120
+	Expr1          goto state 121
 
-State 115
+State 116
 
 	ListArg -> Arg ',' . ListArg                        (rule 29)
 
 	')'            reduce using rule 27
-	'val'          shift, and enter state 47
-	'var'          shift, and enter state 48
+	'val'          shift, and enter state 48
+	'var'          shift, and enter state 49
 	'|'            reduce using rule 27
 
-	Arg            goto state 45
-	ListArg        goto state 118
-
-State 116
-
-	Expr5 -> '|' ListArg . '|' Block                    (rule 78)
-
-	'|'            shift, and enter state 117
-
+	Arg            goto state 46
+	ListArg        goto state 119
 
 State 117
 
-	Expr5 -> '|' ListArg '|' . Block                    (rule 78)
+	Expr5 -> '|' ListArg . '|' Block                    (rule 79)
 
-	'{'            shift, and enter state 35
+	'|'            shift, and enter state 118
 
-	Block          goto state 119
 
 State 118
+
+	Expr5 -> '|' ListArg '|' . Block                    (rule 79)
+
+	'{'            shift, and enter state 36
+
+	Block          goto state 120
+
+State 119
 
 	ListArg -> Arg ',' ListArg .                        (rule 29)
 
@@ -2448,9 +2526,257 @@ State 118
 	'|'            reduce using rule 29
 
 
-State 119
+State 120
 
-	Expr5 -> '|' ListArg '|' Block .                    (rule 78)
+	Expr5 -> '|' ListArg '|' Block .                    (rule 79)
+
+	'!='           reduce using rule 79
+	'%'            reduce using rule 79
+	'&&'           reduce using rule 79
+	'('            reduce using rule 79
+	')'            reduce using rule 79
+	'*'            reduce using rule 79
+	'+'            reduce using rule 79
+	','            reduce using rule 79
+	'-'            reduce using rule 79
+	'..'           reduce using rule 79
+	'/'            reduce using rule 79
+	':'            reduce using rule 79
+	';'            reduce using rule 79
+	'<'            reduce using rule 79
+	'<='           reduce using rule 79
+	'=='           reduce using rule 79
+	'>'            reduce using rule 79
+	'>='           reduce using rule 79
+	'?'            reduce using rule 79
+	'{'            reduce using rule 79
+	'||'           reduce using rule 79
+
+
+State 121
+
+	Expr -> '|' ListArg '|' Expr1 .                     (rule 94)
+
+	')'            reduce using rule 94
+	','            reduce using rule 94
+	'..'           reduce using rule 94
+	';'            reduce using rule 94
+	'{'            reduce using rule 94
+
+
+State 122
+
+	Arg -> 'val' Ident ':' . Type                       (rule 24)
+	Arg -> 'val' Ident ':' . 'new' Type                 (rule 26)
+
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
+	'new'          shift, and enter state 158
+
+	Type           goto state 157
+
+State 123
+
+	Arg -> 'var' Ident ':' . Type                       (rule 23)
+	Arg -> 'var' Ident ':' . 'new' Type                 (rule 25)
+
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
+	'new'          shift, and enter state 156
+
+	Type           goto state 155
+
+State 124
+
+	Instr -> 'while' Expr Block 'finally' . Block       (rule 18)
+
+	'{'            shift, and enter state 36
+
+	Block          goto state 154
+
+State 125
+
+	Item -> Ident '=' Expr .                            (rule 31)
+
+	','            reduce using rule 31
+	';'            reduce using rule 31
+
+
+State 126
+
+	Item -> Ident ':' Type . '=' Expr                   (rule 30)
+	Item -> Ident ':' Type .                            (rule 32)
+
+	','            reduce using rule 32
+	';'            reduce using rule 32
+	'='            shift, and enter state 153
+
+
+State 127
+
+	Type -> '(' . ListTArg ')' '->' Type                (rule 48)
+
+	')'            reduce using rule 53
+	'val'          shift, and enter state 151
+	'var'          shift, and enter state 152
+
+	TArg           goto state 149
+	ListTArg       goto state 150
+
+State 128
+
+	Type -> 'Boolean' .                                 (rule 45)
+
+	')'            reduce using rule 45
+	','            reduce using rule 45
+	';'            reduce using rule 45
+	'='            reduce using rule 45
+	'{'            reduce using rule 45
+	'|'            reduce using rule 45
+
+
+State 129
+
+	Type -> 'Integer' .                                 (rule 44)
+
+	')'            reduce using rule 44
+	','            reduce using rule 44
+	';'            reduce using rule 44
+	'='            reduce using rule 44
+	'{'            reduce using rule 44
+	'|'            reduce using rule 44
+
+
+State 130
+
+	Type -> 'String' .                                  (rule 46)
+
+	')'            reduce using rule 46
+	','            reduce using rule 46
+	';'            reduce using rule 46
+	'='            reduce using rule 46
+	'{'            reduce using rule 46
+	'|'            reduce using rule 46
+
+
+State 131
+
+	Type -> 'Unit' .                                    (rule 47)
+
+	')'            reduce using rule 47
+	','            reduce using rule 47
+	';'            reduce using rule 47
+	'='            reduce using rule 47
+	'{'            reduce using rule 47
+	'|'            reduce using rule 47
+
+
+State 132
+
+	ListItem -> Item ',' ListItem .                     (rule 35)
+
+	';'            reduce using rule 35
+
+
+State 133
+
+	ListElif -> Elif . ListElif                         (rule 43)
+
+	'elif'         shift, and enter state 135
+	'else'         reduce using rule 42
+
+	Elif           goto state 133
+	ListElif       goto state 148
+
+State 134
+
+	Instr -> 'if' Expr Block ListElif . 'else' Block    (rule 16)
+
+	'else'         shift, and enter state 147
+
+
+State 135
+
+	Elif -> 'elif' . Expr Block                         (rule 41)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 15
+	Expr3          goto state 16
+	Expr2          goto state 17
+	Expr1          goto state 18
+	Expr           goto state 146
+
+State 136
+
+	Instr -> 'fun' Ident '(' ListArg . ')' ':' Type Block    (rule 5)
+	Instr -> 'fun' Ident '(' ListArg . ')' Block        (rule 6)
+
+	')'            shift, and enter state 145
+
+
+State 137
+
+	Instr -> 'for' Ident '=' Expr . '..' Expr Block     (rule 19)
+
+	'..'           shift, and enter state 144
+
+
+State 138
+
+	Expr -> Expr1 '?' Expr1 ':' . Expr                  (rule 93)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 15
+	Expr3          goto state 16
+	Expr2          goto state 17
+	Expr1          goto state 18
+	Expr           goto state 143
+
+State 139
+
+	Expr5 -> Expr5 '(' ListExpr ')' .                   (rule 78)
 
 	'!='           reduce using rule 78
 	'%'            reduce using rule 78
@@ -2475,283 +2801,38 @@ State 119
 	'||'           reduce using rule 78
 
 
-State 120
-
-	Expr -> '|' ListArg '|' Expr1 .                     (rule 93)
-
-	')'            reduce using rule 93
-	','            reduce using rule 93
-	'..'           reduce using rule 93
-	';'            reduce using rule 93
-	'{'            reduce using rule 93
-
-
-State 121
-
-	Arg -> 'val' Ident ':' . Type                       (rule 24)
-	Arg -> 'val' Ident ':' . 'new' Type                 (rule 26)
-
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
-	'new'          shift, and enter state 157
-
-	Type           goto state 156
-
-State 122
-
-	Arg -> 'var' Ident ':' . Type                       (rule 23)
-	Arg -> 'var' Ident ':' . 'new' Type                 (rule 25)
-
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
-	'new'          shift, and enter state 155
-
-	Type           goto state 154
-
-State 123
-
-	Instr -> 'while' Expr Block 'finally' . Block       (rule 18)
-
-	'{'            shift, and enter state 35
-
-	Block          goto state 153
-
-State 124
-
-	Item -> Ident '=' Expr .                            (rule 31)
-
-	','            reduce using rule 31
-	';'            reduce using rule 31
-
-
-State 125
-
-	Item -> Ident ':' Type . '=' Expr                   (rule 30)
-	Item -> Ident ':' Type .                            (rule 32)
-
-	','            reduce using rule 32
-	';'            reduce using rule 32
-	'='            shift, and enter state 152
-
-
-State 126
-
-	Type -> '(' . ListTArg ')' '->' Type                (rule 48)
-
-	')'            reduce using rule 53
-	'val'          shift, and enter state 150
-	'var'          shift, and enter state 151
-
-	TArg           goto state 148
-	ListTArg       goto state 149
-
-State 127
-
-	Type -> 'Boolean' .                                 (rule 45)
-
-	')'            reduce using rule 45
-	','            reduce using rule 45
-	';'            reduce using rule 45
-	'='            reduce using rule 45
-	'{'            reduce using rule 45
-	'|'            reduce using rule 45
-
-
-State 128
-
-	Type -> 'Integer' .                                 (rule 44)
-
-	')'            reduce using rule 44
-	','            reduce using rule 44
-	';'            reduce using rule 44
-	'='            reduce using rule 44
-	'{'            reduce using rule 44
-	'|'            reduce using rule 44
-
-
-State 129
-
-	Type -> 'String' .                                  (rule 46)
-
-	')'            reduce using rule 46
-	','            reduce using rule 46
-	';'            reduce using rule 46
-	'='            reduce using rule 46
-	'{'            reduce using rule 46
-	'|'            reduce using rule 46
-
-
-State 130
-
-	Type -> 'Unit' .                                    (rule 47)
-
-	')'            reduce using rule 47
-	','            reduce using rule 47
-	';'            reduce using rule 47
-	'='            reduce using rule 47
-	'{'            reduce using rule 47
-	'|'            reduce using rule 47
-
-
-State 131
-
-	ListItem -> Item ',' ListItem .                     (rule 35)
-
-	';'            reduce using rule 35
-
-
-State 132
-
-	ListElif -> Elif . ListElif                         (rule 43)
-
-	'elif'         shift, and enter state 134
-	'else'         reduce using rule 42
-
-	Elif           goto state 132
-	ListElif       goto state 147
-
-State 133
-
-	Instr -> 'if' Expr Block ListElif . 'else' Block    (rule 16)
-
-	'else'         shift, and enter state 146
-
-
-State 134
-
-	Elif -> 'elif' . Expr Block                         (rule 41)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 15
-	Expr3          goto state 16
-	Expr2          goto state 17
-	Expr1          goto state 18
-	Expr           goto state 145
-
-State 135
-
-	Instr -> 'fun' Ident '(' ListArg . ')' ':' Type Block    (rule 5)
-	Instr -> 'fun' Ident '(' ListArg . ')' Block        (rule 6)
-
-	')'            shift, and enter state 144
-
-
-State 136
-
-	Instr -> 'for' Ident '=' Expr . '..' Expr Block     (rule 19)
-
-	'..'           shift, and enter state 143
-
-
-State 137
-
-	Expr -> Expr1 '?' Expr1 ':' . Expr                  (rule 92)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 15
-	Expr3          goto state 16
-	Expr2          goto state 17
-	Expr1          goto state 18
-	Expr           goto state 142
-
-State 138
-
-	Expr5 -> Expr5 '(' ListExpr ')' .                   (rule 77)
-
-	'!='           reduce using rule 77
-	'%'            reduce using rule 77
-	'&&'           reduce using rule 77
-	'('            reduce using rule 77
-	')'            reduce using rule 77
-	'*'            reduce using rule 77
-	'+'            reduce using rule 77
-	','            reduce using rule 77
-	'-'            reduce using rule 77
-	'..'           reduce using rule 77
-	'/'            reduce using rule 77
-	':'            reduce using rule 77
-	';'            reduce using rule 77
-	'<'            reduce using rule 77
-	'<='           reduce using rule 77
-	'=='           reduce using rule 77
-	'>'            reduce using rule 77
-	'>='           reduce using rule 77
-	'?'            reduce using rule 77
-	'{'            reduce using rule 77
-	'||'           reduce using rule 77
-
-
-State 139
-
-	ListExpr -> Expr ',' . ListExpr                     (rule 98)
-
-	'!'            shift, and enter state 20
-	'('            shift, and enter state 21
-	')'            reduce using rule 96
-	'-'            shift, and enter state 22
-	'false'        shift, and enter state 26
-	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
-	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
-
-	Ident          goto state 40
-	Integer        goto state 4
-	String         goto state 5
-	NotOp          goto state 11
-	NegOp          goto state 12
-	Expr6          goto state 13
-	Expr5          goto state 14
-	Expr4          goto state 15
-	Expr3          goto state 16
-	Expr2          goto state 17
-	Expr1          goto state 18
-	Expr           goto state 94
-	ListExpr       goto state 141
-
 State 140
+
+	ListExpr -> Expr ',' . ListExpr                     (rule 99)
+
+	'!'            shift, and enter state 20
+	'('            shift, and enter state 21
+	')'            reduce using rule 97
+	'-'            shift, and enter state 22
+	'false'        shift, and enter state 26
+	'true'         shift, and enter state 31
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
+	L_Ident        shift, and enter state 2
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
+
+	Ident          goto state 41
+	Integer        goto state 4
+	String         goto state 5
+	NotOp          goto state 11
+	NegOp          goto state 12
+	Expr6          goto state 13
+	Expr5          goto state 14
+	Expr4          goto state 15
+	Expr3          goto state 16
+	Expr2          goto state 17
+	Expr1          goto state 18
+	Expr           goto state 95
+	ListExpr       goto state 142
+
+State 141
 
 	Instr -> Ident '=' Expr ';' .                       (rule 10)
 
@@ -2767,6 +2848,7 @@ State 140
 	'if'           reduce using rule 10
 	'return'       reduce using rule 10
 	'true'         reduce using rule 10
+	'unit'         reduce using rule 10
 	'val'          reduce using rule 10
 	'var'          reduce using rule 10
 	'while'        reduce using rule 10
@@ -2780,25 +2862,25 @@ State 140
 	%eof           reduce using rule 10
 
 
-State 141
-
-	ListExpr -> Expr ',' ListExpr .                     (rule 98)
-
-	')'            reduce using rule 98
-
-
 State 142
 
-	Expr -> Expr1 '?' Expr1 ':' Expr .                  (rule 92)
+	ListExpr -> Expr ',' ListExpr .                     (rule 99)
 
-	')'            reduce using rule 92
-	','            reduce using rule 92
-	'..'           reduce using rule 92
-	';'            reduce using rule 92
-	'{'            reduce using rule 92
+	')'            reduce using rule 99
 
 
 State 143
+
+	Expr -> Expr1 '?' Expr1 ':' Expr .                  (rule 93)
+
+	')'            reduce using rule 93
+	','            reduce using rule 93
+	'..'           reduce using rule 93
+	';'            reduce using rule 93
+	'{'            reduce using rule 93
+
+
+State 144
 
 	Instr -> 'for' Ident '=' Expr '..' . Expr Block     (rule 19)
 
@@ -2807,13 +2889,14 @@ State 143
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -2824,86 +2907,86 @@ State 143
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 171
+	Expr           goto state 172
 
-State 144
+State 145
 
 	Instr -> 'fun' Ident '(' ListArg ')' . ':' Type Block    (rule 5)
 	Instr -> 'fun' Ident '(' ListArg ')' . Block        (rule 6)
 
-	':'            shift, and enter state 170
-	'{'            shift, and enter state 35
+	':'            shift, and enter state 171
+	'{'            shift, and enter state 36
 
-	Block          goto state 169
-
-State 145
-
-	Elif -> 'elif' Expr . Block                         (rule 41)
-
-	'{'            shift, and enter state 35
-
-	Block          goto state 168
+	Block          goto state 170
 
 State 146
 
-	Instr -> 'if' Expr Block ListElif 'else' . Block    (rule 16)
+	Elif -> 'elif' Expr . Block                         (rule 41)
 
-	'{'            shift, and enter state 35
+	'{'            shift, and enter state 36
 
-	Block          goto state 167
+	Block          goto state 169
 
 State 147
+
+	Instr -> 'if' Expr Block ListElif 'else' . Block    (rule 16)
+
+	'{'            shift, and enter state 36
+
+	Block          goto state 168
+
+State 148
 
 	ListElif -> Elif ListElif .                         (rule 43)
 
 	'else'         reduce using rule 43
 
 
-State 148
+State 149
 
 	ListTArg -> TArg .                                  (rule 54)
 	ListTArg -> TArg . ',' ListTArg                     (rule 55)
 
 	')'            reduce using rule 54
-	','            shift, and enter state 166
-
-
-State 149
-
-	Type -> '(' ListTArg . ')' '->' Type                (rule 48)
-
-	')'            shift, and enter state 165
+	','            shift, and enter state 167
 
 
 State 150
 
+	Type -> '(' ListTArg . ')' '->' Type                (rule 48)
+
+	')'            shift, and enter state 166
+
+
+State 151
+
 	TArg -> 'val' . Type                                (rule 50)
 	TArg -> 'val' . '$' Type                            (rule 52)
 
-	'$'            shift, and enter state 164
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'$'            shift, and enter state 165
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 163
+	Type           goto state 164
 
-State 151
+State 152
 
 	TArg -> 'var' . Type                                (rule 49)
 	TArg -> 'var' . '$' Type                            (rule 51)
 
-	'$'            shift, and enter state 162
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'$'            shift, and enter state 163
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 161
+	Type           goto state 162
 
-State 152
+State 153
 
 	Item -> Ident ':' Type '=' . Expr                   (rule 30)
 
@@ -2912,13 +2995,14 @@ State 152
 	'-'            shift, and enter state 22
 	'false'        shift, and enter state 26
 	'true'         shift, and enter state 31
-	'|'            shift, and enter state 36
-	'||'           shift, and enter state 37
+	'unit'         shift, and enter state 32
+	'|'            shift, and enter state 37
+	'||'           shift, and enter state 38
 	L_Ident        shift, and enter state 2
-	L_integ        shift, and enter state 38
-	L_quoted       shift, and enter state 39
+	L_integ        shift, and enter state 39
+	L_quoted       shift, and enter state 40
 
-	Ident          goto state 40
+	Ident          goto state 41
 	Integer        goto state 4
 	String         goto state 5
 	NotOp          goto state 11
@@ -2929,9 +3013,9 @@ State 152
 	Expr3          goto state 16
 	Expr2          goto state 17
 	Expr1          goto state 18
-	Expr           goto state 160
+	Expr           goto state 161
 
-State 153
+State 154
 
 	Instr -> 'while' Expr Block 'finally' Block .       (rule 18)
 
@@ -2947,6 +3031,7 @@ State 153
 	'if'           reduce using rule 18
 	'return'       reduce using rule 18
 	'true'         reduce using rule 18
+	'unit'         reduce using rule 18
 	'val'          reduce using rule 18
 	'var'          reduce using rule 18
 	'while'        reduce using rule 18
@@ -2960,7 +3045,7 @@ State 153
 	%eof           reduce using rule 18
 
 
-State 154
+State 155
 
 	Arg -> 'var' Ident ':' Type .                       (rule 23)
 
@@ -2969,19 +3054,19 @@ State 154
 	'|'            reduce using rule 23
 
 
-State 155
+State 156
 
 	Arg -> 'var' Ident ':' 'new' . Type                 (rule 25)
 
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 159
+	Type           goto state 160
 
-State 156
+State 157
 
 	Arg -> 'val' Ident ':' Type .                       (rule 24)
 
@@ -2990,19 +3075,19 @@ State 156
 	'|'            reduce using rule 24
 
 
-State 157
+State 158
 
 	Arg -> 'val' Ident ':' 'new' . Type                 (rule 26)
 
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 158
+	Type           goto state 159
 
-State 158
+State 159
 
 	Arg -> 'val' Ident ':' 'new' Type .                 (rule 26)
 
@@ -3011,7 +3096,7 @@ State 158
 	'|'            reduce using rule 26
 
 
-State 159
+State 160
 
 	Arg -> 'var' Ident ':' 'new' Type .                 (rule 25)
 
@@ -3020,7 +3105,7 @@ State 159
 	'|'            reduce using rule 25
 
 
-State 160
+State 161
 
 	Item -> Ident ':' Type '=' Expr .                   (rule 30)
 
@@ -3028,7 +3113,7 @@ State 160
 	';'            reduce using rule 30
 
 
-State 161
+State 162
 
 	TArg -> 'var' Type .                                (rule 49)
 
@@ -3036,19 +3121,19 @@ State 161
 	','            reduce using rule 49
 
 
-State 162
+State 163
 
 	TArg -> 'var' '$' . Type                            (rule 51)
 
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 177
+	Type           goto state 178
 
-State 163
+State 164
 
 	TArg -> 'val' Type .                                (rule 50)
 
@@ -3056,37 +3141,37 @@ State 163
 	','            reduce using rule 50
 
 
-State 164
+State 165
 
 	TArg -> 'val' '$' . Type                            (rule 52)
 
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 176
+	Type           goto state 177
 
-State 165
+State 166
 
 	Type -> '(' ListTArg ')' . '->' Type                (rule 48)
 
-	'->'           shift, and enter state 175
+	'->'           shift, and enter state 176
 
 
-State 166
+State 167
 
 	ListTArg -> TArg ',' . ListTArg                     (rule 55)
 
 	')'            reduce using rule 53
-	'val'          shift, and enter state 150
-	'var'          shift, and enter state 151
+	'val'          shift, and enter state 151
+	'var'          shift, and enter state 152
 
-	TArg           goto state 148
-	ListTArg       goto state 174
+	TArg           goto state 149
+	ListTArg       goto state 175
 
-State 167
+State 168
 
 	Instr -> 'if' Expr Block ListElif 'else' Block .    (rule 16)
 
@@ -3102,6 +3187,7 @@ State 167
 	'if'           reduce using rule 16
 	'return'       reduce using rule 16
 	'true'         reduce using rule 16
+	'unit'         reduce using rule 16
 	'val'          reduce using rule 16
 	'var'          reduce using rule 16
 	'while'        reduce using rule 16
@@ -3115,7 +3201,7 @@ State 167
 	%eof           reduce using rule 16
 
 
-State 168
+State 169
 
 	Elif -> 'elif' Expr Block .                         (rule 41)
 
@@ -3123,7 +3209,7 @@ State 168
 	'else'         reduce using rule 41
 
 
-State 169
+State 170
 
 	Instr -> 'fun' Ident '(' ListArg ')' Block .        (rule 6)
 
@@ -3139,6 +3225,7 @@ State 169
 	'if'           reduce using rule 6
 	'return'       reduce using rule 6
 	'true'         reduce using rule 6
+	'unit'         reduce using rule 6
 	'val'          reduce using rule 6
 	'var'          reduce using rule 6
 	'while'        reduce using rule 6
@@ -3152,27 +3239,27 @@ State 169
 	%eof           reduce using rule 6
 
 
-State 170
+State 171
 
 	Instr -> 'fun' Ident '(' ListArg ')' ':' . Type Block    (rule 5)
 
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 173
+	Type           goto state 174
 
-State 171
+State 172
 
 	Instr -> 'for' Ident '=' Expr '..' Expr . Block     (rule 19)
 
-	'{'            shift, and enter state 35
+	'{'            shift, and enter state 36
 
-	Block          goto state 172
+	Block          goto state 173
 
-State 172
+State 173
 
 	Instr -> 'for' Ident '=' Expr '..' Expr Block .     (rule 19)
 
@@ -3188,6 +3275,7 @@ State 172
 	'if'           reduce using rule 19
 	'return'       reduce using rule 19
 	'true'         reduce using rule 19
+	'unit'         reduce using rule 19
 	'val'          reduce using rule 19
 	'var'          reduce using rule 19
 	'while'        reduce using rule 19
@@ -3201,34 +3289,34 @@ State 172
 	%eof           reduce using rule 19
 
 
-State 173
+State 174
 
 	Instr -> 'fun' Ident '(' ListArg ')' ':' Type . Block    (rule 5)
 
-	'{'            shift, and enter state 35
+	'{'            shift, and enter state 36
 
-	Block          goto state 179
+	Block          goto state 180
 
-State 174
+State 175
 
 	ListTArg -> TArg ',' ListTArg .                     (rule 55)
 
 	')'            reduce using rule 55
 
 
-State 175
+State 176
 
 	Type -> '(' ListTArg ')' '->' . Type                (rule 48)
 
-	'('            shift, and enter state 126
-	'Boolean'      shift, and enter state 127
-	'Integer'      shift, and enter state 128
-	'String'       shift, and enter state 129
-	'Unit'         shift, and enter state 130
+	'('            shift, and enter state 127
+	'Boolean'      shift, and enter state 128
+	'Integer'      shift, and enter state 129
+	'String'       shift, and enter state 130
+	'Unit'         shift, and enter state 131
 
-	Type           goto state 178
+	Type           goto state 179
 
-State 176
+State 177
 
 	TArg -> 'val' '$' Type .                            (rule 52)
 
@@ -3236,7 +3324,7 @@ State 176
 	','            reduce using rule 52
 
 
-State 177
+State 178
 
 	TArg -> 'var' '$' Type .                            (rule 51)
 
@@ -3244,7 +3332,7 @@ State 177
 	','            reduce using rule 51
 
 
-State 178
+State 179
 
 	Type -> '(' ListTArg ')' '->' Type .                (rule 48)
 
@@ -3256,7 +3344,7 @@ State 178
 	'|'            reduce using rule 48
 
 
-State 179
+State 180
 
 	Instr -> 'fun' Ident '(' ListArg ')' ':' Type Block .    (rule 5)
 
@@ -3272,6 +3360,7 @@ State 179
 	'if'           reduce using rule 5
 	'return'       reduce using rule 5
 	'true'         reduce using rule 5
+	'unit'         reduce using rule 5
 	'val'          reduce using rule 5
 	'var'          reduce using rule 5
 	'while'        reduce using rule 5
@@ -3288,7 +3377,7 @@ State 179
 -----------------------------------------------------------------------------
 Grammar Totals
 -----------------------------------------------------------------------------
-Number of rules: 99
-Number of terminals: 51
+Number of rules: 100
+Number of terminals: 52
 Number of non-terminals: 33
-Number of states: 180
+Number of states: 181

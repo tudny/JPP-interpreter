@@ -3,7 +3,7 @@ module Main where
 import Prelude
   ( ($), (.)
   , Either(..)
-  , Int, (>)
+  , Int, (>), (==)
   , String, (++), concat, unlines
   , Show, show
   , IO, (>>), (>>=), mapM_, putStrLn
@@ -11,7 +11,7 @@ import Prelude
   , getContents, readFile, print, Applicative (pure)
   )
 import System.Environment ( getArgs )
-import System.Exit        ( exitFailure )
+import System.Exit        ( exitFailure, exitWith, ExitCode (ExitSuccess, ExitFailure) )
 import Control.Monad      ( when )
 
 import Src.Jabba.Abs   (Program)
@@ -21,7 +21,7 @@ import Src.Jabba.Print ( Print, printTree )
 import Src.Jabba.Skel  ()
 import Src.TypeChecker ( typeCheck )
 import Src.Evaluator   ( evaluate )
-import Src.Errors      ( ErrHolder (ParserErr) )
+import Src.Errors      ( ErrHolder (ParserErr, ControlledExit) )
 import Src.Utils       ( left )
 
 type Err        = Either String
@@ -39,6 +39,11 @@ run p s = case go of
   Right p -> do
     e <- evaluate p s
     case e of
+      Left (ControlledExit c) -> do
+        putStrLn $ "Program exited with code " ++ show c
+        exitWith $ if c == 0
+           then ExitSuccess
+           else ExitFailure c
       Left eh -> do
         putStrLn "\nRuntime Error!\n"
         print eh

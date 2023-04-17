@@ -261,6 +261,7 @@ checkTypeE (EIntLit _ _) = pure VTInt
 checkTypeE (EStringLit _ _) = pure VTString
 checkTypeE (EBoolLitFalse _) = pure VTBool
 checkTypeE (EBoolLitTrue _) = pure VTBool
+checkTypeE (EUnitLiteral _) = pure VTVoid
 checkTypeE (ERun pos ef es) = do
     env <- get
     fType <- checkTypeE ef

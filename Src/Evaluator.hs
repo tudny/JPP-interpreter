@@ -64,7 +64,7 @@ data FunBlock
 
 type FnArg = (Ident, VarRef)
 data Value
-    = VTInt Integer
+    = VTInt Int
     | VTBool Bool
     | VTString String
     | VTUnit
@@ -226,7 +226,7 @@ resolveDeclArg (CopyConstArg _ i _) = (i, VRCopy)
 
 
 
-runFor :: Loc -> [Integer] -> Block -> IM RetType
+runFor :: Loc -> [Int] -> Block -> IM RetType
 runFor loc [] _ = pure (Nothing, Nothing)
 runFor loc (n:ns) b = do
     modify $ insertStore loc (VTInt n)
@@ -247,7 +247,7 @@ handleRetType is (Nothing, controlFlow) = pure (Nothing, controlFlow)
 
 
 
-modIntVar :: Ident -> (Integer -> Integer) -> IM ()
+modIntVar :: Ident -> (Int -> Int) -> IM ()
 modIntVar v f = do
     loc <- envGet v =<< ask
     store <- get
@@ -309,9 +309,10 @@ evalB (IBlock _ is) = evalIs is
 evalE :: Expr -> IM Value
 
 evalE (EVarName pos v) = getVarValue pos v
-evalE (EIntLit _ n) = pure $ VTInt n
+evalE (EIntLit _ n) = pure $ VTInt $ fromInteger n
 evalE (EBoolLitTrue _) = pure $ VTBool True
 evalE (EBoolLitFalse _) = pure $ VTBool False
+evalE (EUnitLiteral _) = pure $ VTUnit
 evalE (EStringLit _ s) = pure $ VTString s
 evalE (ENeg _ (ONeg _) e) = do
     (VTInt n) <- evalE e
@@ -365,7 +366,6 @@ evalE (ERun pos e argsE) = do
     let (argsI, argsR) = unzip args
     argsL <- mapM insertArg $ zip3 argsR argsV argsMl
     let envInserter = insertEnvMany $ zip argsI argsL
-    (ret, Nothing) <- local (\_ -> envInserter env) $ evalFunB pos b
     (ret, Nothing) <- local (\_ -> envInserter env) $ evalFunB pos b
     case ret of 
         Nothing -> pure VTUnit
