@@ -9,6 +9,7 @@ data ErrHolder
     = ParserErr String
     | TypeChecker BNFC'Position ErrType
     | RuntimeError BNFC'Position RuntimeType
+    | ControlledExit Integer
 
 data ErrType
     = ImmutVar Ident
@@ -43,6 +44,7 @@ data RuntimeType
     = ZeroDiv
     | TypeCheckerDidntCatch
     | CannotCast String String
+    | AssertionFailed String
     deriving (Eq)
 
 
@@ -66,6 +68,8 @@ instance Show ErrHolder where
     show (RuntimeError pos errT) = 
         "There was a runtime problem at " ++ showPos pos ++
         ": " ++ show errT
+    show (ControlledExit i) =
+        "Program exited with code " ++ show i
 
 
 instance Show ErrType where
@@ -100,3 +104,4 @@ instance Show RuntimeType where
     show ZeroDiv = "division by zero."
     show TypeCheckerDidntCatch = "type checker didn't catch this error."
     show (CannotCast s t) = "cannot cast " ++ s ++ " to type " ++ show t ++ "."
+    show (AssertionFailed s) = "assertion failed: " ++ s ++ "."
