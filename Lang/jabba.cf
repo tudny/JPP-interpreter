@@ -57,8 +57,6 @@ IBreak.         Instr ::= "break" ";" ;
 
 ICont.          Instr ::= "continue" ";" ;
 
--- IIf.            Instr ::= "if" Expr Block ;
-
 IIfElif.        Instr ::= "if" Expr Block [Elif] ;
 
 IIfElifElse.    Instr ::= "if" Expr Block [Elif] "else" Block ;
