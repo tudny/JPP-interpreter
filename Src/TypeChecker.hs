@@ -1,35 +1,15 @@
 module Src.TypeChecker where
 
-import Src.Jabba.Abs ( Ident,
-                       Program' (..), Program (..),
-                       Instr' (..), Instr (..),
-                       Arg' (..), Arg (..),
-                       Item' (..), Item (..),
-                       Decl' (..), Decl (..),
-                       Block' (..), Block (..),
-                       Type' (..), Type (..),
-                       PlsOp' (..), PlsOp (..),
-                       MulOp' (..), MulOp (..),
-                       NotOp' (..), NotOp (..),
-                       NegOp' (..), NegOp (..),
-                       RelOp' (..), RelOp (..),
-                       AndOp' (..), AndOp (..),
-                       OrOp' (..), OrOp (..),
-                       Expr' (..), Expr (..),
-                       BNFC'Position, Ident (..), HasPosition (hasPosition), Elif' (ElseIf)
-                       )
+import Src.Jabba.Abs
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Control.Monad.Except (ExceptT, MonadError (throwError), runExceptT, when)
-import Control.Monad.State (StateT (runStateT), State, runState, evalState, MonadState (get, put), modify)
-import Data.List ( nub )
-import qualified Data.Maybe
+import Control.Monad.State (State, evalState, MonadState (get, put), modify)
 import Src.Errors
     ( ErrType (..),
       ErrHolder (TypeChecker),
       Err )
-import Src.Types ( VarMutability (..), VarType (..), absTypeToVarType, VarRef (..), FnArg (..) )
-import Debug.Trace (trace)
+import Src.Types
 
 data RetType'
     = None
@@ -119,7 +99,7 @@ checkTypeI (IAss pos v e) = do
         then throwError $ TypeChecker pos $ WrongType v t [et]
     else pure (None, False)
 checkTypeI (IRet _ e) = checkTypeE e >>= (\x -> pure (x, False)) . Definitive
-checkTypeI (IRetUnit pos) = pure (Definitive VTVoid, False)
+checkTypeI (IRetUnit _) = pure (Definitive VTVoid, False)
 checkTypeI (IBreak _) = pure (None, True)
 checkTypeI (ICont _) = pure (None, True)
 checkTypeI (IIfElifElse pos eb bl1 [] bl2) = checkIf pos eb bl1 bl2
@@ -141,8 +121,8 @@ checkTypeI (IBBlock _ b) = checkTypeB b
 checkTypeI (DFunUnit pos fName args b) = checkTypeI (DFun pos fName args (TVoid pos) b)
 checkTypeI (DFun pos fName args t b) = do
     args' <- mapM resolveFnArg args
-    checkAllNamesAreUnique Set.empty $ map (\(i, t, _, _, p) -> (i, t, p)) args'
-    let fnArgs = map (\(_, t, m, r, _) -> (t, m, r)) args'
+    checkAllNamesAreUnique Set.empty $ map (\(i, t', _, _, p) -> (i, t', p)) args'
+    let fnArgs = map (\(_, t', m, r, _) -> (t', m, r)) args'
     let fnRet = absTypeToVarType t
     saveEnv <- get
     let f = Fn fnArgs fnRet
@@ -151,9 +131,9 @@ checkTypeI (DFun pos fName args t b) = do
     if loopFlow then throwError $ TypeChecker pos $ FunctionLoopFlow fName
     else case retType of
         None -> when (fnRet /= VTVoid) $ throwError $ TypeChecker pos $ FunctionNoReturn fName fnRet
-        Definitive t -> when (t /= fnRet) $ throwError $ TypeChecker pos $ FunctionReturnMismatch fName t fnRet
-        Branching t -> if t /= fnRet
-            then throwError $ TypeChecker pos $ FunctionReturnMismatch fName t fnRet
+        Definitive t' -> when (t' /= fnRet) $ throwError $ TypeChecker pos $ FunctionReturnMismatch fName t' fnRet
+        Branching t' -> if t' /= fnRet
+            then throwError $ TypeChecker pos $ FunctionReturnMismatch fName t' fnRet
             else when (fnRet /= VTVoid) $ throwError $ TypeChecker pos $ FunctionMaybeReturn fName fnRet
     put saveEnv
     modify $ envUnion $ Env $ Map.fromList [(fName, (f, fMut))]
@@ -193,7 +173,7 @@ modifyEnvForFunction :: [(Ident, (VarType, VarMutability))] -> [(Ident, VarType,
 modifyEnvForFunction f args = envUnion newEnv
     where
         fEnv = Env $ Map.fromList f
-        vEnv = Env $ Map.fromList $ map (\(i, t, m, r, _) -> (i, (t, m))) args
+        vEnv = Env $ Map.fromList $ map (\(i, t, m, _, _) -> (i, (t, m))) args
         newEnv = envUnion fEnv vEnv
 
 
@@ -263,7 +243,6 @@ checkTypeE (EBoolLitFalse _) = pure VTBool
 checkTypeE (EBoolLitTrue _) = pure VTBool
 checkTypeE (EUnitLiteral _) = pure VTVoid
 checkTypeE (ERun pos ef es) = do
-    env <- get
     fType <- checkTypeE ef
     (args, ret) <- decunstructFnType pos fType
     callArgs <- mapM (getCallExprType pos) es
@@ -275,7 +254,7 @@ checkTypeE (ERun pos ef es) = do
             pure ret
 checkTypeE (ENeg pos (ONeg _) e) = checkExprSingleOp "negation" pos e VTInt
 checkTypeE (ENot pos (ONot _) e) = checkExprSingleOp "negation" pos e VTBool
-checkTypeE (EMul pos e1 (ODiv _) (EIntLit _ 0)) = throwError $ TypeChecker pos ZeroLiternalDiv
+checkTypeE (EMul pos _ (ODiv _) (EIntLit _ 0)) = throwError $ TypeChecker pos ZeroLiternalDiv
 checkTypeE (EMul pos e1 op e2) = checkExprBiOp (getMulOpName op) pos e1 e2 [VTInt]
 checkTypeE (ESum pos e1 op@(OPlus _) e2) = checkExprBiOp (getSumOpName op) pos e1 e2 [VTInt, VTString]
 checkTypeE (ESum pos e1 op e2) = checkExprBiOp (getSumOpName op) pos e1 e2 [VTInt]
@@ -311,8 +290,7 @@ checkTypeE (ELambda pos args b) = do
                 else pure t
     put saveEnv
     pure $ Fn fnArgs deducedType
-checkTypeE (ELambdaExpr pos args e) = do
-    let fName = Ident "lambda"
+checkTypeE (ELambdaExpr _ args e) = do
     args' <- mapM resolveFnArg args
     checkAllNamesAreUnique Set.empty $ map (\(i, t, _, _, p) -> (i, t, p)) args'
     let fnArgs = map (\(_, t, m, r, _) -> (t, m, r)) args'
@@ -365,7 +343,7 @@ decunstructFnType pos t = throwError $ TypeChecker pos $ NotFnType t
 
 
 getCallExprType :: BNFC'Position -> Expr -> IM (VarType, Maybe VarMutability)
-getCallExprType _ (EVarName pos v) = do
+getCallExprType _ (EVarName _ v) = do
     (t, m) <- getVarType undefined v
     pure (t, Just m)
 getCallExprType _ e = do
@@ -374,27 +352,27 @@ getCallExprType _ e = do
 
 
 checkCallArgument :: BNFC'Position -> ((VarType, Maybe VarMutability), (VarType, VarMutability, VarRef), Int) -> IM ()
-checkCallArgument pos ((t, mm), (t', m, r), id) = do
-    checkCallArgumentType pos t t' id
-    checkCallArgumentMutability pos mm (m, r) id
+checkCallArgument pos ((t, mm), (t', m, r), idd) = do
+    checkCallArgumentType pos t t' idd
+    checkCallArgumentMutability pos mm (m, r) idd
 
 
 checkCallArgumentType :: BNFC'Position -> VarType -> VarType -> Int -> IM ()
-checkCallArgumentType pos t t' id = do
+checkCallArgumentType pos t t' idd = do
     if t == t'
         then pure ()
-        else throwError $ TypeChecker pos $ WrongTypeArg id t t'
+        else throwError $ TypeChecker pos $ WrongTypeArg idd t t'
 
 
 -- There are 12 cases to check, but only 3 are problematic.
 checkCallArgumentMutability :: BNFC'Position -> Maybe VarMutability -> (VarMutability, VarRef) -> Int -> IM ()
-checkCallArgumentMutability pos Nothing (_, VRRef) id = throwError $ TypeChecker pos $ ExprRefPass id
-checkCallArgumentMutability pos (Just VMConst) (VMMut, VRRef) id = throwError $ TypeChecker pos $ ImmutMutPass id
+checkCallArgumentMutability pos Nothing (_, VRRef) idd = throwError $ TypeChecker pos $ ExprRefPass idd
+checkCallArgumentMutability pos (Just VMConst) (VMMut, VRRef) idd = throwError $ TypeChecker pos $ ImmutMutPass idd
 checkCallArgumentMutability _ _ _ _ = pure ()
 
 
 opOnVarType :: BNFC'Position -> Ident -> [VarType] -> IM RetType
-opOnVarType pos v ex = do
+opOnVarType pos v _ = do
     (t, m) <- getVarType pos v
     case t of
         VTInt -> case m of
@@ -405,14 +383,14 @@ opOnVarType pos v ex = do
 
 checkAllNamesAreUnique :: Set.Set Ident -> [(Ident, VarType, BNFC'Position)] -> IM ()
 checkAllNamesAreUnique _ [] = pure ()
-checkAllNamesAreUnique s ((v, t, pos):xs) = do
+checkAllNamesAreUnique s ((v, _, pos):xs) = do
     if Set.member v s
         then throwError $ TypeChecker pos $ VarAlreadyDecl v
         else checkAllNamesAreUnique (Set.insert v s) xs
 
 
 declareNewVariables :: BNFC'Position -> [Item' BNFC'Position] -> VarMutability -> IM RetType
-declareNewVariables pos its m = do
+declareNewVariables _ its m = do
     items <- mapM checkTypeItem its
     checkAllNamesAreUnique Set.empty items
     mapM_ (\(v, t, _) -> modify (envInsert v (t, m))) items

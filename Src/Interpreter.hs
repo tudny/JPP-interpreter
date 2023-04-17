@@ -1,23 +1,11 @@
 module Main where
 
-import Prelude
-  ( ($), (.)
-  , Either(..)
-  , Int, (>), (==)
-  , String, (++), concat, unlines
-  , Show, show
-  , IO, (>>), (>>=), mapM_, putStrLn
-  , FilePath
-  , getContents, readFile, print, Applicative (pure)
-  )
 import System.Environment ( getArgs )
 import System.Exit        ( exitFailure, exitWith, ExitCode (ExitSuccess, ExitFailure) )
-import Control.Monad      ( when )
 
 import Src.Jabba.Abs   (Program)
-import Src.Jabba.Lex   ( Token, mkPosToken )
+import Src.Jabba.Lex   ( Token )
 import Src.Jabba.Par   ( pProgram, myLexer )
-import Src.Jabba.Print ( Print, printTree )
 import Src.Jabba.Skel  ()
 import Src.TypeChecker ( typeCheck )
 import Src.Evaluator   ( evaluate )
@@ -36,8 +24,8 @@ run p s = case go of
     putStrLn "\nPrerun Error!\n"
     print err
     exitFailure
-  Right p -> do
-    e <- evaluate p s
+  Right prog -> do
+    e <- evaluate prog s
     case e of
       Left (ControlledExit c) -> do
         putStrLn $ "Program exited with code " ++ show c
@@ -72,5 +60,5 @@ main = do
     ["--help"] -> usage
     []         -> getContents >>= run pProgram
     [f]        -> runFile pProgram f
-    t          -> usage
+    _          -> usage
 

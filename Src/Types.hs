@@ -1,6 +1,6 @@
 module Src.Types where
 
-import Src.Jabba.Abs ( Type' (..), Type (..), TArg' (..), TArg (..) )
+import Src.Jabba.Abs
 
 data VarType
     = VTInt 

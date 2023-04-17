@@ -4,9 +4,8 @@ import Src.Types
 import Src.Jabba.Par
 import Src.Jabba.Abs
 import System.Directory.Internal.Prelude (exitFailure)
-import Src.TypeChecker (typeCheck, typeCheckWithEnv, Env (Env), emptyEnv, fMut)
+import Src.TypeChecker
 import qualified Data.Map as Map
-import Debug.Trace (trace)
 
 type TestCase = (String, String, Env, ErrType)
 

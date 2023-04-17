@@ -1,38 +1,19 @@
 module Src.Evaluator where
 
-import Src.Jabba.Abs ( Ident,
-                       Program' (..), Program (..),
-                       Instr' (..), Instr (..),
-                       Arg' (..), Arg (..),
-                       Item' (..), Item (..),
-                       Decl' (..), Decl (..),
-                       Block' (..), Block (..),
-                       Type' (..), Type (..),
-                       PlsOp' (..), PlsOp (..),
-                       MulOp' (..), MulOp (..),
-                       NotOp' (..), NotOp (..),
-                       NegOp' (..), NegOp (..),
-                       RelOp' (..), RelOp (..),
-                       AndOp' (..), AndOp (..),
-                       OrOp' (..), OrOp (..),
-                       Expr' (..), Expr (..),
-                       Ident (..), HasPosition (hasPosition),
-                       BNFC'Position, TArg' (..), TArg (..), Elif' (ElseIf)
-                       )
+import Src.Jabba.Abs
 
 import Src.Types ( VarRef (..) )
-import Src.Errors ( ErrHolder (ControlledExit), Err (..), ErrHolder (RuntimeError), RuntimeType (..) )
-import Src.Errors ( ErrHolder (ControlledExit), Err (..), ErrHolder (RuntimeError), RuntimeType (..) )
+import Src.Errors
 import Control.Monad.Except (ExceptT, runExceptT, throwError, void, MonadIO (liftIO))
 import Control.Monad.Reader (ReaderT, runReaderT, ask, local, asks)
 import Control.Monad.State (StateT, evalStateT, get, put, modify, gets)
-import qualified Data.Map as Map (Map, empty, insert, lookup, fromList)
-import Data.Maybe (isJust, isNothing, fromMaybe)
+import qualified Data.Map as Map (Map, empty, insert, lookup)
+import Data.Maybe (isJust, fromMaybe)
 import Text.Read (readMaybe)
 
 -- =============================================================================
 
-newtype Env = Env { env :: Map.Map Ident Loc } deriving (Show)
+newtype Env = Env { getEnv :: Map.Map Ident Loc } deriving (Show)
 
 emptyEnv :: Env
 emptyEnv = Env Map.empty
@@ -109,7 +90,7 @@ insertStoreMany [] s = s
 insertStoreMany ((l, v):xs) s = insertStoreMany xs $ insertStore l v s
 
 storeGet :: Loc -> Store -> IM Value
-storeGet l (Store _ m s) = case Map.lookup l m of
+storeGet l (Store _ m _) = case Map.lookup l m of
     Nothing -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
     Just v -> pure v
 
@@ -148,10 +129,10 @@ evalP (PProgram _ is) = void $ evalIs is
 
 evalIs :: [Instr] -> IM RetType
 evalIs [] = pure (Nothing, Nothing)
-evalIs ((IExpr pos e):is) = evalE e >> evalIs is
+evalIs ((IExpr _ e):is) = evalE e >> evalIs is
 evalIs ((IDecl _ d):is) = do
-    mod <- evalD d
-    local mod $ evalIs is
+    modEnv <- evalD d
+    local modEnv $ evalIs is
 evalIs ((IUnit _):is) = evalIs is
 evalIs ((IIncr _ v):is) = modIntVar v (+1) >> evalIs is
 evalIs ((IDecr _ v):is) = modIntVar v (subtract 1) >> evalIs is
@@ -169,25 +150,25 @@ evalIs ((ICont _):_) = pure (Nothing, Just Continue)
 evalIs ((IIfElifElse _ eb b1 [] b2):is) = evalIf eb b1 b2 is
 evalIs ((IIfElifElse pos eb b1 ((ElseIf _ eb2 b2):xs) b3):is) = evalIf eb b1 (IBlock pos [IIfElifElse pos eb2 b2 xs b3]) is
 evalIs ((IIfElif pos eb b1 elifs):is) = evalIs (IIfElifElse pos eb b1 elifs (IBlock pos []):is)
-evalIs all@((IWhile pos e b):is) = do
+evalIs whileLoop@((IWhile _ e b):is) = do
     (VTBool cond) <- evalE e
     if cond then do
         (ret, flow) <- evalB b
         if isJust ret then pure (ret, Nothing)
         else case flow of
-            Nothing -> evalIs all
+            Nothing -> evalIs whileLoop
             Just Break -> pure (Nothing, Nothing)
-            Just Continue -> evalIs all
+            Just Continue -> evalIs whileLoop
     else evalIs is
-evalIs all@((IWhileFin pos e b bFin):is) = do
+evalIs whileLoop@((IWhileFin _ e b bFin):is) = do
     (VTBool cond) <- evalE e
     if cond then do
         (ret, flow) <- evalB b
         if isJust ret then pure (ret, Nothing)
         else case flow of
-            Nothing -> evalIs all
+            Nothing -> evalIs whileLoop
             Just Break -> pure (Nothing, Nothing)
-            Just Continue -> evalIs all
+            Just Continue -> evalIs whileLoop
     else evalB bFin >> evalIs is
 evalIs ((IFor _ v e1 e2 b):is) = do
     (VTInt n1) <- evalE e1
@@ -196,7 +177,7 @@ evalIs ((IFor _ v e1 e2 b):is) = do
     loc <- newlockM
     local (insertEnv v loc) (runFor loc range b) >>= handleRetType is
 evalIs ((IBBlock _ b):is) = evalB b >>= handleRetType is
-evalIs ((DFun _ fN args t b):is) = do
+evalIs ((DFun _ fN args _ b):is) = do
     let args' = map resolveDeclArg args
     env <- ask
     loc <- newlockM
@@ -214,7 +195,7 @@ evalIf eb b1 b2 is = do
         VTBool b -> 
             if b then evalB b1 >>= handleRetType is
                 else evalB b2 >>= handleRetType is
-        t -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
+        _ -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
 
 
 
@@ -227,7 +208,7 @@ resolveDeclArg (CopyConstArg _ i _) = (i, VRCopy)
 
 
 runFor :: Loc -> [Int] -> Block -> IM RetType
-runFor loc [] _ = pure (Nothing, Nothing)
+runFor _ [] _ = pure (Nothing, Nothing)
 runFor loc (n:ns) b = do
     modify $ insertStore loc (VTInt n)
     (ret, flow) <- evalB b
@@ -241,9 +222,9 @@ runFor loc (n:ns) b = do
 
 handleRetType :: [Instr] -> RetType -> IM RetType
 handleRetType is (Nothing, Nothing) = evalIs is
-handleRetType is (Just _, Just _) = undefined -- There should never be a return and a break/continue
-handleRetType is (ret, Nothing) = pure (ret, Nothing)
-handleRetType is (Nothing, controlFlow) = pure (Nothing, controlFlow)
+handleRetType _ (Just _, Just _) = undefined -- There should never be a return and a break/continue
+handleRetType _ (ret, Nothing) = pure (ret, Nothing)
+handleRetType _ (Nothing, controlFlow) = pure (Nothing, controlFlow)
 
 
 
@@ -392,11 +373,11 @@ evalE (ELambdaEmptEpr pos e) = evalE (ELambda pos [] (IBlock pos [IRet pos e]))
 
 
 evalERef :: Expr -> IM (Value, Maybe Loc)
-evalERef (EVarName pos v) = do
+evalERef (EVarName _ v) = do
     loc <- envGet v =<< ask
     store <- get
-    v <- storeGet loc store
-    pure (v, Just loc)
+    val <- storeGet loc store
+    pure (val, Just loc)
 evalERef e = do
     v <- evalE e
     pure (v, Nothing)
@@ -423,7 +404,7 @@ doRelOp _ _ _ = throwError $ RuntimeError Nothing TypeCheckerDidntCatch
 
 
 getVarLoc :: BNFC'Position -> Ident -> IM Loc
-getVarLoc pos v = do
+getVarLoc _ v = do
     env <- ask
     envGet v env
 
