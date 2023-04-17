@@ -132,8 +132,6 @@ All other symbols are terminals.
   | //Expr5// | -> | //Expr5// ``(`` //[Expr]// ``)``
   |  |  **|**  | ``|`` //[Arg]// ``|`` //Block//
   |  |  **|**  | ``||`` //Block//
-  |  |  **|**  | ``|`` //[Arg]// ``|`` //Expr6//
-  |  |  **|**  | ``||`` //Expr6//
   |  |  **|**  | //NegOp// //Expr6//
   |  |  **|**  | //NotOp// //Expr6//
   |  |  **|**  | //Expr6//
@@ -147,6 +145,8 @@ All other symbols are terminals.
   |  |  **|**  | //Expr2//
   | //Expr// | -> | //Expr1// //OrOp// //Expr//
   |  |  **|**  | //Expr1// ``?`` //Expr1// ``:`` //Expr//
+  |  |  **|**  | ``|`` //[Arg]// ``|`` //Expr1//
+  |  |  **|**  | ``||`` //Expr1//
   |  |  **|**  | //Expr1//
   | //[Expr]// | -> | **eps**
   |  |  **|**  | //Expr//

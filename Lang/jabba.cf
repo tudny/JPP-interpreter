@@ -157,10 +157,6 @@ ELambda.        Expr5 ::= "|" [Arg] "|" Block ;
 
 ELambdaEmpty.   Expr5 ::= "||" Block ;
 
-ELambdaExpr.    Expr5 ::= "|" [Arg] "|" Expr6 ;
-
-ELambdaEmptEpr. Expr5 ::= "||" Expr6 ;
-
 ENeg.           Expr5 ::= NegOp Expr6 ;
 
 ENot.           Expr5 ::= NotOp Expr6 ;
@@ -176,6 +172,10 @@ EBAnd.          Expr1 ::= Expr2 AndOp Expr1 ;
 EBOr.           Expr ::= Expr1 OrOp Expr ;
 
 ETer.           Expr ::= Expr1 "?" Expr1 ":" Expr ;
+
+ELambdaExpr.    Expr ::= "|" [Arg] "|" Expr1 ;
+
+ELambdaEmptEpr. Expr ::= "||" Expr1 ;
 
 coercions       Expr 6 ;
 

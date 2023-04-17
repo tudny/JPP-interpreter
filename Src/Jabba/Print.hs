@@ -276,8 +276,6 @@ instance Print (Src.Jabba.Abs.Expr' a) where
     Src.Jabba.Abs.ERun _ expr exprs -> prPrec i 5 (concatD [prt 5 expr, doc (showString "("), prt 0 exprs, doc (showString ")")])
     Src.Jabba.Abs.ELambda _ args block -> prPrec i 5 (concatD [doc (showString "|"), prt 0 args, doc (showString "|"), prt 0 block])
     Src.Jabba.Abs.ELambdaEmpty _ block -> prPrec i 5 (concatD [doc (showString "||"), prt 0 block])
-    Src.Jabba.Abs.ELambdaExpr _ args expr -> prPrec i 5 (concatD [doc (showString "|"), prt 0 args, doc (showString "|"), prt 6 expr])
-    Src.Jabba.Abs.ELambdaEmptEpr _ expr -> prPrec i 5 (concatD [doc (showString "||"), prt 6 expr])
     Src.Jabba.Abs.ENeg _ negop expr -> prPrec i 5 (concatD [prt 0 negop, prt 6 expr])
     Src.Jabba.Abs.ENot _ notop expr -> prPrec i 5 (concatD [prt 0 notop, prt 6 expr])
     Src.Jabba.Abs.EMul _ expr1 mulop expr2 -> prPrec i 4 (concatD [prt 4 expr1, prt 0 mulop, prt 5 expr2])
@@ -286,6 +284,8 @@ instance Print (Src.Jabba.Abs.Expr' a) where
     Src.Jabba.Abs.EBAnd _ expr1 andop expr2 -> prPrec i 1 (concatD [prt 2 expr1, prt 0 andop, prt 1 expr2])
     Src.Jabba.Abs.EBOr _ expr1 orop expr2 -> prPrec i 0 (concatD [prt 1 expr1, prt 0 orop, prt 0 expr2])
     Src.Jabba.Abs.ETer _ expr1 expr2 expr3 -> prPrec i 0 (concatD [prt 1 expr1, doc (showString "?"), prt 1 expr2, doc (showString ":"), prt 0 expr3])
+    Src.Jabba.Abs.ELambdaExpr _ args expr -> prPrec i 0 (concatD [doc (showString "|"), prt 0 args, doc (showString "|"), prt 1 expr])
+    Src.Jabba.Abs.ELambdaEmptEpr _ expr -> prPrec i 0 (concatD [doc (showString "||"), prt 1 expr])
 
 instance Print [Src.Jabba.Abs.Expr' a] where
   prt _ [] = concatD []

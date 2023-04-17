@@ -127,8 +127,6 @@ data Expr' a
     | ERun a (Expr' a) [Expr' a]
     | ELambda a [Arg' a] (Block' a)
     | ELambdaEmpty a (Block' a)
-    | ELambdaExpr a [Arg' a] (Expr' a)
-    | ELambdaEmptEpr a (Expr' a)
     | ENeg a (NegOp' a) (Expr' a)
     | ENot a (NotOp' a) (Expr' a)
     | EMul a (Expr' a) (MulOp' a) (Expr' a)
@@ -137,6 +135,8 @@ data Expr' a
     | EBAnd a (Expr' a) (AndOp' a) (Expr' a)
     | EBOr a (Expr' a) (OrOp' a) (Expr' a)
     | ETer a (Expr' a) (Expr' a) (Expr' a)
+    | ELambdaExpr a [Arg' a] (Expr' a)
+    | ELambdaEmptEpr a (Expr' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 newtype Ident = Ident String
@@ -270,8 +270,6 @@ instance HasPosition Expr where
     ERun p _ _ -> p
     ELambda p _ _ -> p
     ELambdaEmpty p _ -> p
-    ELambdaExpr p _ _ -> p
-    ELambdaEmptEpr p _ -> p
     ENeg p _ _ -> p
     ENot p _ _ -> p
     EMul p _ _ _ -> p
@@ -280,4 +278,6 @@ instance HasPosition Expr where
     EBAnd p _ _ _ -> p
     EBOr p _ _ _ -> p
     ETer p _ _ _ -> p
+    ELambdaExpr p _ _ -> p
+    ELambdaEmptEpr p _ -> p
 

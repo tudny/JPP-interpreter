@@ -132,8 +132,6 @@ transExpr x = case x of
   Src.Jabba.Abs.ERun _ expr exprs -> failure x
   Src.Jabba.Abs.ELambda _ args block -> failure x
   Src.Jabba.Abs.ELambdaEmpty _ block -> failure x
-  Src.Jabba.Abs.ELambdaExpr _ args expr -> failure x
-  Src.Jabba.Abs.ELambdaEmptEpr _ expr -> failure x
   Src.Jabba.Abs.ENeg _ negop expr -> failure x
   Src.Jabba.Abs.ENot _ notop expr -> failure x
   Src.Jabba.Abs.EMul _ expr1 mulop expr2 -> failure x
@@ -142,3 +140,5 @@ transExpr x = case x of
   Src.Jabba.Abs.EBAnd _ expr1 andop expr2 -> failure x
   Src.Jabba.Abs.EBOr _ expr1 orop expr2 -> failure x
   Src.Jabba.Abs.ETer _ expr1 expr2 expr3 -> failure x
+  Src.Jabba.Abs.ELambdaExpr _ args expr -> failure x
+  Src.Jabba.Abs.ELambdaEmptEpr _ expr -> failure x
