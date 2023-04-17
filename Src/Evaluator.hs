@@ -21,7 +21,7 @@ import Src.Jabba.Abs ( Ident,
                        )
 
 import Src.Types ( VarRef (..) )
-import Src.Errors ( ErrHolder, Err (..), ErrHolder (RuntimeError), RuntimeType (..) )
+import Src.Errors ( ErrHolder (ControlledExit), Err (..), ErrHolder (RuntimeError), RuntimeType (..) )
 import Control.Monad.Except (ExceptT, runExceptT, throwError, void, MonadIO (liftIO))
 import Control.Monad.Reader (ReaderT, runReaderT, ask, local, asks)
 import Control.Monad.State (StateT, evalStateT, get, put, modify, gets)
@@ -58,6 +58,8 @@ data FunBlock
     | WriteInt
     | ToInt
     | ToString
+    | ExitCode
+    | AssertExpr
 
 type FnArg = (Ident, VarRef)
 data Value
@@ -352,14 +354,14 @@ evalE (ETer _ eb e1 e2) = do
     if b
         then evalE e1
         else evalE e2
-evalE (ERun _ e argsE) = do
+evalE (ERun pos e argsE) = do
     (VTFun args b env) <- evalE e
     argsVMl <- mapM evalERef argsE
     let (argsV, argsMl) = unzip argsVMl
     let (argsI, argsR) = unzip args
     argsL <- mapM insertArg $ zip3 argsR argsV argsMl
     let envInserter = insertEnvMany $ zip argsI argsL
-    (ret, Nothing) <- local (\_ -> envInserter env) $ evalFunB b
+    (ret, Nothing) <- local (\_ -> envInserter env) $ evalFunB pos b
     case ret of 
         Nothing -> pure VTUnit
         Just v  -> pure v
@@ -432,24 +434,32 @@ getVarValue pos v = do
 -- =============================================================================
 
 
-evalFunB :: FunBlock -> IM RetType
-evalFunB (NormalBlock b) = evalB b
-evalFunB WriteStr = do
-    (VTString s) <- evalE (EVarName Nothing (Ident "s"))
+evalFunB :: BNFC'Position -> FunBlock -> IM RetType
+evalFunB _ (NormalBlock b) = evalB b
+evalFunB pos WriteStr = do
+    (VTString s) <- evalE (EVarName pos (Ident "s"))
     liftIO $ putStr s
     pure (Nothing, Nothing)
-evalFunB WriteInt = do
-    (VTInt n) <- evalE (EVarName Nothing (Ident "n"))
+evalFunB pos WriteInt = do
+    (VTInt n) <- evalE (EVarName pos (Ident "n"))
     liftIO $ putStr $ show n
     pure (Nothing, Nothing)
-evalFunB ToString = do
-    (VTInt n) <- evalE (EVarName Nothing (Ident "n"))
+evalFunB pos ToString = do
+    (VTInt n) <- evalE (EVarName pos (Ident "n"))
     pure (Just $ VTString $ show n, Nothing)
-evalFunB ToInt = do
-    (VTString s) <- evalE (EVarName Nothing (Ident "s"))
+evalFunB pos ToInt = do
+    (VTString s) <- evalE (EVarName pos (Ident "s"))
     case readMaybe s of
         Just n -> pure (Just $ VTInt n, Nothing)
-        Nothing -> throwError $ RuntimeError Nothing $ CannotCast s "Integer"
+        Nothing -> throwError $ RuntimeError pos $ CannotCast s "Integer"
+evalFunB pos ExitCode = do
+    (VTInt n) <- evalE (EVarName pos (Ident "n"))
+    throwError $ ControlledExit n
+evalFunB pos AssertExpr = do
+    (VTBool b) <- evalE (EVarName pos (Ident "e"))
+    if b
+        then pure (Nothing, Nothing)
+        else throwError $ RuntimeError pos $ AssertionFailed "assertion failed"
 
 
 writeStrDecl :: (Ident, Value)
@@ -464,8 +474,15 @@ toStringDecl = (Ident "toString", VTFun [(Ident "n", VRCopy)] ToString emptyEnv)
 toIntDecl :: (Ident, Value)
 toIntDecl = (Ident "toInt", VTFun [(Ident "s", VRCopy)] ToInt emptyEnv)
 
+exitCode :: (Ident, Value)
+exitCode = (Ident "exitCode", VTFun [(Ident "n", VRCopy)] ExitCode emptyEnv)
+
+assertExpr :: (Ident, Value)
+assertExpr = (Ident "assert", VTFun [(Ident "e", VRCopy)] AssertExpr emptyEnv)
+
+
 stdLib :: [(Ident, Value)]
-stdLib = [writeStrDecl, writeIntDecl, toStringDecl, toIntDecl]
+stdLib = [writeStrDecl, writeIntDecl, toStringDecl, toIntDecl, exitCode, assertExpr]
 
 
 makeStdLib :: Env -> Store -> (Env, Store)

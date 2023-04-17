@@ -70,7 +70,9 @@ stdLib = Env (
             (Ident "writeStr", (Fn [(VTString, VMConst, VRCopy)] VTVoid, fMut)),
             (Ident "writeInt", (Fn [(VTInt, VMConst, VRCopy)] VTVoid, fMut)),
             (Ident "toString", (Fn [(VTInt, VMConst, VRCopy)] VTString, fMut)),
-            (Ident "toInt", (Fn [(VTString, VMConst, VRCopy)] VTInt, fMut))
+            (Ident "toInt", (Fn [(VTString, VMConst, VRCopy)] VTInt, fMut)),
+            (Ident "exit", (Fn [(VTInt, VMConst, VRCopy)] VTVoid, fMut)),
+            (Ident "assert", (Fn [(VTBool, VMConst, VRCopy)] VTVoid, fMut))
         ]
     )
 
