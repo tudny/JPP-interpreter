@@ -10,6 +10,8 @@ HAPPY_OPTS = --array --info --ghc --coerce
 ALEX       = alex
 ALEX_OPTS  = --ghc
 
+PREFIX 	   = /home/tudny/.local/bin
+
 SRCS =\
 	Src/Errors.hs\
 	Src/Evaluator.hs\
@@ -48,6 +50,9 @@ Test : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src
 
 TypeCheckerTest : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/Print.hs Src/TypeCheckerTest.hs $(SRCS)
 	${GHC} ${GHC_OPTS} Src/TypeCheckerTest -o TypeCheckerTest
+
+install : Interpreter
+	install Interpreter $(PREFIX)/jabba
 
 # Rules for cleaning generated files.
 
