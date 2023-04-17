@@ -522,7 +522,7 @@ toIntDecl :: (Ident, Value)
 toIntDecl = (Ident "toInt", VTFun [(Ident "s", VRCopy)] ToInt emptyEnv)
 
 exitCode :: (Ident, Value)
-exitCode = (Ident "exitCode", VTFun [(Ident "n", VRCopy)] ExitCode emptyEnv)
+exitCode = (Ident "exit", VTFun [(Ident "n", VRCopy)] ExitCode emptyEnv)
 
 assertExpr :: (Ident, Value)
 assertExpr = (Ident "assert", VTFun [(Ident "e", VRCopy)] AssertExpr emptyEnv)

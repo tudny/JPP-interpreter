@@ -1,0 +1,12 @@
+
+fun fib(val n: new Integer): Integer {
+    if n < 2 {
+        return n;
+    }
+    if n == 8 {
+        exit(2137);
+    }
+    return fib(n - 1) + fib(n - 2);
+}
+
+fib(10);
