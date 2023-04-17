@@ -166,7 +166,6 @@ evalIs ((IRet _ e):_) = do
 evalIs ((IRetUnit _):_) = pure (Just VTUnit, Nothing)
 evalIs ((IBreak _):_) = pure (Nothing, Just Break)
 evalIs ((ICont _):_) = pure (Nothing, Just Continue)
-evalIs ((IIf pos eb b):is) = evalIs (IIfElifElse pos eb b [] (IBlock pos []):is)
 evalIs ((IIfElifElse _ eb b1 [] b2):is) = evalIf eb b1 b2 is
 evalIs ((IIfElifElse pos eb b1 ((ElseIf _ eb2 b2):xs) b3):is) = evalIf eb b1 (IBlock pos [IIfElifElse pos eb2 b2 xs b3]) is
 evalIs ((IIfElif pos eb b1 elifs):is) = evalIs (IIfElifElse pos eb b1 elifs (IBlock pos []):is)

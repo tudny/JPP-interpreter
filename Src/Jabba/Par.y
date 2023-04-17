@@ -103,7 +103,6 @@ Instr
   | 'return' ';' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IRetUnit (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | 'break' ';' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IBreak (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | 'continue' ';' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ICont (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
-  | 'if' Expr Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IIf (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3)) }
   | 'if' Expr Block ListElif { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IIfElif (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3) (snd $4)) }
   | 'if' Expr Block ListElif 'else' Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IIfElifElse (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3) (snd $4) (snd $6)) }
   | 'while' Expr Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IWhile (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3)) }
@@ -233,6 +232,8 @@ Expr5
   : Expr5 '(' ListExpr ')' { (fst $1, Src.Jabba.Abs.ERun (fst $1) (snd $1) (snd $3)) }
   | '|' ListArg '|' Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambda (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4)) }
   | '||' Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaEmpty (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2)) }
+  | '|' ListArg '|' Expr6 { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaExpr (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4)) }
+  | '||' Expr6 { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaEmptEpr (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2)) }
   | NegOp Expr6 { (fst $1, Src.Jabba.Abs.ENeg (fst $1) (snd $1) (snd $2)) }
   | NotOp Expr6 { (fst $1, Src.Jabba.Abs.ENot (fst $1) (snd $1) (snd $2)) }
   | Expr6 { (fst $1, (snd $1)) }
@@ -261,8 +262,6 @@ Expr :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Expr) }
 Expr
   : Expr1 OrOp Expr { (fst $1, Src.Jabba.Abs.EBOr (fst $1) (snd $1) (snd $2) (snd $3)) }
   | Expr1 '?' Expr1 ':' Expr { (fst $1, Src.Jabba.Abs.ETer (fst $1) (snd $1) (snd $3) (snd $5)) }
-  | '|' ListArg '|' Expr1 { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaExpr (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4)) }
-  | '||' Expr1 { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaEmptEpr (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2)) }
   | Expr1 { (fst $1, (snd $1)) }
 
 ListExpr :: { (Src.Jabba.Abs.BNFC'Position, [Src.Jabba.Abs.Expr]) }
