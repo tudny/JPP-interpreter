@@ -28,7 +28,7 @@ SRCS =\
 
 # Default goal.
 
-all : Interpreter Test TypeCheckerTest
+all : Interpreter Test TypeCheckerTest Makefile
 
 
 # Rules for building the parser.
@@ -53,6 +53,9 @@ TypeCheckerTest : Src/Jabba/Abs.hs Src/Jabba/Lex.hs Src/Jabba/Par.hs Src/Jabba/P
 
 install : Interpreter
 	install Interpreter $(PREFIX)/jabba
+
+test : all
+	./check_examples.sh
 
 # Rules for cleaning generated files.
 
