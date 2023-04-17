@@ -222,29 +222,30 @@ eitherResIdent tv s = treeFind resWords
 -- | The keywords and symbols of the language organized as binary search tree.
 resWords :: BTree
 resWords =
-  b ">=" 24
-    (b "-" 12
-       (b "(" 6
-          (b "$" 3 (b "!=" 2 (b "!" 1 N N) N) (b "&&" 5 (b "%" 4 N N) N))
-          (b "+" 9 (b "*" 8 (b ")" 7 N N) N) (b "," 11 (b "++" 10 N N) N)))
-       (b ";" 18
-          (b ".." 15
-             (b "->" 14 (b "--" 13 N N) N) (b ":" 17 (b "/" 16 N N) N))
-          (b "=" 21
-             (b "<=" 20 (b "<" 19 N N) N) (b ">" 23 (b "==" 22 N N) N))))
-    (b "fun" 36
-       (b "break" 30
-          (b "Integer" 27
-             (b "Boolean" 26 (b "?" 25 N N) N)
-             (b "Unit" 29 (b "String" 28 N N) N))
-          (b "false" 33
-             (b "else" 32 (b "continue" 31 N N) N)
-             (b "for" 35 (b "finally" 34 N N) N)))
-       (b "var" 42
-          (b "return" 39
-             (b "new" 38 (b "if" 37 N N) N) (b "val" 41 (b "true" 40 N N) N))
-          (b "|" 45
-             (b "{" 44 (b "while" 43 N N) N) (b "}" 47 (b "||" 46 N N) N))))
+  b "?" 25
+    (b "--" 13
+       (b ")" 7
+          (b "%" 4
+             (b "!=" 2 (b "!" 1 N N) (b "$" 3 N N)) (b "(" 6 (b "&&" 5 N N) N))
+          (b "++" 10 (b "+" 9 (b "*" 8 N N) N) (b "-" 12 (b "," 11 N N) N)))
+       (b "<" 19
+          (b "/" 16
+             (b ".." 15 (b "->" 14 N N) N) (b ";" 18 (b ":" 17 N N) N))
+          (b "==" 22
+             (b "=" 21 (b "<=" 20 N N) N) (b ">=" 24 (b ">" 23 N N) N))))
+    (b "fun" 37
+       (b "continue" 31
+          (b "String" 28
+             (b "Integer" 27 (b "Boolean" 26 N N) N)
+             (b "break" 30 (b "Unit" 29 N N) N))
+          (b "false" 34
+             (b "else" 33 (b "elif" 32 N N) N)
+             (b "for" 36 (b "finally" 35 N N) N)))
+       (b "var" 43
+          (b "return" 40
+             (b "new" 39 (b "if" 38 N N) N) (b "val" 42 (b "true" 41 N N) N))
+          (b "|" 46
+             (b "{" 45 (b "while" 44 N N) N) (b "}" 48 (b "||" 47 N N) N))))
   where
   b s n = B bs (TS bs n)
     where
@@ -501,15 +502,11 @@ alex_scan_tkn user__ orig_input len input__ s last_acc =
         let
                 base   = alexIndexInt32OffAddr alex_base s
                 offset = PLUS(base,ord_c)
+                check  = alexIndexInt16OffAddr alex_check offset
 
-                new_s
-                  | GTE(offset,ILIT(0))
-                  , check <- alexIndexInt16OffAddr alex_check offset
-                  , EQ(check,ord_c)
-                  = alexIndexInt16OffAddr alex_table offset
-
-                  | otherwise
-                  = alexIndexInt16OffAddr alex_deflt s
+                new_s = if GTE(offset,ILIT(0)) && EQ(check,ord_c)
+                          then alexIndexInt16OffAddr alex_table offset
+                          else alexIndexInt16OffAddr alex_deflt s
         in
         case new_s of
             ILIT(-1) -> (new_acc, input__)

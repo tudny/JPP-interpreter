@@ -17,7 +17,7 @@ import Src.Jabba.Abs ( Ident,
                        OrOp' (..), OrOp (..),
                        Expr' (..), Expr (..),
                        Ident (..), HasPosition (hasPosition),
-                       BNFC'Position, TArg' (..), TArg (..)
+                       BNFC'Position, TArg' (..), TArg (..), Elif' (ElseIf)
                        )
 
 import Src.Types ( VarRef (..) )
@@ -160,14 +160,9 @@ evalIs ((IRet _ e):_) = do
 evalIs ((IRetUnit _):_) = pure (Just VTUnit, Nothing)
 evalIs ((IBreak _):_) = pure (Nothing, Just Break)
 evalIs ((ICont _):_) = pure (Nothing, Just Continue)
-evalIs ((IIf pos eb b):is) = evalIs (IIfElse pos eb b (IBlock pos []):is)
-evalIs ((IIfElse _ eb b1 b2):is) = do
-    retTypeB <- evalE eb
-    case retTypeB of
-        VTBool b -> 
-            if b then evalB b1 >>= handleRetType is
-                else evalB b2 >>= handleRetType is
-        t -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
+evalIs ((IIf pos eb b):is) = evalIs (IIfElif pos eb b [] (IBlock pos []):is)
+evalIs ((IIfElif _ eb b1 [] b2):is) = evalIf eb b1 b2 is
+evalIs ((IIfElif pos eb b1 ((ElseIf _ eb2 b2):xs) b3):is) = evalIf eb b1 (IBlock pos [IIfElif pos eb2 b2 xs b3]) is
 evalIs all@((IWhile pos e b):is) = do
     (VTBool cond) <- evalE e
     if cond then do
@@ -203,6 +198,17 @@ evalIs ((DFun _ fN args t b):is) = do
     modify $ insertStore loc f
     local (insertEnv fN loc) (evalIs is)
 evalIs ((DFunUnit pos fN args b):is) = evalIs (DFun pos fN args (TVoid pos) b:is)
+
+
+
+evalIf :: Expr -> Block -> Block -> [Instr] -> IM RetType
+evalIf eb b1 b2 is = do
+    retTypeB <- evalE eb
+    case retTypeB of
+        VTBool b -> 
+            if b then evalB b1 >>= handleRetType is
+                else evalB b2 >>= handleRetType is
+        t -> throwError $ RuntimeError Nothing TypeCheckerDidntCatch
 
 
 

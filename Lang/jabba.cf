@@ -59,7 +59,11 @@ ICont.          Instr ::= "continue" ";" ;
 
 IIf.            Instr ::= "if" Expr Block ;
 
-IIfElse.        Instr ::= "if" Expr Block "else" Block ;
+IIfElif.        Instr ::= "if" Expr Block [Elif] "else" Block ;
+
+ElseIf.         Elif  ::= "elif" Expr Block ;
+
+separator       Elif "" ;
 
 IWhile.         Instr ::= "while" Expr Block ;
 

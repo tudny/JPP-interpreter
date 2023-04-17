@@ -16,7 +16,7 @@ import Src.Jabba.Abs ( Ident,
                        AndOp' (..), AndOp (..),
                        OrOp' (..), OrOp (..),
                        Expr' (..), Expr (..),
-                       BNFC'Position, Ident (..), HasPosition (hasPosition)
+                       BNFC'Position, Ident (..), HasPosition (hasPosition), Elif' (ElseIf)
                        )
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -120,32 +120,9 @@ checkTypeI (IRet _ e) = checkTypeE e >>= (\x -> pure (x, False)) . Definitive
 checkTypeI (IRetUnit pos) = pure (Definitive VTVoid, False)
 checkTypeI (IBreak _) = pure (None, True)
 checkTypeI (ICont _) = pure (None, True)
-checkTypeI (IIf pos eb bl) = checkTypeI (IIfElse pos eb bl (IBlock pos []))
-checkTypeI (IIfElse pos eb bl1 bl2) = do
-    eb' <- checkTypeE eb
-    if eb' /= VTBool
-        then throwError $ TypeChecker pos $ WrongTypeOp "if else condition" eb'
-        else do
-            (bl1Ret, loopFlow1) <- checkTypeB bl1
-            (bl2Ret, loopFlow2) <- checkTypeB bl2
-            let loopFlow = loopFlow1 || loopFlow2
-            case (bl1Ret, bl2Ret) of
-              (None, None) -> pure None
-              (Definitive vt, None) -> pure $ Branching vt
-              (None, Definitive vt) -> pure $ Branching vt
-              (Branching vt, None)  -> pure $ Branching vt
-              (None, Branching vt)  -> pure $ Branching vt
-              (Definitive vt1, Definitive vt2) -> go vt1 vt2 Definitive
-              (Branching  vt1, Branching  vt2) -> go vt1 vt2 Branching
-              (Definitive vt1, Branching  vt2) -> go vt1 vt2 Branching
-              (Branching  vt1, Definitive vt2) -> go vt1 vt2 Branching
-              >>= \x -> pure (x, loopFlow)
-            where
-                go :: VarType -> VarType -> (VarType -> RetType') -> IM RetType'
-                go vt1 vt2 f =
-                    if vt1 == vt2
-                        then pure $ f vt1
-                        else throwError $ TypeChecker pos $ MismatchedReturnTypes vt1 vt2
+checkTypeI (IIf pos eb bl) = checkTypeI (IIfElif pos eb bl [] (IBlock pos []))
+checkTypeI (IIfElif pos eb bl1 [] bl2) = checkIf pos eb bl1 bl2
+checkTypeI (IIfElif pos eb bl1 ((ElseIf _ eb2 bl2):xs) bl3) = checkIf pos eb bl1 (IBlock pos [IIfElif pos eb2 bl2 xs bl3])
 checkTypeI (IWhile pos eb bl) = checkTypeI (IIf pos eb bl) >>= \(x, _) -> pure (x, False)
 checkTypeI (IWhileFin pos eb (IBlock _ bIs) (IBlock _ finIs)) = do
     retType <- checkTypeI (IWhile pos eb $ IBlock pos bIs)
@@ -179,6 +156,35 @@ checkTypeI (DFun pos fName args t b) = do
     put saveEnv
     modify $ envUnion $ Env $ Map.fromList [(fName, (f, fMut))]
     pure (None, False)
+
+
+
+checkIf :: BNFC'Position -> Expr -> Block -> Block -> IM RetType
+checkIf pos eb bl1 bl2 = do
+    eb' <- checkTypeE eb
+    if eb' /= VTBool
+        then throwError $ TypeChecker pos $ WrongTypeOp "if else condition" eb'
+        else do
+            (bl1Ret, loopFlow1) <- checkTypeB bl1
+            (bl2Ret, loopFlow2) <- checkTypeB bl2
+            let loopFlow = loopFlow1 || loopFlow2
+            case (bl1Ret, bl2Ret) of
+              (None, None) -> pure None
+              (Definitive vt, None) -> pure $ Branching vt
+              (None, Definitive vt) -> pure $ Branching vt
+              (Branching vt, None)  -> pure $ Branching vt
+              (None, Branching vt)  -> pure $ Branching vt
+              (Definitive vt1, Definitive vt2) -> go vt1 vt2 Definitive
+              (Branching  vt1, Branching  vt2) -> go vt1 vt2 Branching
+              (Definitive vt1, Branching  vt2) -> go vt1 vt2 Branching
+              (Branching  vt1, Definitive vt2) -> go vt1 vt2 Branching
+              >>= \x -> pure (x, loopFlow)
+            where
+                go :: VarType -> VarType -> (VarType -> RetType') -> IM RetType'
+                go vt1 vt2 f =
+                    if vt1 == vt2
+                        then pure $ f vt1
+                        else throwError $ TypeChecker pos $ MismatchedReturnTypes vt1 vt2
 
 
 modifyEnvForFunction :: [(Ident, (VarType, VarMutability))] -> [(Ident, VarType, VarMutability, VarRef, BNFC'Position)] -> Env -> Env

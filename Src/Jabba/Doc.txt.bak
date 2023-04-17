@@ -67,7 +67,7 @@ All other symbols are terminals.
   |  |  **|**  | ``break`` ``;``
   |  |  **|**  | ``continue`` ``;``
   |  |  **|**  | ``if`` //Expr// //Block//
-  |  |  **|**  | ``if`` //Expr// //Block// ``else`` //Block//
+  |  |  **|**  | ``if`` //Expr// //Block// //[Elif]// ``else`` //Block//
   |  |  **|**  | ``while`` //Expr// //Block//
   |  |  **|**  | ``while`` //Expr// //Block// ``finally`` //Block//
   |  |  **|**  | ``for`` //Ident// ``=`` //Expr// ``..`` //Expr// //Block//
@@ -92,6 +92,9 @@ All other symbols are terminals.
   | //Block// | -> | ``{`` //[Instr]// ``}``
   | //[Instr]// | -> | **eps**
   |  |  **|**  | //Instr// //[Instr]//
+  | //Elif// | -> | ``else`` ``if`` //Expr// //Block//
+  | //[Elif]// | -> | **eps**
+  |  |  **|**  | //Elif// //[Elif]//
   | //Type// | -> | ``Integer``
   |  |  **|**  | ``Boolean``
   |  |  **|**  | ``String``
@@ -127,6 +130,7 @@ All other symbols are terminals.
   |  |  **|**  | ``(`` //Expr// ``)``
   | //Expr5// | -> | //Expr5// ``(`` //[Expr]// ``)``
   |  |  **|**  | ``|`` //[Arg]// ``|`` //Block//
+  |  |  **|**  | ``||`` //Block//
   |  |  **|**  | //NegOp// //Expr6//
   |  |  **|**  | //NotOp// //Expr6//
   |  |  **|**  | //Expr6//
@@ -141,6 +145,7 @@ All other symbols are terminals.
   | //Expr// | -> | //Expr1// //OrOp// //Expr//
   |  |  **|**  | //Expr1// ``?`` //Expr1// ``:`` //Expr//
   |  |  **|**  | ``|`` //[Arg]// ``|`` //Expr1//
+  |  |  **|**  | ``||`` //Expr1//
   |  |  **|**  | //Expr1//
   | //[Expr]// | -> | **eps**
   |  |  **|**  | //Expr//

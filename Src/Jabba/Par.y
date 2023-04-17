@@ -54,22 +54,23 @@ import Src.Jabba.Lex
   'Unit'     { PT _ (TS _ 29) }
   'break'    { PT _ (TS _ 30) }
   'continue' { PT _ (TS _ 31) }
-  'else'     { PT _ (TS _ 32) }
-  'false'    { PT _ (TS _ 33) }
-  'finally'  { PT _ (TS _ 34) }
-  'for'      { PT _ (TS _ 35) }
-  'fun'      { PT _ (TS _ 36) }
-  'if'       { PT _ (TS _ 37) }
-  'new'      { PT _ (TS _ 38) }
-  'return'   { PT _ (TS _ 39) }
-  'true'     { PT _ (TS _ 40) }
-  'val'      { PT _ (TS _ 41) }
-  'var'      { PT _ (TS _ 42) }
-  'while'    { PT _ (TS _ 43) }
-  '{'        { PT _ (TS _ 44) }
-  '|'        { PT _ (TS _ 45) }
-  '||'       { PT _ (TS _ 46) }
-  '}'        { PT _ (TS _ 47) }
+  'elif'     { PT _ (TS _ 32) }
+  'else'     { PT _ (TS _ 33) }
+  'false'    { PT _ (TS _ 34) }
+  'finally'  { PT _ (TS _ 35) }
+  'for'      { PT _ (TS _ 36) }
+  'fun'      { PT _ (TS _ 37) }
+  'if'       { PT _ (TS _ 38) }
+  'new'      { PT _ (TS _ 39) }
+  'return'   { PT _ (TS _ 40) }
+  'true'     { PT _ (TS _ 41) }
+  'val'      { PT _ (TS _ 42) }
+  'var'      { PT _ (TS _ 43) }
+  'while'    { PT _ (TS _ 44) }
+  '{'        { PT _ (TS _ 45) }
+  '|'        { PT _ (TS _ 46) }
+  '||'       { PT _ (TS _ 47) }
+  '}'        { PT _ (TS _ 48) }
   L_Ident    { PT _ (TV _)    }
   L_integ    { PT _ (TI _)    }
   L_quoted   { PT _ (TL _)    }
@@ -102,7 +103,7 @@ Instr
   | 'break' ';' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IBreak (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | 'continue' ';' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ICont (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | 'if' Expr Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IIf (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3)) }
-  | 'if' Expr Block 'else' Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IIfElse (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3) (snd $5)) }
+  | 'if' Expr Block ListElif 'else' Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IIfElif (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3) (snd $4) (snd $6)) }
   | 'while' Expr Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IWhile (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3)) }
   | 'while' Expr Block 'finally' Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IWhileFin (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3) (snd $5)) }
   | 'for' Ident '=' Expr '..' Expr Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.IFor (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4) (snd $6) (snd $7)) }
@@ -148,6 +149,15 @@ ListInstr :: { (Src.Jabba.Abs.BNFC'Position, [Src.Jabba.Abs.Instr]) }
 ListInstr
   : {- empty -} { (Src.Jabba.Abs.BNFC'NoPosition, []) }
   | Instr ListInstr { (fst $1, (:) (snd $1) (snd $2)) }
+
+Elif :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Elif) }
+Elif
+  : 'elif' Expr Block { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ElseIf (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $3)) }
+
+ListElif :: { (Src.Jabba.Abs.BNFC'Position, [Src.Jabba.Abs.Elif]) }
+ListElif
+  : {- empty -} { (Src.Jabba.Abs.BNFC'NoPosition, []) }
+  | Elif ListElif { (fst $1, (:) (snd $1) (snd $2)) }
 
 Type :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Type) }
 Type
