@@ -102,10 +102,8 @@ checkTypeI (IRet _ e) = checkTypeE e >>= (\x -> pure (x, False)) . Definitive
 checkTypeI (IRetUnit _) = pure (Definitive VTVoid, False)
 checkTypeI (IBreak _) = pure (None, True)
 checkTypeI (ICont _) = pure (None, True)
-checkTypeI (IIfElifElse pos eb bl1 [] bl2) = checkIf pos eb bl1 bl2
-checkTypeI (IIfElifElse pos eb bl1 ((ElseIf _ eb2 bl2):xs) bl3) = checkIf pos eb bl1 (IBlock pos [IIfElifElse pos eb2 bl2 xs bl3])
-checkTypeI (IIfElif pos eb bl elifs) = checkTypeI (IIfElifElse pos eb bl elifs (IBlock pos []))
-checkTypeI (IWhile pos eb bl) = checkTypeI (IIfElifElse pos eb bl [] (IBlock pos [])) >>= \(x, _) -> pure (x, False)
+checkTypeI (IIf _ ifStmt) = checkTypeIf ifStmt
+checkTypeI (IWhile pos eb bl) = checkTypeIf (IfElse pos eb bl (IBlock pos [])) >>= \(x, _) -> pure (x, False)
 checkTypeI (IWhileFin pos eb (IBlock _ bIs) (IBlock _ finIs)) = do
     retType <- checkTypeI (IWhile pos eb $ IBlock pos bIs)
     finRetType <- checkTypeB (IBlock pos finIs)
@@ -138,6 +136,13 @@ checkTypeI (DFun pos fName args t b) = do
     put saveEnv
     modify $ envUnion $ Env $ Map.fromList [(fName, (f, fMut))]
     pure (None, False)
+
+
+
+checkTypeIf ::IfStmt -> IM RetType 
+checkTypeIf (IfElse pos e b1 b2) = checkIf pos e b1 b2
+checkTypeIf (IfIf pos e b) = checkIf pos e b (IBlock pos [])
+checkTypeIf (IfElseIf pos e b nextIf) = checkIf pos e b (IBlock pos [IIf pos nextIf])
 
 
 

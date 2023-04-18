@@ -172,20 +172,20 @@ resWords =
              (b ".." 15 (b "->" 14 N N) N) (b ";" 18 (b ":" 17 N N) N))
           (b "==" 22
              (b "=" 21 (b "<=" 20 N N) N) (b ">=" 24 (b ">" 23 N N) N))))
-    (b "if" 38
-       (b "elif" 32
-          (b "Unit" 29
-             (b "Integer" 27 (b "Boolean" 26 N N) (b "String" 28 N N))
-             (b "continue" 31 (b "break" 30 N N) N))
-          (b "finally" 35
-             (b "false" 34 (b "else" 33 N N) N)
-             (b "fun" 37 (b "for" 36 N N) N)))
-       (b "var" 44
-          (b "true" 41
-             (b "return" 40 (b "new" 39 N N) N)
-             (b "val" 43 (b "unit" 42 N N) N))
-          (b "|" 47
-             (b "{" 46 (b "while" 45 N N) N) (b "}" 49 (b "||" 48 N N) N))))
+    (b "if" 37
+       (b "continue" 31
+          (b "String" 28
+             (b "Integer" 27 (b "Boolean" 26 N N) N)
+             (b "break" 30 (b "Unit" 29 N N) N))
+          (b "finally" 34
+             (b "false" 33 (b "else" 32 N N) N)
+             (b "fun" 36 (b "for" 35 N N) N)))
+       (b "var" 43
+          (b "true" 40
+             (b "return" 39 (b "new" 38 N N) N)
+             (b "val" 42 (b "unit" 41 N N) N))
+          (b "|" 46
+             (b "{" 45 (b "while" 44 N N) N) (b "}" 48 (b "||" 47 N N) N))))
   where
   b s n = B bs (TS bs n)
     where

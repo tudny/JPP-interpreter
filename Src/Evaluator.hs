@@ -147,9 +147,10 @@ evalIs ((IRet _ e):_) = do
 evalIs ((IRetUnit _):_) = pure (Just VTUnit, Nothing)
 evalIs ((IBreak _):_) = pure (Nothing, Just Break)
 evalIs ((ICont _):_) = pure (Nothing, Just Continue)
-evalIs ((IIfElifElse _ eb b1 [] b2):is) = evalIf eb b1 b2 is
-evalIs ((IIfElifElse pos eb b1 ((ElseIf _ eb2 b2):xs) b3):is) = evalIf eb b1 (IBlock pos [IIfElifElse pos eb2 b2 xs b3]) is
-evalIs ((IIfElif pos eb b1 elifs):is) = evalIs (IIfElifElse pos eb b1 elifs (IBlock pos []):is)
+-- evalIs ((IIfElifElse _ eb b1 [] b2):is) = evalIf eb b1 b2 is
+-- evalIs ((IIfElifElse pos eb b1 ((ElseIf _ eb2 b2):xs) b3):is) = evalIf eb b1 (IBlock pos [IIfElifElse pos eb2 b2 xs b3]) is
+-- evalIs ((IIfElif pos eb b1 elifs):is) = evalIs (IIfElifElse pos eb b1 elifs (IBlock pos []):is)
+evalIs ((IIf _ ifStmt):is) = evalIfStmt ifStmt is
 evalIs whileLoop@((IWhile _ e b):is) = do
     (VTBool cond) <- evalE e
     if cond then do
@@ -186,6 +187,12 @@ evalIs ((DFun _ fN args _ b):is) = do
     local (insertEnv fN loc) (evalIs is)
 evalIs ((DFunUnit pos fN args b):is) = evalIs (DFun pos fN args (TVoid pos) b:is)
 
+
+
+evalIfStmt :: IfStmt -> [Instr] -> IM RetType
+evalIfStmt (IfIf pos e b) is = evalIf e b (IBlock pos []) is
+evalIfStmt (IfElse _ e b1 b2) is = evalIf e b1 b2 is
+evalIfStmt (IfElseIf pos e b1 elif) is = evalIf e b1 (IBlock pos [IIf pos elif]) is
 
 
 evalIf :: Expr -> Block -> Block -> [Instr] -> IM RetType

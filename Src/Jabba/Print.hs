@@ -156,8 +156,7 @@ instance Print (Src.Jabba.Abs.Instr' a) where
     Src.Jabba.Abs.IRetUnit _ -> prPrec i 0 (concatD [doc (showString "return"), doc (showString ";")])
     Src.Jabba.Abs.IBreak _ -> prPrec i 0 (concatD [doc (showString "break"), doc (showString ";")])
     Src.Jabba.Abs.ICont _ -> prPrec i 0 (concatD [doc (showString "continue"), doc (showString ";")])
-    Src.Jabba.Abs.IIfElif _ expr block elifs -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block, prt 0 elifs])
-    Src.Jabba.Abs.IIfElifElse _ expr block1 elifs block2 -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block1, prt 0 elifs, doc (showString "else"), prt 0 block2])
+    Src.Jabba.Abs.IIf _ ifstmt -> prPrec i 0 (concatD [prt 0 ifstmt])
     Src.Jabba.Abs.IWhile _ expr block -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block])
     Src.Jabba.Abs.IWhileFin _ expr block1 block2 -> prPrec i 0 (concatD [doc (showString "while"), prt 0 expr, prt 0 block1, doc (showString "finally"), prt 0 block2])
     Src.Jabba.Abs.IFor _ id_ expr1 expr2 block -> prPrec i 0 (concatD [doc (showString "for"), prt 0 id_, doc (showString "="), prt 0 expr1, doc (showString ".."), prt 0 expr2, prt 0 block])
@@ -201,13 +200,11 @@ instance Print [Src.Jabba.Abs.Instr' a] where
   prt _ [] = concatD []
   prt _ (x:xs) = concatD [prt 0 x, prt 0 xs]
 
-instance Print (Src.Jabba.Abs.Elif' a) where
+instance Print (Src.Jabba.Abs.IfStmt' a) where
   prt i = \case
-    Src.Jabba.Abs.ElseIf _ expr block -> prPrec i 0 (concatD [doc (showString "elif"), prt 0 expr, prt 0 block])
-
-instance Print [Src.Jabba.Abs.Elif' a] where
-  prt _ [] = concatD []
-  prt _ (x:xs) = concatD [prt 0 x, prt 0 xs]
+    Src.Jabba.Abs.IfIf _ expr block -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block])
+    Src.Jabba.Abs.IfElse _ expr block1 block2 -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block1, doc (showString "else"), prt 0 block2])
+    Src.Jabba.Abs.IfElseIf _ expr block ifstmt -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr, prt 0 block, doc (showString "else"), prt 0 ifstmt])
 
 instance Print (Src.Jabba.Abs.Type' a) where
   prt i = \case

@@ -57,13 +57,13 @@ IBreak.         Instr ::= "break" ";" ;
 
 ICont.          Instr ::= "continue" ";" ;
 
-IIfElif.        Instr ::= "if" Expr Block [Elif] ;
+IIf.            Instr ::= IfStmt ;
 
-IIfElifElse.    Instr ::= "if" Expr Block [Elif] "else" Block ;
+IfIf.           IfStmt ::= "if" Expr Block ;
 
-ElseIf.         Elif  ::= "elif" Expr Block ;
+IfElse.         IfStmt ::= "if" Expr Block "else" Block ;
 
-separator       Elif "" ;
+IfElseIf.       IfStmt ::= "if" Expr Block "else" IfStmt ;
 
 IWhile.         Instr ::= "while" Expr Block ;
 

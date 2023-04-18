@@ -20,97 +20,97 @@ fun evenOdd(val n: new Integer): String {
     if n == 0 {
         printN();
         return "even";
-    } elif n == 1 {
+    } else if n == 1 {
         printN();
         return "odd";
-    } elif n == 2 {
+    } else if n == 2 {
         printN();
         return "even";
-    } elif n == 3 {
+    } else if n == 3 {
         printN();
         return "odd";
-    } elif n == 4 {
+    } else if n == 4 {
         printN();
         return "even";
-    } elif n == 5 {
+    } else if n == 5 {
         printN();
         return "odd";
-    } elif n == 6 {
+    } else if n == 6 {
         printN();
         return "even";
-    } elif n == 7 {
+    } else if n == 7 {
         printN();
         return "odd";
-    } elif n == 8 {
+    } else if n == 8 {
         printN();
         return "even";
-    } elif n == 9 {
+    } else if n == 9 {
         printN();
         return "odd";
-    } elif n == 10 {
+    } else if n == 10 {
         printN();
         return "even";
-    } elif n == 11 {
+    } else if n == 11 {
         printN();
         return "odd";
-    } elif n == 12 {
+    } else if n == 12 {
         printN();
         return "even";
-    } elif n == 13 {
+    } else if n == 13 {
         printN();
         return "odd";
-    } elif n == 14 {
+    } else if n == 14 {
         printN();
         return "even";
-    } elif n == 15 {
+    } else if n == 15 {
         printN();
         return "odd";
-    } elif n == 16 {
+    } else if n == 16 {
         printN();
         return "even";
-    } elif n == 17 {
+    } else if n == 17 {
         printN();
         return "odd";
-    } elif n == 18 {
+    } else if n == 18 {
         printN();
         return "even";
-    } elif n == 19 {
+    } else if n == 19 {
         printN();
         return "odd";
-    } elif n == 20 {
+    } else if n == 20 {
         printN();
         return "even";
-    } elif n == 21 {
+    } else if n == 21 {
         printN();
         return "odd";
-    } elif n == 22 {
+    } else if n == 22 {
         printN();
         return "even";
-    } elif n == 23 {
+    } else if n == 23 {
         printN();
         return "odd";
-    } elif n == 24 {
+    } else if n == 24 {
         printN();
         return "even";
-    } elif n == 25 {
+    } else if n == 25 {
         printN();
         return "odd";
-    } elif n == 26 {
+    } else if n == 26 {
         printN();
         return "even";
-    } elif n == 27 {
+    } else if n == 27 {
         printN();
         return "odd";
-    } elif n == 28 {
+    } else if n == 28 {
         printN();
         return "even";
-    } elif n == 29 {
+    } else if n == 29 {
         printN();
         return "odd";
-    } elif n == 30 {
+    } else if n == 30 {
         printN();
         return "even";
-    } elif n == 31 {
+    } else if n == 31 {
         printN();
         return "odd";
     } else {

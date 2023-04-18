@@ -8,7 +8,7 @@ fun colatzGen() : (val$Integer) -> Integer {
     fun colatz(val n: new Integer): Integer {
         if isOne(n) {
             return 1;
-        } elif isEven(n) {
+        } else if isEven(n) {
             return div2(n);
         } else {
             return n3p1(n);

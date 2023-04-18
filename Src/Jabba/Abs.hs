@@ -34,8 +34,7 @@ data Instr' a
     | IRetUnit a
     | IBreak a
     | ICont a
-    | IIfElif a (Expr' a) (Block' a) [Elif' a]
-    | IIfElifElse a (Expr' a) (Block' a) [Elif' a] (Block' a)
+    | IIf a (IfStmt' a)
     | IWhile a (Expr' a) (Block' a)
     | IWhileFin a (Expr' a) (Block' a) (Block' a)
     | IFor a Ident (Expr' a) (Expr' a) (Block' a)
@@ -67,8 +66,11 @@ type Block = Block' BNFC'Position
 data Block' a = IBlock a [Instr' a]
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
-type Elif = Elif' BNFC'Position
-data Elif' a = ElseIf a (Expr' a) (Block' a)
+type IfStmt = IfStmt' BNFC'Position
+data IfStmt' a
+    = IfIf a (Expr' a) (Block' a)
+    | IfElse a (Expr' a) (Block' a) (Block' a)
+    | IfElseIf a (Expr' a) (Block' a) (IfStmt' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Type = Type' BNFC'Position
@@ -173,8 +175,7 @@ instance HasPosition Instr where
     IRetUnit p -> p
     IBreak p -> p
     ICont p -> p
-    IIfElif p _ _ _ -> p
-    IIfElifElse p _ _ _ _ -> p
+    IIf p _ -> p
     IWhile p _ _ -> p
     IWhileFin p _ _ _ -> p
     IFor p _ _ _ _ -> p
@@ -204,9 +205,11 @@ instance HasPosition Block where
   hasPosition = \case
     IBlock p _ -> p
 
-instance HasPosition Elif where
+instance HasPosition IfStmt where
   hasPosition = \case
-    ElseIf p _ _ -> p
+    IfIf p _ _ -> p
+    IfElse p _ _ _ -> p
+    IfElseIf p _ _ _ -> p
 
 instance HasPosition Type where
   hasPosition = \case
