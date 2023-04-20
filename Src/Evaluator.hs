@@ -7,7 +7,7 @@ import Src.Errors
 import Control.Monad.Except (ExceptT, runExceptT, throwError, void, MonadIO (liftIO))
 import Control.Monad.Reader (ReaderT, runReaderT, ask, local, asks)
 import Control.Monad.State (StateT, evalStateT, get, put, modify, gets)
-import qualified Data.Map as Map (Map, empty, insert, lookup)
+import qualified Data.Map as Map (Map, empty, insert, lookup, fromList)
 import Data.Maybe (isJust, fromMaybe)
 import Text.Read (readMaybe)
 
@@ -50,6 +50,7 @@ data Value
     | VTString String
     | VTUnit
     | VTFun [FnArg] FunBlock Env
+    | VTTab Int (Map.Map Int Value)
 
 instance Show Value where
     show (VTInt i) = show i
@@ -57,6 +58,7 @@ instance Show Value where
     show (VTString s) = show s
     show VTUnit = "()"
     show (VTFun args _ _) = "Fn(" ++ show args ++ ")"
+    show (VTTab s vs) = "[" ++ show s ++ "<>" ++ show vs ++ "]"
 
 data LoopControlFlow = Break | Continue
 
@@ -106,6 +108,33 @@ reserveN n = do
     pure locs
 
 type ModStore = Store -> Store
+
+-- =============================================================================
+
+getTabValueAt :: BNFC'Position -> Int -> Loc -> IM Value
+getTabValueAt pos i l = do
+    (VTTab s m) <- storeGet l =<< get
+    case Map.lookup i m of
+        Nothing -> throwError $ RuntimeError pos $ ArrayIndexOutOfBounds i s
+        Just v -> pure v
+
+setTabValueAt :: BNFC'Position -> Int -> Loc -> Value -> IM ()
+setTabValueAt pos i l v = do
+    (VTTab s m) <- storeGet l =<< get
+    if i >= s || i < 0 then throwError $ RuntimeError pos $ ArrayIndexOutOfBounds i s
+    else do
+        let m' = Map.insert i v m
+        modify $ insertStore l (VTTab s m')
+
+initArray :: BNFC'Position -> Int -> Value -> IM Value
+initArray pos size defVal = initArrayDefs pos size $ replicate size defVal
+
+initArrayDefs :: BNFC'Position -> Int -> [Value] -> IM Value
+initArrayDefs pos size defs = do
+    if size < 0 then throwError $ RuntimeError pos $ ArrayInvalidSize size
+    else do
+        let m = Map.fromList $ zip [0..size-1] defs
+        pure $ VTTab size m
 
 -- =============================================================================
 
@@ -186,6 +215,12 @@ evalIs ((DFun _ fN args _ b):is) = do
     modify $ insertStore loc f
     local (insertEnv fN loc) (evalIs is)
 evalIs ((DFunUnit pos fN args b):is) = evalIs (DFun pos fN args (TVoid pos) b:is)
+evalIs ((ITabAss pos aN i e):is) = do
+    n <- evalE e
+    (VTInt aId) <- evalE i
+    l <- envGet aN =<< ask
+    setTabValueAt pos aId l n
+    evalIs is
 
 
 
@@ -286,6 +321,7 @@ defaultValueForType (TBool _) = VTBool False
 defaultValueForType (TString _) = VTString ""
 defaultValueForType (TVoid _) = VTUnit
 defaultValueForType TFun {} = undefined -- type checker should catch this
+defaultValueForType TTab {} = undefined -- type checker should catch this
 
 
 
@@ -300,7 +336,7 @@ evalE (EVarName pos v) = getVarValue pos v
 evalE (EIntLit _ n) = pure $ VTInt $ fromInteger n
 evalE (EBoolLitTrue _) = pure $ VTBool True
 evalE (EBoolLitFalse _) = pure $ VTBool False
-evalE (EUnitLiteral _) = pure $ VTUnit
+evalE (EUnitLiteral _) = pure VTUnit
 evalE (EStringLit _ s) = pure $ VTString s
 evalE (ENeg _ (ONeg _) e) = do
     (VTInt n) <- evalE e
@@ -376,6 +412,17 @@ evalE (ELambda _ args b) = do
 evalE (ELambdaEmpty pos b) = evalE (ELambda pos [] b)
 evalE (ELambdaExpr pos args e) = evalE (ELambda pos args (IBlock pos [IRet pos e]))
 evalE (ELambdaEmptEpr pos e) = evalE (ELambda pos [] (IBlock pos [IRet pos e]))
+evalE (ITabAcc pos v e) = do
+    arrayLoc <- getVarLoc pos v
+    (VTInt i) <- evalE e
+    getTabValueAt pos i arrayLoc
+evalE (ITabInit pos eS eD) = do
+    (VTInt arrSize) <- evalE eS
+    defVal <- evalE eD
+    initArray pos arrSize defVal
+evalE (ITabInitEls pos els) = do
+    elsVals <- mapM evalE els
+    initArrayDefs pos (length elsVals) elsVals
 
 
 

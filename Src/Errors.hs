@@ -41,6 +41,7 @@ data ErrType
     | NotAnArray Ident
     | EmptyArray
     | ArrayElementsMismatch [VarType]
+    | TableWithoutInitializer Ident
     deriving (Eq)
 
 
@@ -49,6 +50,8 @@ data RuntimeType
     | TypeCheckerDidntCatch
     | CannotCast String String
     | AssertionFailed String
+    | ArrayIndexOutOfBounds Int Int
+    | ArrayInvalidSize Int
     deriving (Eq)
 
 
@@ -106,7 +109,7 @@ instance Show ErrType where
     show (NotAnArray i) = "variable " ++ show i ++ " is not an array."
     show EmptyArray = "array is empty - cannot deduce type."
     show (ArrayElementsMismatch ts) = "array elements have types " ++ show ts ++ " but expected all to be the same."
-
+    show (TableWithoutInitializer i) = "table " ++ show i ++ " is not initialized."
 
 
 instance Show RuntimeType where
@@ -114,3 +117,6 @@ instance Show RuntimeType where
     show TypeCheckerDidntCatch = "type checker didn't catch this error."
     show (CannotCast s t) = "cannot cast " ++ s ++ " to type " ++ show t ++ "."
     show (AssertionFailed s) = "assertion failed:\n" ++ s ++ "."
+    show (ArrayIndexOutOfBounds i l) = "array index " ++ show i ++ " is out of bounds (length " ++ show l ++ ")."
+    show (ArrayInvalidSize i) = "array size " ++ show i ++ " is invalid."
+    
