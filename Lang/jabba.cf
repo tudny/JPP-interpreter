@@ -135,6 +135,21 @@ RLeq.           RelOp ::= "<=" ;
 
 RGeq.           RelOp ::= ">=" ;
 
+-- Tabs --------------------------------------------------
+-- This is an added extension to the language
+
+TTab.           Type ::= "[" Type "]" ;
+
+ITabAss.        Instr ::= Ident "[" Expr "]" "=" Expr ";" ;
+
+ITabAcc.        Expr ::= Ident "[" Expr "]" ;
+
+-- tab with length and initial value
+ITabInit.       Expr ::= "[" Expr "<>" Expr "]" ;
+
+ITabInitEls.    Expr ::= "[" [Expr] "]" ;
+
+
 -- Expressions --------------------------------------------
 
 EVarName.       Expr6 ::= Ident ;

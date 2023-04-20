@@ -42,6 +42,7 @@ transInstr x = case x of
   Src.Jabba.Abs.IExpr _ expr -> failure x
   Src.Jabba.Abs.IDecl _ decl -> failure x
   Src.Jabba.Abs.IBBlock _ block -> failure x
+  Src.Jabba.Abs.ITabAss _ ident expr1 expr2 -> failure x
 
 transArg :: Show a => Src.Jabba.Abs.Arg' a -> Result
 transArg x = case x of
@@ -78,6 +79,7 @@ transType x = case x of
   Src.Jabba.Abs.TString _ -> failure x
   Src.Jabba.Abs.TVoid _ -> failure x
   Src.Jabba.Abs.TFun _ targs type_ -> failure x
+  Src.Jabba.Abs.TTab _ type_ -> failure x
 
 transTArg :: Show a => Src.Jabba.Abs.TArg' a -> Result
 transTArg x = case x of
@@ -124,6 +126,9 @@ transRelOp x = case x of
 
 transExpr :: Show a => Src.Jabba.Abs.Expr' a -> Result
 transExpr x = case x of
+  Src.Jabba.Abs.ITabAcc _ ident expr -> failure x
+  Src.Jabba.Abs.ITabInit _ expr1 expr2 -> failure x
+  Src.Jabba.Abs.ITabInitEls _ exprs -> failure x
   Src.Jabba.Abs.EVarName _ ident -> failure x
   Src.Jabba.Abs.EIntLit _ integer -> failure x
   Src.Jabba.Abs.EBoolLitTrue _ -> failure x

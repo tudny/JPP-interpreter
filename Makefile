@@ -4,7 +4,7 @@
 # Makefile for building the parser and test program.
 
 GHC        = ghc
-GHC_OPTS   = -odir Target -hidir Target -Wall -Werror -Wextra -O2
+GHC_OPTS   = -odir Target -hidir Target -Wall -Werror -Wextra # -O2
 HAPPY      = happy 
 HAPPY_OPTS = --array --info --ghc --coerce
 ALEX       = alex

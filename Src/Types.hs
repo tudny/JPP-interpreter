@@ -8,6 +8,7 @@ data VarType
     | VTString 
     | VTVoid 
     | Fn [FnArg] VarType
+    | VTTab VarType
     deriving (Eq)
 
 type FnArg = (VarType, VarMutability, VarRef)
@@ -31,6 +32,7 @@ absTypeToVarType (TBool _) = VTBool
 absTypeToVarType (TString _) = VTString
 absTypeToVarType (TVoid _) = VTVoid
 absTypeToVarType (TFun _ args ret) = Fn (map absTypeToFnArg args) (absTypeToVarType ret)
+absTypeToVarType (TTab _ t) = VTTab $ absTypeToVarType t
 
 
 absTypeToFnArg :: TArg -> FnArg
@@ -46,6 +48,7 @@ instance Show VarType where
     show VTBool = "Boolean"
     show VTVoid = "Unit"
     show (Fn args ret) = "(" ++ show args ++ ") -> " ++ show ret
+    show (VTTab t) = "[" ++ show t ++ "]"
 
 
 instance Show VarMutability where

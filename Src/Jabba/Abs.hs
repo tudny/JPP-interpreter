@@ -41,6 +41,7 @@ data Instr' a
     | IExpr a (Expr' a)
     | IDecl a (Decl' a)
     | IBBlock a (Block' a)
+    | ITabAss a Ident (Expr' a) (Expr' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Arg = Arg' BNFC'Position
@@ -80,6 +81,7 @@ data Type' a
     | TString a
     | TVoid a
     | TFun a [TArg' a] (Type' a)
+    | TTab a (Type' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type TArg = TArg' BNFC'Position
@@ -120,7 +122,10 @@ data RelOp' a = REq a | RNeq a | RLt a | RGt a | RLeq a | RGeq a
 
 type Expr = Expr' BNFC'Position
 data Expr' a
-    = EVarName a Ident
+    = ITabAcc a Ident (Expr' a)
+    | ITabInit a (Expr' a) (Expr' a)
+    | ITabInitEls a [Expr' a]
+    | EVarName a Ident
     | EIntLit a Integer
     | EBoolLitTrue a
     | EBoolLitFalse a
@@ -182,6 +187,7 @@ instance HasPosition Instr where
     IExpr p _ -> p
     IDecl p _ -> p
     IBBlock p _ -> p
+    ITabAss p _ _ _ -> p
 
 instance HasPosition Arg where
   hasPosition = \case
@@ -218,6 +224,7 @@ instance HasPosition Type where
     TString p -> p
     TVoid p -> p
     TFun p _ _ -> p
+    TTab p _ -> p
 
 instance HasPosition TArg where
   hasPosition = \case
@@ -264,6 +271,9 @@ instance HasPosition RelOp where
 
 instance HasPosition Expr where
   hasPosition = \case
+    ITabAcc p _ _ -> p
+    ITabInit p _ _ -> p
+    ITabInitEls p _ -> p
     EVarName p _ -> p
     EIntLit p _ -> p
     EBoolLitTrue p -> p

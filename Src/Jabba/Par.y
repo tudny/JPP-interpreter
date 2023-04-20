@@ -43,34 +43,37 @@ import Src.Jabba.Lex
   ';'        { PT _ (TS _ 18) }
   '<'        { PT _ (TS _ 19) }
   '<='       { PT _ (TS _ 20) }
-  '='        { PT _ (TS _ 21) }
-  '=='       { PT _ (TS _ 22) }
-  '>'        { PT _ (TS _ 23) }
-  '>='       { PT _ (TS _ 24) }
-  '?'        { PT _ (TS _ 25) }
-  'Boolean'  { PT _ (TS _ 26) }
-  'Integer'  { PT _ (TS _ 27) }
-  'String'   { PT _ (TS _ 28) }
-  'Unit'     { PT _ (TS _ 29) }
-  'break'    { PT _ (TS _ 30) }
-  'continue' { PT _ (TS _ 31) }
-  'else'     { PT _ (TS _ 32) }
-  'false'    { PT _ (TS _ 33) }
-  'finally'  { PT _ (TS _ 34) }
-  'for'      { PT _ (TS _ 35) }
-  'fun'      { PT _ (TS _ 36) }
-  'if'       { PT _ (TS _ 37) }
-  'new'      { PT _ (TS _ 38) }
-  'return'   { PT _ (TS _ 39) }
-  'true'     { PT _ (TS _ 40) }
-  'unit'     { PT _ (TS _ 41) }
-  'val'      { PT _ (TS _ 42) }
-  'var'      { PT _ (TS _ 43) }
-  'while'    { PT _ (TS _ 44) }
-  '{'        { PT _ (TS _ 45) }
-  '|'        { PT _ (TS _ 46) }
-  '||'       { PT _ (TS _ 47) }
-  '}'        { PT _ (TS _ 48) }
+  '<>'       { PT _ (TS _ 21) }
+  '='        { PT _ (TS _ 22) }
+  '=='       { PT _ (TS _ 23) }
+  '>'        { PT _ (TS _ 24) }
+  '>='       { PT _ (TS _ 25) }
+  '?'        { PT _ (TS _ 26) }
+  'Boolean'  { PT _ (TS _ 27) }
+  'Integer'  { PT _ (TS _ 28) }
+  'String'   { PT _ (TS _ 29) }
+  'Unit'     { PT _ (TS _ 30) }
+  '['        { PT _ (TS _ 31) }
+  ']'        { PT _ (TS _ 32) }
+  'break'    { PT _ (TS _ 33) }
+  'continue' { PT _ (TS _ 34) }
+  'else'     { PT _ (TS _ 35) }
+  'false'    { PT _ (TS _ 36) }
+  'finally'  { PT _ (TS _ 37) }
+  'for'      { PT _ (TS _ 38) }
+  'fun'      { PT _ (TS _ 39) }
+  'if'       { PT _ (TS _ 40) }
+  'new'      { PT _ (TS _ 41) }
+  'return'   { PT _ (TS _ 42) }
+  'true'     { PT _ (TS _ 43) }
+  'unit'     { PT _ (TS _ 44) }
+  'val'      { PT _ (TS _ 45) }
+  'var'      { PT _ (TS _ 46) }
+  'while'    { PT _ (TS _ 47) }
+  '{'        { PT _ (TS _ 48) }
+  '|'        { PT _ (TS _ 49) }
+  '||'       { PT _ (TS _ 50) }
+  '}'        { PT _ (TS _ 51) }
   L_Ident    { PT _ (TV _)    }
   L_integ    { PT _ (TI _)    }
   L_quoted   { PT _ (TL _)    }
@@ -109,6 +112,7 @@ Instr
   | Expr ';' { (fst $1, Src.Jabba.Abs.IExpr (fst $1) (snd $1)) }
   | Decl ';' { (fst $1, Src.Jabba.Abs.IDecl (fst $1) (snd $1)) }
   | Block { (fst $1, Src.Jabba.Abs.IBBlock (fst $1) (snd $1)) }
+  | Ident '[' Expr ']' '=' Expr ';' { (fst $1, Src.Jabba.Abs.ITabAss (fst $1) (snd $1) (snd $3) (snd $6)) }
 
 Arg :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Arg) }
 Arg
@@ -162,6 +166,7 @@ Type
   | 'String' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.TString (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | 'Unit' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.TVoid (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | '(' ListTArg ')' '->' Type { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.TFun (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $5)) }
+  | '[' Type ']' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.TTab (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2)) }
 
 TArg :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.TArg) }
 TArg
@@ -212,6 +217,17 @@ RelOp
   | '<=' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.RLeq (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
   | '>=' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.RGeq (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1))) }
 
+Expr :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Expr) }
+Expr
+  : Ident '[' Expr ']' { (fst $1, Src.Jabba.Abs.ITabAcc (fst $1) (snd $1) (snd $3)) }
+  | '[' Expr '<>' Expr ']' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ITabInit (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4)) }
+  | '[' ListExpr ']' { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ITabInitEls (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2)) }
+  | Expr1 OrOp Expr { (fst $1, Src.Jabba.Abs.EBOr (fst $1) (snd $1) (snd $2) (snd $3)) }
+  | Expr1 '?' Expr1 ':' Expr { (fst $1, Src.Jabba.Abs.ETer (fst $1) (snd $1) (snd $3) (snd $5)) }
+  | '|' ListArg '|' Expr1 { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaExpr (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4)) }
+  | '||' Expr1 { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaEmptEpr (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2)) }
+  | Expr1 { (fst $1, (snd $1)) }
+
 Expr6 :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Expr) }
 Expr6
   : Ident { (fst $1, Src.Jabba.Abs.EVarName (fst $1) (snd $1)) }
@@ -250,14 +266,6 @@ Expr1 :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Expr) }
 Expr1
   : Expr2 AndOp Expr1 { (fst $1, Src.Jabba.Abs.EBAnd (fst $1) (snd $1) (snd $2) (snd $3)) }
   | Expr2 { (fst $1, (snd $1)) }
-
-Expr :: { (Src.Jabba.Abs.BNFC'Position, Src.Jabba.Abs.Expr) }
-Expr
-  : Expr1 OrOp Expr { (fst $1, Src.Jabba.Abs.EBOr (fst $1) (snd $1) (snd $2) (snd $3)) }
-  | Expr1 '?' Expr1 ':' Expr { (fst $1, Src.Jabba.Abs.ETer (fst $1) (snd $1) (snd $3) (snd $5)) }
-  | '|' ListArg '|' Expr1 { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaExpr (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2) (snd $4)) }
-  | '||' Expr1 { (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1), Src.Jabba.Abs.ELambdaEmptEpr (uncurry Src.Jabba.Abs.BNFC'Position (tokenLineCol $1)) (snd $2)) }
-  | Expr1 { (fst $1, (snd $1)) }
 
 ListExpr :: { (Src.Jabba.Abs.BNFC'Position, [Src.Jabba.Abs.Expr]) }
 ListExpr

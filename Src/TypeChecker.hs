@@ -10,6 +10,7 @@ import Src.Errors
       ErrHolder (TypeChecker),
       Err )
 import Src.Types
+import Foreign.C (throwErrno)
 
 data RetType'
     = None
@@ -136,6 +137,14 @@ checkTypeI (DFun pos fName args t b) = do
     put saveEnv
     modify $ envUnion $ Env $ Map.fromList [(fName, (f, fMut))]
     pure (None, False)
+checkTypeI (ITabAss pos v ei ev) = do
+    ei' <- checkTypeE ei
+    ev' <- checkTypeE ev
+    if ei' /= VTInt then throwError $ TypeChecker pos $ InvalidArrayIndex ei'
+    else do
+        (varType, _) <- getVarType pos v
+        if varType /= VTTab ev' then throwError $ TypeChecker pos $ NotAnArray v
+        else pure (None, False)
 
 
 
@@ -306,6 +315,24 @@ checkTypeE (ELambdaExpr _ args e) = do
     pure $ Fn fnArgs deducedType
 checkTypeE (ELambdaEmpty pos b) = checkTypeE (ELambda pos [] b)
 checkTypeE (ELambdaEmptEpr pos b) = checkTypeE (ELambdaExpr pos [] b)
+checkTypeE (ITabAcc pos v e) = do
+    ei' <- checkTypeE e
+    if ei' /= VTInt then throwError $ TypeChecker pos $ InvalidArrayIndex ei'
+    else do
+        (vType, _) <- getVarType pos v
+        deconstructTabType pos vType v
+checkTypeE (ITabInit pos el ev) = do
+    el' <- checkTypeE el
+    ev' <- checkTypeE ev
+    if el' /= VTInt then throwError $ TypeChecker pos $ InvalidArrayIndex el'
+    else pure $ VTTab ev'
+checkTypeE (ITabInitEls pos els) = do
+    els' <- mapM checkTypeE els
+    if null els' then throwError $ TypeChecker pos EmptyArray
+    else do
+        let elType = head els'
+        if any (/= elType) els' then throwError $ TypeChecker pos $ ArrayElementsMismatch els'
+        else pure $ VTTab elType
 
 
 getMulOpName :: MulOp -> String
@@ -345,6 +372,11 @@ getF pos fn = do
 decunstructFnType :: BNFC'Position -> VarType -> IM ([FnArg], VarType)
 decunstructFnType _ (Fn args ret) = pure (args, ret)
 decunstructFnType pos t = throwError $ TypeChecker pos $ NotFnType t
+
+
+deconstructTabType :: BNFC'Position -> VarType -> Ident -> IM VarType
+deconstructTabType _ (VTTab t) _ = pure t
+deconstructTabType pos _ v = throwError $ TypeChecker pos $ NotAnArray v
 
 
 getCallExprType :: BNFC'Position -> Expr -> IM (VarType, Maybe VarMutability)

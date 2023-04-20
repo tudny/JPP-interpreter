@@ -37,6 +37,10 @@ data ErrType
     | FunctionMaybeReturn Ident VarType
     | NotFnType VarType
     | FunctionWithoutInitializer Ident
+    | InvalidArrayIndex VarType
+    | NotAnArray Ident
+    | EmptyArray
+    | ArrayElementsMismatch [VarType]
     deriving (Eq)
 
 
@@ -98,6 +102,11 @@ instance Show ErrType where
     show (FunctionMaybeReturn i t) = "not all paths in function " ++ show i ++ " return a value and return type is " ++ show t ++ "."
     show (NotFnType t) = "type " ++ show t ++ " is not a function type."
     show (FunctionWithoutInitializer i) = "function " ++ show i ++ " is not initialized."
+    show (InvalidArrayIndex t) = "array index is of type " ++ show t ++ " but expected Integer."
+    show (NotAnArray i) = "variable " ++ show i ++ " is not an array."
+    show EmptyArray = "array is empty - cannot deduce type."
+    show (ArrayElementsMismatch ts) = "array elements have types " ++ show ts ++ " but expected all to be the same."
+
 
 
 instance Show RuntimeType where
