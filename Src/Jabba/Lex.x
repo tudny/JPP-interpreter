@@ -28,7 +28,7 @@ $u = [. \n]          -- universal: any character
 
 -- Symbols and non-identifier-like reserved words
 
-@rsyms = \( | \) | \: | \, | \= | \{ | \} | \; | \+ \+ | \- \- | \. \. | \- \> | \$ | \+ | \- | \* | \/ | \% | \! | \& \& | \| \| | \= \= | \! \= | \< | \> | \< \= | \> \= | \[ | \] | \< \> | \| | \?
+@rsyms = \( | \) | \: | \, | \= | \{ | \} | \; | \+ \+ | \- \- | \. \. | \- \> | \$ | \+ | \- | \* | \/ | \% | \! | \& \& | \| \| | \= \= | \! \= | \< | \> | \< \= | \> \= | \[ | \] | \| | \?
 
 :-
 
@@ -161,7 +161,7 @@ eitherResIdent tv s = treeFind resWords
 -- | The keywords and symbols of the language organized as binary search tree.
 resWords :: BTree
 resWords =
-  b "?" 26
+  b "Boolean" 26
     (b "--" 13
        (b ")" 7
           (b "%" 4
@@ -171,22 +171,22 @@ resWords =
           (b ":" 17
              (b ".." 15 (b "->" 14 N N) (b "/" 16 N N))
              (b "<" 19 (b ";" 18 N N) N))
-          (b "==" 23
-             (b "=" 22 (b "<>" 21 N N) N) (b ">=" 25 (b ">" 24 N N) N))))
-    (b "fun" 39
-       (b "break" 33
-          (b "Unit" 30
-             (b "Integer" 28 (b "Boolean" 27 N N) (b "String" 29 N N))
-             (b "]" 32 (b "[" 31 N N) N))
-          (b "false" 36
-             (b "else" 35 (b "continue" 34 N N) N)
-             (b "for" 38 (b "finally" 37 N N) N)))
-       (b "var" 46
-          (b "true" 43
-             (b "new" 41 (b "if" 40 N N) (b "return" 42 N N))
-             (b "val" 45 (b "unit" 44 N N) N))
-          (b "|" 49
-             (b "{" 48 (b "while" 47 N N) N) (b "}" 51 (b "||" 50 N N) N))))
+          (b ">" 23
+             (b "==" 22 (b "=" 21 N N) N) (b "?" 25 (b ">=" 24 N N) N))))
+    (b "if" 39
+       (b "continue" 33
+          (b "[" 30
+             (b "String" 28 (b "Integer" 27 N N) (b "Unit" 29 N N))
+             (b "break" 32 (b "]" 31 N N) N))
+          (b "finally" 36
+             (b "false" 35 (b "else" 34 N N) N)
+             (b "fun" 38 (b "for" 37 N N) N)))
+       (b "var" 45
+          (b "true" 42
+             (b "return" 41 (b "new" 40 N N) N)
+             (b "val" 44 (b "unit" 43 N N) N))
+          (b "|" 48
+             (b "{" 47 (b "while" 46 N N) N) (b "}" 50 (b "||" 49 N N) N))))
   where
   b s n = B bs (TS bs n)
     where

@@ -142,10 +142,10 @@ TTab.           Type ::= "[" Type "]" ;
 
 ITabAss.        Instr ::= Ident "[" Expr "]" "=" Expr ";" ;
 
-ITabAcc.        Expr ::= Ident "[" Expr "]" ;
+ITabAcc.        Expr6 ::= Ident "[" Expr "]" ;
 
 -- tab with length and initial value
-ITabInit.       Expr ::= "[" Expr "<>" Expr "]" ;
+ITabInit.       Expr ::= "[" Expr ";" Expr "]" ;
 
 ITabInitEls.    Expr ::= "[" [Expr] "]" ;
 

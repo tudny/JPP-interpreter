@@ -266,8 +266,8 @@ instance Print (Src.Jabba.Abs.RelOp' a) where
 
 instance Print (Src.Jabba.Abs.Expr' a) where
   prt i = \case
-    Src.Jabba.Abs.ITabAcc _ id_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString "["), prt 0 expr, doc (showString "]")])
-    Src.Jabba.Abs.ITabInit _ expr1 expr2 -> prPrec i 0 (concatD [doc (showString "["), prt 0 expr1, doc (showString "<>"), prt 0 expr2, doc (showString "]")])
+    Src.Jabba.Abs.ITabAcc _ id_ expr -> prPrec i 6 (concatD [prt 0 id_, doc (showString "["), prt 0 expr, doc (showString "]")])
+    Src.Jabba.Abs.ITabInit _ expr1 expr2 -> prPrec i 0 (concatD [doc (showString "["), prt 0 expr1, doc (showString ";"), prt 0 expr2, doc (showString "]")])
     Src.Jabba.Abs.ITabInitEls _ exprs -> prPrec i 0 (concatD [doc (showString "["), prt 0 exprs, doc (showString "]")])
     Src.Jabba.Abs.EVarName _ id_ -> prPrec i 6 (concatD [prt 0 id_])
     Src.Jabba.Abs.EIntLit _ n -> prPrec i 6 (concatD [prt 0 n])

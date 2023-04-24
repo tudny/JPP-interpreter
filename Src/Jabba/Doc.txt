@@ -44,7 +44,7 @@ The symbols used in jabba are the following:
   | / | % | ! | &&
   | || | == | != | <
   | > | <= | >= | [
-  | ] | <> | | | ?
+  | ] | | | ? |
 
 ===Comments===
 Single-line comments begin with #, //.Multiple-line comments are  enclosed with /* and */.
@@ -123,21 +123,21 @@ All other symbols are terminals.
   |  |  **|**  | ``>``
   |  |  **|**  | ``<=``
   |  |  **|**  | ``>=``
-  | //Expr// | -> | //Ident// ``[`` //Expr// ``]``
-  |  |  **|**  | ``[`` //Expr// ``<>`` //Expr// ``]``
-  |  |  **|**  | ``[`` //[Expr]// ``]``
-  |  |  **|**  | //Expr1// //OrOp// //Expr//
-  |  |  **|**  | //Expr1// ``?`` //Expr1// ``:`` //Expr//
-  |  |  **|**  | ``|`` //[Arg]// ``|`` //Expr1//
-  |  |  **|**  | ``||`` //Expr1//
-  |  |  **|**  | //Expr1//
-  | //Expr6// | -> | //Ident//
+  | //Expr6// | -> | //Ident// ``[`` //Expr// ``]``
+  |  |  **|**  | //Ident//
   |  |  **|**  | //Integer//
   |  |  **|**  | ``true``
   |  |  **|**  | ``false``
   |  |  **|**  | ``unit``
   |  |  **|**  | //String//
   |  |  **|**  | ``(`` //Expr// ``)``
+  | //Expr// | -> | ``[`` //Expr// ``;`` //Expr// ``]``
+  |  |  **|**  | ``[`` //[Expr]// ``]``
+  |  |  **|**  | //Expr1// //OrOp// //Expr//
+  |  |  **|**  | //Expr1// ``?`` //Expr1// ``:`` //Expr//
+  |  |  **|**  | ``|`` //[Arg]// ``|`` //Expr1//
+  |  |  **|**  | ``||`` //Expr1//
+  |  |  **|**  | //Expr1//
   | //Expr5// | -> | //Expr5// ``(`` //[Expr]// ``)``
   |  |  **|**  | ``|`` //[Arg]// ``|`` //Block//
   |  |  **|**  | ``||`` //Block//
