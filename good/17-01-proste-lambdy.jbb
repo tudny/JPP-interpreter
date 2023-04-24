@@ -24,6 +24,8 @@ var m = || (|| 5) ;
 
 var x: Integer = m()();
 
+assert(x == 5);
+
 var f: (val Integer) -> Integer = |val x: Integer| x;
 
 var g: (var String) -> String = |var x: String| "World";
