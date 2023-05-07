@@ -213,7 +213,7 @@ var g: (var String) -> String = |var x: String| "World";
 g("Hello"); // zwróci "World"
 ```
 
-Lambdy mogą być przekazywane jako argumenty do funkcji. Przykład:
+Funkcje mogą być przekazywane jako argumenty do funkcji. Przykład:
 ```kotlin
 fun foo(val x: new Integer, val f: (val$Integer) -> Integer) : Integer {
     return f(x);
@@ -225,6 +225,82 @@ fun bar(val x: new Integer) : Integer {
 
 val res = foo(10, bar); // zwróci 11
 assert(res == 11);
+```
+
+Lambdy mogę nie przyjmować argumentów. Przykład:
+```kotlin
+var g = || 10;
+
+for i = 0..100 {
+    assert(g() == 10);
+    writeInt(g());
+    writeStr("\n");
+}
+```
+
+Syntax dla lambd:
+```kotlin
+|<argumenty>| <ciało>
+```
+
+Argumenty lambdy mogą być zadeklarowane jako `val` lub `var`. Przykład:
+```kotlin
+var g = |var x: Integer| x + 1;
+```
+
+Tak samo jak w przypadku funkcji argument lambdy może być zadeklarowany jako `new`. Przykład:
+```kotlin
+var g = |new x: Integer| x + 1;
+```
+
+Typowanie zmiennych funkcyjnych jest dosyć proste. Przykład:
+```kotlin
+var g: (var Integer) -> Integer = |var x: Integer| x + 1;
+
+var x = 10;
+g(x); // zwróci 11
+```
+Funkcja przyjmuje zmienną `Integer` i zwraca `Integer`.
+Zmienna przyjęta w funkcji `g` jest zmienną lokalną dla lambdy.
+Jest ona modyfikowalną referencją do zmiennej przekazanej do lambdy.
+
+Tutaj lambda przyjmuje dwa argumenty, z czego jeden jest kopią 
+(`$` jest odpowiednikiem `new` w typach lambd).
+```kotlin
+fun foo(
+    val f: new (var Integer, var$Integer) -> Unit, 
+    var x: Integer, 
+    var y: new Integer
+): Unit {make
+    f(x, y);
+}
+
+var x = 10;
+var y = 20;
+foo(|var x: Integer, var y: new Integer| {
+    val temp = x;
+    x = y;
+    y = temp;
+}, x, y);
+
+assert(x == 20);
+assert(y == 20); // y jest kopią, więc nie zmieni się
+```
+
+Jak widać na przykładzie powyżej, lambdy mogą mieć dwa rodzaje ciała:
+- wyrażeniowe
+- blokowe
+
+Wyrażeniowe lambdy zwracają wartość ostatniego wyrażenia. Przykład:
+```kotlin
+var g = |var x: Integer| x + 1;
+```
+
+Blokowe lambdy zwracają wartość wskazaną przez instrukcję `return`. Przykład:
+```kotlin
+var g = |var x: Integer| {
+    return x + 1;
+};
 ```
 
 
