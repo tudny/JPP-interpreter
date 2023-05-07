@@ -28,6 +28,9 @@ SRCS =\
 
 # Default goal.
 
+interpreter: Interpreter
+	cp Interpreter interpreter
+
 all : Interpreter Test TypeCheckerTest Makefile
 
 

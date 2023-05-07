@@ -354,10 +354,18 @@ Wszystkie testy można uruchomić za pomocą skryptu `./check_examples.sh`, kt�
 
 
 ### Wymagania i kompilacja
+
+Wersja kompilatora:
 ```
 ➜ ghc --version
 The Glorious Glasgow Haskell Compilation System, version 8.10.7
 ```
+
+Kompilacja:
+```
+make
+```
+Zostanie wygenerowany plik `Interpreter` oraz `interpreter`.
 
 
 ## Tabelka deklaracji
