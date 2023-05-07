@@ -66,14 +66,11 @@ toString(Integer) : String
 // zamienia zmienną typu `String` na `Integer`
 toInt(String) : Integer
 
-// przechodzi o jeden krok w generatorze i zwraca wartość
-//  rzuca wyjątek w przypadku przejścia przez całe generator
-next(Gen[Integer]) : Integer
-next(Gen[Boolean]) : Boolean
-next(Gen[String]) : String
+// sprawdza warunek i w przypadku jego nie spełnienia wywłaszcza program
+assert(Boolean) : Unit
 
-// sprawdza czy generator ma następny krok
-hasNext(Gen[T]) : Boolean
+// zamyka program z kodem błędu podanym w argumencie
+exit(Integer) : Unit
 ```
 
 ### Instrukcje warunkowe, pętle, break, continue, while-finally
@@ -201,58 +198,35 @@ Typy zostaną sprawdzone przed wykonaniem programu. Błędy typów to na przykł
   - `var x: Integer = 10; x = x + y;`
 
 W trakcie wykonania programu mogą wystąpić błędy wykonania. Błędy wykonania to na przykład:
-- dzielenie przez 0
+- dzielenie przez 0 (przy czym dzielenie przez literał 0 jest sprawdzane podczas typowania)
 
-### Generatory
-Generatory są dodatkowym typem danych. Nie można na nim wykonywać żadnych operacji, nie można go kopiować,
-przekazywać do funkcji. Generator można utworzyć tylko poprzez odpowiednio zdefiniowaną funkcję.
-Na przykład generator liczb całkowitych:
+### ~~Generatory~~
+
+Zdecydowałem się nie pisać generatorów. Zamiast tego powstały lambdy.
+
+### Lambdy i przekazywanie funkcji jako argumentów
+
+Lambdy są anonimowymi funkcjami. Przykład:
 ```kotlin
-fun range(val start: Integer, val end: Integer) : Gen[Integer] {
-    var x: Integer = start;
-    while x <= end {
-        yield x;
-        x = x + 1;
-    }
-}
+var g: (var String) -> String = |var x: String| "World";
+
+g("Hello"); // zwróci "World"
 ```
-Generator jest typu `Gen[T]`, gdzie `T` to typ zwracany przez generator.
-Generator jest funkcją, która wykonuje się aż do momentu, w którym wywołana zostanie funkcja `yield e`.
-Ponowane wywołania generatora rozpoczyna się od miejsca ostatniego zakończenia. 
-Any sprawdzić czy generator się zakończyć (t.j. doszedł do końca bloku i nie ma więcej wywołań `yield`),
-można użyć funkcji `hasNext(g)`, gdzie `g` to generator. Z kolei aby wywołać generator należy użyć funkcji `next(g)`.
-Gdy generator dojdzie do końca, to kolejne wywołania `next(g)` będą domyślną wartość danego typu.
-Na przykład:
+
+Lambdy mogą być przekazywane jako argumenty do funkcji. Przykład:
 ```kotlin
-fun two_stpes() : Gen[Integer] {
-    yield 1;
-    yield 2;
+fun foo(val x: new Integer, val f: (val$Integer) -> Integer) : Integer {
+    return f(x);
 }
 
-fun main() : Unit {
-    var g: Gen[Integer] = two_steps();
-    while hasNext(g) {
-        writeInt(next(g));
-    } // wyświetli 1, 2, 0
-    // has next sprawdzi tylko czy generator się zakończył
+fun bar(val x: new Integer) : Integer {
+    return x + 1;
 }
-// lub
-fun main() : Unit {
-    for x in two_steps() {
-        writeInt(x);
-    } // wyświetli 1, 2
-    // for sprawdzi czy generator się zakończył.
-    // W przeciwieństwie do ręcznego sprawdzenia hasNext,
-    // for nie wywoła next, jeśli generator się zakończył.
-    // nie potrafimy tego zrobić ręcznie, ponieważ
-    // nie wiemy kiedy zakończy się generator.
-    // W przypadku generatora `two_steps` najpierw zwróci on 1, potem 2, 
-    // a potem będzie zwracał domyślną wartość dla typu Integer, czyli 0.
-    // Nie wiemy jednak, że dany `yield` był ostatnio dopóki generator nie dojdzie 
-    // do końca. Gdy to zrobi możemy zignorować ostatnią wartość `next(g)`.
-    // For robi to za nas. While nie. 
-}
+
+val res = foo(10, bar); // zwróci 11
+assert(res == 11);
 ```
+
 
 ### Dołączone pliki
 Dodatkowe przykłady pozostają w katalogu `Lang/Examples/`.
@@ -292,8 +266,22 @@ main();
 
 ```
 
+### Testowanie
+
+Wszystkie testy można uruchomić za pomocą skryptu `./check_examples.sh`, który:
+- kompiluje Interpreter poleceniem `make Interpreter`
+- Uruchamia Interpreter na wszystkich plikach w katalogu `Lang/Examples/`
+- Uruchamia Interpreter na wszystkich plikach w katalogu `good/`
+- Uruchamia Interpreter na wszystkich plikach w katalogu `bad/` i sprawdza czy zwrócił błąd
+- Kompiluje testy type checker'a poleceniem `make TypeCheckerTest`
+- Uruchamia testy type checker'a poleceniem `./TypeCheckerTest`
 
 
+### Wymagania i kompilacja
+```
+➜ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 8.10.7
+```
 
 
 ## Tabelka deklaracji
@@ -315,7 +303,8 @@ main();
   12 (4) (statyczne typowanie)
   13 (2) (funkcje zagnieżdżone ze statycznym wiązaniem)
   16 (1) (break, continue)
-  18 (3) (generatory)
+  17 (4) (funkcje wyższego rzędu, anonimowe, domknięcia)
+  ~~18 (3) (generatory)~~
 
-Razem: 30
+Razem: min(30, \sigma = 31) = 30
 ```
