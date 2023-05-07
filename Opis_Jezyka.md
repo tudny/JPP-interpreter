@@ -367,6 +367,12 @@ make
 ```
 Zostanie wygenerowany plik `Interpreter` oraz `interpreter`.
 
+Poniższe polecenie uruchamia `check_examples.sh`:
+```
+make test
+```
+
+
 
 ## Tabelka deklaracji
 ```txt
