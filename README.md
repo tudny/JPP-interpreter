@@ -271,7 +271,7 @@ fun foo(
     val f: new (var Integer, var$Integer) -> Unit, 
     var x: Integer, 
     var y: new Integer
-): Unit {make
+): Unit {
     f(x, y);
 }
 
