@@ -330,6 +330,12 @@ evalB (IBlock _ is) = evalIs is
 
 
 
+doDivLikeOp :: (Int -> Int -> Int) -> BNFC'Position -> Int -> Int -> IM Value
+doDivLikeOp op pos n1 n2 = if n2 == 0 then throwError $ RuntimeError pos ZeroDiv
+    else pure $ VTInt $ op n1 n2
+
+
+
 evalE :: Expr -> IM Value
 
 evalE (EVarName pos v) = getVarValue pos v
@@ -349,8 +355,8 @@ evalE (EMul _ e1 op e2) = do
     (VTInt n2) <- evalE e2
     case op of
         OMul _ -> pure (VTInt $ n1 * n2)
-        ODiv _ -> pure (VTInt $ n1 `div` n2)
-        OMod _ -> pure (VTInt $ n1 `mod` n2)
+        ODiv pos -> doDivLikeOp div pos n1 n2
+        OMod pos -> doDivLikeOp mod pos n1 n2
 evalE (ESum pos e1 op e2) = do
     v1 <- evalE e1
     v2 <- evalE e2
