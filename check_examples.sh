@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This is a test script.
+
 make Interpreter > /dev/null 2>&1
 
 for file in Lang/Examples/*.jbb; do
