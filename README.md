@@ -250,7 +250,7 @@ var g = |var x: Integer| x + 1;
 
 Tak samo jak w przypadku funkcji argument lambdy może być zadeklarowany jako `new`. Przykład:
 ```kotlin
-var g = |new x: Integer| x + 1;
+var g = |val x: new Integer| x + 1;
 ```
 
 Typowanie zmiennych funkcyjnych jest dosyć proste. Przykład:
